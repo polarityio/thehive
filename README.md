@@ -10,6 +10,15 @@ Check out the integration in action:
 
 ![thehive](https://user-images.githubusercontent.com/22529325/56053166-5c93ba00-5d21-11e9-96a6-ea2b02ace95a.gif)
 
+## TheHive Integration Options
+
+### TheHive Host
+The host of your TheHive instance
+
+### TheHive API Key
+
+TheHive API key
+
 ## Installation Instructions
 
 Installation instructions for integrations are provided on the [PolarityIO GitHub Page](https://polarityio.github.io/).
