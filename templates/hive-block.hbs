@@ -1,0 +1,86 @@
+<div class="p-non-exfoliate-outer-padding">
+{{#each details as |object|}}
+  {{#if object.id}}
+
+  <div>
+    <a href="{{block.userOptions.url}}/index.html#/case/{{object._parent}}/details" class="p-link">(Pivot To Case Details)</a>
+  </div>
+  
+  <h1 class="p-title">
+      {{fa-icon "eye" fixedWidth=true}}  Observable Information
+  </h1>
+
+
+  {{#if (eq object.tlp 0)}}
+      <div>
+          <span class="p-key">TLP: </span>
+          <span class="p-value">WHITE</span>
+      </div>
+  {{/if}}
+  {{#if (eq object.tlp 1)}}
+      <div>
+          <span class="p-key">TLP: </span>
+          <span class="p-value" style="color:green">GREEN</span>
+      </div>
+  {{/if}}
+  {{#if (eq object.tlp 2)}}
+      <div>
+          <span class="p-key">TLP: </span>
+          <span class="p-value" style="color:orange">AMBER</span>
+      </div>
+  {{/if}}
+  {{#if (eq object.tlp 3)}}
+      <div>
+          <span class="p-key">TLP: </span>
+          <span class="p-value" style="color:red">RED</span>
+      </div>
+  {{/if}}
+  <div>
+      <span class="p-key">Case Ceated Date </span>
+      <span class="p-value">{{moment-time object.createdAt}}</span>
+  </div>
+
+  <div>
+      <span class="p-key">Case Start Date </span>
+      <span class="p-value">{{moment-time object.startDate}}</span>
+  </div>
+
+  <div>
+      <span class="p-key">Observable Message: </span>
+      <span class="p-value">{{object.message}}</span>
+  </div>
+  <div>
+      <span class="p-key">Observable Type: </span>
+      <span class="p-value">{{object.dataType}}</span>
+  </div>
+  <div>
+      <span class="p-key">Created By: </span>
+      <span class="p-value">{{object.createdBy}}</span>
+  </div>
+  <div>
+      <span class="p-key">Is IOC? </span>
+      <span class="p-value">{{object.ioc}}</span>
+  </div>
+  <div>
+      <span class="p-key">Observable Sighted? </span>
+      <span class="p-value">{{object.sighted}}</span>
+  </div>
+
+  <div>
+      <span class="p-key">Hive Type? </span>
+      <span class="p-value">{{object._type}}</span>
+  </div>
+
+  <div class="p-title">
+    {{fa-icon "tag" fixedWidth=true}}  Tags
+</div>
+    <div class="tags">
+      {{#each  object.tags as |tag|}}
+      <span class="pulse-tag">{{tag}}</span>
+      {{/each}}
+    </div>
+<hr>
+  {{/if}}
+
+{{/each}}
+</div>
