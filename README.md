@@ -6,8 +6,9 @@ The Polarity TheHive integration allows Polarity to search TheHive's Search API 
 
 For more information on TheHive, please visit [official website](https://thehive-project.org/).
 
-Check out the integration in action: 
+Check out the integration in action:
 
+![thehive](https://user-images.githubusercontent.com/22529325/56053166-5c93ba00-5d21-11e9-96a6-ea2b02ace95a.gif)
 
 ## Installation Instructions
 
