@@ -6,8 +6,30 @@ The Polarity TheHive integration allows Polarity to search TheHive's Search API 
 
 For more information on TheHive, please visit [official website](https://thehive-project.org/).
 
-Check out the integration in action: 
+Check out the integration in action:
 
+![thehive](https://user-images.githubusercontent.com/22529325/56053166-5c93ba00-5d21-11e9-96a6-ea2b02ace95a.gif)
+
+## TheHive Integration Options
+
+### TheHive Host
+The host of your TheHive instance
+
+### TheHive API Key
+
+TheHive API key
+
+### Domain and IP Blacklist
+
+This is an alternate option that can be used to specify domains or IPs that you do not want sent to TheHive.  The data must specify the entire IP or domain to be blocked (e.g., www.google.com is treated differently than google.com).
+
+### Domain Blacklist Regex
+
+This option allows you to specify a regex to blacklist domains.  Any domain matching the regex will not be looked up.  If the regex is left blank then no domains will be blacklisted.
+
+### IP Blacklist Regex
+
+This option allows you to specify a regex to blacklist IPv4 Addresses.  Any IPv4 matching the regex will not be looked up.  If the regex is left blank then no IPv4s will be blacklisted.
 
 ## Installation Instructions
 
