@@ -31,7 +31,7 @@ module.exports = {
      * @type Array
      * @optional
      */
-    "styles": [
+    styles: [
         "./styles/hive.less",
     ],
     /**
@@ -87,53 +87,53 @@ module.exports = {
      * @type Array
      * @optional
      */
-    "options": [
+    options: [
         {
-            "key": "url",
-            "name": "TheHive URL",
-            "description": "The URL path to TheHive instance - i.e. http://<host>:9000",
-            "default": "",
-            "type": "text",
-            "userCanEdit": false,
-            "adminOnly": true
+            key: "url",
+            name: "TheHive URL",
+            description: "The URL path to TheHive instance - i.e. http://<host>:9000",
+            default: "",
+            type: "text",
+            userCanEdit: false,
+            adminOnly: true
         },
         {
-            "key": "apiKey",
-            "name": "API Key",
-            "description": "TheHive API Key",
-            "default": "",
-            "type": "password",
-            "userCanEdit": true,
-            "adminOnly": false
+            key: "apiKey",
+            name: "API Key",
+            description: "TheHive API Key",
+            default: "",
+            type: "password",
+            userCanEdit: true,
+            adminOnly: false
         },
-    {
-      "key": 'blacklist',
-      "name": 'Blacklist Domains and IPs',
-      "description": 'List of domains and IPs that you never want to send to TheHive',
-      "default": '',
-      "type": 'text',
-      "userCanEdit": false,
-      "adminOnly": false
-    },
-    {
-      "key": 'domainBlacklistRegex',
-      "name": 'Domain Black List Regex',
-      "description":
-        'Domains that match the given regex will not be looked up (if blank, no domains will be black listed)',
-      "default": '',
-      "type": 'text',
-      "userCanEdit": false,
-      "adminOnly": false
-    },
-    {
-      "key": 'ipBlacklistRegex',
-      "name": 'IP Black List Regex',
-      "description":
-        'IPs that match the given regex will not be looked up (if blank, no IPs will be black listed)',
-      "default": '',
-      "type": 'text',
-      "userCanEdit": false,
-      "adminOnly": false
-    }
+        {
+            key: 'blacklist',
+            name: 'Blacklist Domains and IPs',
+            description: 'List of domains and IPs that you never want to send to TheHive',
+            default: '',
+            type: 'text',
+            userCanEdit: false,
+            adminOnly: false
+        },
+        {
+            key: 'domainBlacklistRegex',
+            name: 'Domain Black List Regex',
+            description:
+                'Domains that match the given regex will not be looked up (if blank, no domains will be black listed)',
+            default: '',
+            type: 'text',
+            userCanEdit: false,
+            adminOnly: false
+        },
+        {
+            key: 'ipBlacklistRegex',
+            name: 'IP Black List Regex',
+            description:
+                'IPs that match the given regex will not be looked up (if blank, no IPs will be black listed)',
+            default: '',
+            type: 'text',
+            userCanEdit: false,
+            adminOnly: false
+        }
     ]
 };
