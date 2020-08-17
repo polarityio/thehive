@@ -107,8 +107,8 @@ module.exports = {
             adminOnly: false
         },
         {
-            key: 'blacklist',
-            name: 'Blacklist Domains and IPs',
+            key: 'blocklist',
+            name: 'Ignored List',
             description: 'List of domains and IPs that you never want to send to TheHive',
             default: '',
             type: 'text',
@@ -116,20 +116,20 @@ module.exports = {
             adminOnly: false
         },
         {
-            key: 'domainBlacklistRegex',
-            name: 'Domain Black List Regex',
+            key: 'domainBlocklistRegex',
+            name: 'Ignore Domain Regex',
             description:
-                'Domains that match the given regex will not be looked up (if blank, no domains will be black listed)',
+                'Domains that match the given regex will not be looked up (if blank, no domains will be ignored)',
             default: '',
             type: 'text',
             userCanEdit: false,
             adminOnly: false
         },
         {
-            key: 'ipBlacklistRegex',
-            name: 'IP Black List Regex',
+            key: 'ipBlocklistRegex',
+            name: 'Ignore IP Regex',
             description:
-                'IPs that match the given regex will not be looked up (if blank, no IPs will be black listed)',
+                'IPs that match the given regex will not be looked up (if blank, no IPs will be ignored)',
             default: '',
             type: 'text',
             userCanEdit: false,
