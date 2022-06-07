@@ -1,86 +1,187 @@
-<div class="p-non-exfoliate-outer-padding">
-{{#each details as |object|}}
-  {{#if object.id}}
+<ul class='nav nav-tabs'>
+  <li class='nav-item'>
+    <a
+      {{action 'changeTab' 'cases'}}
+      class='nav-link {{if (or (eq changeTab "cases") (not changeTab)) "active"}}'
+      href='#'
+    >
+      Cases
+    </a>
+  </li>
 
-  <div>
-    <a href="{{block.userOptions.url}}/index.html#/case/{{object._parent}}/details" class="p-link">(Pivot To Case Details)</a>
-  </div>
-  
-  <h1 class="p-title">
-      {{fa-icon "eye" fixedWidth=true}}  Observable Information
-  </h1>
+  <li class='nav-item'>
+    <a
+      {{action 'changeTab' 'create'}}
+      class='nav-link {{if (or (eq changeTab "create") (not changeTab)) "active"}}'
+      href='#'
+    >
+      Create
+    </a>
+  </li>
+</ul>
 
+{{#if (eq changeTab 'cases')}}
+  <div class='p-non-exfoliate-outer-padding'>
+    {{#each details as |object|}}
+      {{#if object.id}}
+        <div>
+          <a href='{{block.userOptions.url}}/index.html#/case/{{object._parent}}/details' class='p-link'>(Pivot To Case
+            Details)</a>
+        </div>
 
-  {{#if (eq object.tlp 0)}}
-      <div>
-          <span class="p-key">TLP: </span>
-          <span class="p-value">WHITE</span>
-      </div>
-  {{/if}}
-  {{#if (eq object.tlp 1)}}
-      <div>
-          <span class="p-key">TLP: </span>
-          <span class="p-value" style="color:green">GREEN</span>
-      </div>
-  {{/if}}
-  {{#if (eq object.tlp 2)}}
-      <div>
-          <span class="p-key">TLP: </span>
-          <span class="p-value" style="color:orange">AMBER</span>
-      </div>
-  {{/if}}
-  {{#if (eq object.tlp 3)}}
-      <div>
-          <span class="p-key">TLP: </span>
-          <span class="p-value" style="color:red">RED</span>
-      </div>
-  {{/if}}
-  <div>
-      <span class="p-key">Case Ceated Date </span>
-      <span class="p-value">{{moment-time object.createdAt}}</span>
-  </div>
+        <h1 class='p-title'>
+          {{fa-icon 'eye' fixedWidth=true}}
+          Observable Information
+        </h1>
 
-  <div>
-      <span class="p-key">Case Start Date </span>
-      <span class="p-value">{{moment-time object.startDate}}</span>
-  </div>
+        {{#if (eq object.tlp 0)}}
+          <div>
+            <span class='p-key'>TLP: </span>
+            <span class='p-value'>WHITE</span>
+          </div>
+        {{/if}}
+        {{#if (eq object.tlp 1)}}
+          <div>
+            <span class='p-key'>TLP: </span>
+            <span class='p-value' style='color:green'>GREEN</span>
+          </div>
+        {{/if}}
+        {{#if (eq object.tlp 2)}}
+          <div>
+            <span class='p-key'>TLP: </span>
+            <span class='p-value' style='color:orange'>AMBER</span>
+          </div>
+        {{/if}}
+        {{#if (eq object.tlp 3)}}
+          <div>
+            <span class='p-key'>TLP: </span>
+            <span class='p-value' style='color:red'>RED</span>
+          </div>
+        {{/if}}
+        <div>
+          <span class='p-key'>Case Ceated Date </span>
+          <span class='p-value'>{{moment-time object.createdAt}}</span>
+        </div>
 
-  <div>
-      <span class="p-key">Observable Message: </span>
-      <span class="p-value">{{object.message}}</span>
-  </div>
-  <div>
-      <span class="p-key">Observable Type: </span>
-      <span class="p-value">{{object.dataType}}</span>
-  </div>
-  <div>
-      <span class="p-key">Created By: </span>
-      <span class="p-value">{{object.createdBy}}</span>
-  </div>
-  <div>
-      <span class="p-key">Is IOC? </span>
-      <span class="p-value">{{object.ioc}}</span>
-  </div>
-  <div>
-      <span class="p-key">Observable Sighted? </span>
-      <span class="p-value">{{object.sighted}}</span>
-  </div>
+        <div>
+          <span class='p-key'>Case Start Date </span>
+          <span class='p-value'>{{moment-time object.startDate}}</span>
+        </div>
 
-  <div>
-      <span class="p-key">Hive Type? </span>
-      <span class="p-value">{{object._type}}</span>
-  </div>
+        <div>
+          <span class='p-key'>Observable Message: </span>
+          <span class='p-value'>{{object.message}}</span>
+        </div>
+        <div>
+          <span class='p-key'>Observable Type: </span>
+          <span class='p-value'>{{object.dataType}}</span>
+        </div>
+        <div>
+          <span class='p-key'>Created By: </span>
+          <span class='p-value'>{{object.createdBy}}</span>
+        </div>
+        <div>
+          <span class='p-key'>Is IOC? </span>
+          <span class='p-value'>{{object.ioc}}</span>
+        </div>
+        <div>
+          <span class='p-key'>Observable Sighted? </span>
+          <span class='p-value'>{{object.sighted}}</span>
+        </div>
 
-  <div class="p-title">
-    {{fa-icon "tag" fixedWidth=true}}  Tags
-</div>
-    <div class="tags">
-      {{#each  object.tags as |tag|}}
-      <span class="pulse-tag">{{tag}}</span>
-      {{/each}}
+        <div>
+          <span class='p-key'>Hive Type? </span>
+          <span class='p-value'>{{object._type}}</span>
+        </div>
+
+        <div class='p-title'>
+          {{fa-icon 'tag' fixedWidth=true}}
+          Tags
+        </div>
+        <div class='tags'>
+          {{#each object.tags as |tag|}}
+            <span class='pulse-tag'>{{tag}}</span>
+          {{/each}}
+        </div>
+
+      {{/if}}
+    {{/each}}
+  </div>
+{{/if}}
+
+{{#if (eq changeTab 'create')}}
+  <form class='case-creation-form' {{action 'submit' on='submit'}}>
+    <table class='case-inputs'>
+      <tr>
+        <td> <label for='title'>Title: </label></td>
+        <td>{{input value=titleInput placeholder='Title'}}</td>
+      </tr>
+
+      <tr>
+        <td> <label for='severity'>Severity: </label></td>
+        <div class='severity-options'>
+          <button style='background-color: {{lowSeverity}}' {{action 'selectSeverity' 'low' 'severity' '#5cb85c'}}>
+            L
+          </button>
+          <button
+            style='background-color: {{mediumSeverity}}'
+            {{action 'selectSeverity' 'medium' 'severity' '#5bc0de'}}
+          >
+            M
+          </button>
+          <button style='background-color: {{highSeverity}}' {{action 'selectSeverity' 'high' 'severity' '#f0ad4e'}}>
+            H
+          </button>
+          <button
+            style='background-color: {{criticalSeverity}}'
+            {{action 'selectSeverity' 'critical' 'severity' '#d9534f'}}
+          >
+            !!
+          </button>
+        </div>
+      </tr>
+
+      <tr>
+        <td> <label for='tlp'>TLP: </label></td>
+        <div class='severity-options'>
+          <button style='background-color: {{whiteTlp}}' {{action 'selectSeverity' 'white' 'tlp' '#5bc0de'}}>
+            WHITE
+          </button>
+          <button style='background-color: {{greenTlp}}' {{action 'selectSeverity' 'green' 'tlp' '#5cb85c'}}>
+            GREEN
+          </button>
+          <button style='background-color: {{amberTlp}}' {{action 'selectSeverity' 'amber' 'tlp' '#f0ad4e'}}>
+            AMBER
+          </button>
+          <button style='background-color: {{redTlp}}' {{action 'selectSeverity' 'red' 'tlp' '#d9534f'}}>
+            RED
+          </button>
+        </div>
+      </tr>
+
+      <tr>
+        <td> <label for='tlp'>PAP: </label></td>
+        <div class='severity-options'>
+          <button style='background-color: {{whitePap}}' {{action 'selectSeverity' 'white' 'pap' '#5bc0de'}}>
+            WHITE
+          </button>
+          <button style='background-color: {{greenPap}}' {{action 'selectSeverity' 'green' 'pap' '#5cb85c'}}>
+            GREEN
+          </button>
+          <button style='background-color: {{amberPap}}' {{action 'selectSeverity' 'amber' 'pap' '#f0ad4e'}}>
+            AMBER
+          </button>
+          <button style='background-color: {{redPap}}' {{action 'selectSeverity' 'red' 'pap' '#d9534f'}}>
+            RED
+          </button>
+        </div>
+      </tr>
+    </table>
+
+    <div class='case-description'>
+      {{textarea value=descriptionInput cols='30' rows='4' placeholder='Case Description'}}
     </div>
-<hr>
-  {{/if}}
 
-{{/each}}
-</div>
+    <button class='create-case-btn' type='submit'>Create Case</button>
+  </form>
+{{/if}}
