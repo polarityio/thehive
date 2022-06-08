@@ -120,21 +120,27 @@
       <tr>
         <td> <label for='severity'>Severity: </label></td>
         <div class='severity-options'>
-          <button style='background-color: {{lowSeverity}}' {{action 'selectSeverity' 'low' 'severity' '#5cb85c'}}>
+          <button
+            style='background-color: {{lowSeverity}}'
+            {{action 'getSeverityInputAndSeverityColor' 'low' '#5cb85c'}}
+          >
             L
           </button>
           <button
             style='background-color: {{mediumSeverity}}'
-            {{action 'selectSeverity' 'medium' 'severity' '#5bc0de'}}
+            {{action 'getSeverityInputAndSeverityColor' 'medium' '#5bc0de'}}
           >
             M
           </button>
-          <button style='background-color: {{highSeverity}}' {{action 'selectSeverity' 'high' 'severity' '#f0ad4e'}}>
+          <button
+            style='background-color: {{highSeverity}}'
+            {{action 'getSeverityInputAndSeverityColor' 'high' '#f0ad4e'}}
+          >
             H
           </button>
           <button
             style='background-color: {{criticalSeverity}}'
-            {{action 'selectSeverity' 'critical' 'severity' '#d9534f'}}
+            {{action 'getSeverityInputAndSeverityColor' 'critical' '#d9534f'}}
           >
             !!
           </button>
@@ -144,16 +150,16 @@
       <tr>
         <td> <label for='tlp'>TLP: </label></td>
         <div class='severity-options'>
-          <button style='background-color: {{whiteTlp}}' {{action 'selectSeverity' 'white' 'tlp' '#5bc0de'}}>
+          <button style='background-color: {{whiteTlp}}' {{action 'getTlpInputAndToggleColor' 'white' '#5bc0de'}}>
             WHITE
           </button>
-          <button style='background-color: {{greenTlp}}' {{action 'selectSeverity' 'green' 'tlp' '#5cb85c'}}>
+          <button style='background-color: {{greenTlp}}' {{action 'getTlpInputAndToggleColor' 'green' '#5cb85c'}}>
             GREEN
           </button>
-          <button style='background-color: {{amberTlp}}' {{action 'selectSeverity' 'amber' 'tlp' '#f0ad4e'}}>
+          <button style='background-color: {{amberTlp}}' {{action 'getTlpInputAndToggleColor' 'amber' '#f0ad4e'}}>
             AMBER
           </button>
-          <button style='background-color: {{redTlp}}' {{action 'selectSeverity' 'red' 'tlp' '#d9534f'}}>
+          <button style='background-color: {{redTlp}}' {{action 'getTlpInputAndToggleColor' 'red' '#d9534f'}}>
             RED
           </button>
         </div>
@@ -162,16 +168,16 @@
       <tr>
         <td> <label for='tlp'>PAP: </label></td>
         <div class='severity-options'>
-          <button style='background-color: {{whitePap}}' {{action 'selectSeverity' 'white' 'pap' '#5bc0de'}}>
+          <button style='background-color: {{whitePap}}' {{action 'getPapInputAndToggleColor' 'white' '#5bc0de'}}>
             WHITE
           </button>
-          <button style='background-color: {{greenPap}}' {{action 'selectSeverity' 'green' 'pap' '#5cb85c'}}>
+          <button style='background-color: {{greenPap}}' {{action 'getPapInputAndToggleColor' 'green' '#5cb85c'}}>
             GREEN
           </button>
-          <button style='background-color: {{amberPap}}' {{action 'selectSeverity' 'amber' 'pap' '#f0ad4e'}}>
+          <button style='background-color: {{amberPap}}' {{action 'getPapInputAndToggleColor' 'amber' '#f0ad4e'}}>
             AMBER
           </button>
-          <button style='background-color: {{redPap}}' {{action 'selectSeverity' 'red' 'pap' '#d9534f'}}>
+          <button style='background-color: {{redPap}}' {{action 'getPapInputAndToggleColor' 'red' '#d9534f'}}>
             RED
           </button>
         </div>

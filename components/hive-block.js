@@ -36,7 +36,6 @@ polarity.export = PolarityComponent.extend({
       };
 
       console.log(severity, title, description);
-
       this.sendIntegrationMessage({
         action: 'createCase',
         data: { caseInputs }
@@ -51,49 +50,36 @@ polarity.export = PolarityComponent.extend({
           this.set('details.errorMessage', JSON.stringify(err, null));
         });
     },
-    selectSeverity: function (value, type, color) {
-      if (type === 'severity') {
-        this.toggleSeverityColor(value, color);
-        this.set('severityInput', value);
-      }
-      if (type === 'tlp') {
-        this.toggleTlpColor(value, color);
-        this.set('tlpInput', value);
-      }
-      if (type === 'pap') {
-        this.togglePapColor(value, color);
-        this.set('papInput', value);
-      }
+    getSeverityInputAndSeverityColor: function (severityLevel, color) {
+      this.set('severityInput', severityLevel);
+      this.set(`${severityLevel}Severity`, color);
+
+      ['low', 'medium', 'high', 'critical'].forEach((level) => {
+        if (level !== severityLevel) {
+          this.set(`${level}Severity`, '');
+        }
+      });
+    },
+    getTlpInputAndToggleColor: function (tlpLevel, color) {
+      this.set('tlpInput', tlpLevel);
+      this.set(`${tlpLevel}Tlp`, color);
+
+      ['white', 'green', 'amber', 'red'].forEach((level) => {
+        if (level !== tlpLevel) {
+          this.set(`${level}Tlp`, '');
+        }
+      });
+    },
+    getPapInputAndToggleColor: function (papLevel, color) {
+      this.set('papInput', papLevel);
+      this.set(`${papLevel}Pap`, color);
+
+      ['white', 'green', 'amber', 'red'].forEach((level) => {
+        if (level !== papLevel) {
+          this.set(`${level}Pap`, '');
+        }
+      });
     }
-  },
-  toggleSeverityColor: function (severityLevel, color) {
-    this.set(`${severityLevel}Severity`, color);
-
-    ['low', 'medium', 'high', 'critical'].forEach((level) => {
-      if (level !== severityLevel) {
-        this.set(`${level}Severity`, '');
-      }
-    });
-  },
-  toggleTlpColor: function (tlpLevel, color) {
-    this.set(`${tlpLevel}Tlp`, color);
-
-    ['white', 'green', 'amber', 'red'].forEach((color) => {
-      if (color !== tlpLevel) {
-        console.log(`${color}Tlp`);
-        this.set(`${color}Tlp`, '');
-      }
-    });
-  },
-  togglePapColor: function (papLevel, color) {
-    this.set(`${papLevel}Pap`, color);
-
-    ['white', 'green', 'amber', 'red'].forEach((color) => {
-      if (color !== papLevel) {
-        console.log(`${color}Pap`);
-        this.set(`${color}Pap`, '');
-      }
-    });
   },
   setErrorMessages: function (index, prefix, message) {
     this.set(
