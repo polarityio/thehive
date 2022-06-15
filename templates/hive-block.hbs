@@ -1,23 +1,25 @@
 <ul class='nav nav-tabs'>
-  <li class='nav-item'>
-    <a
-      {{action 'changeTab' 'cases'}}
-      class='nav-link {{if (or (eq changeTab "cases") (not changeTab)) "active"}}'
-      href='#'
-    >
-      Cases
-    </a>
-  </li>
-
-  <li class='nav-item'>
-    <a
-      {{action 'changeTab' 'create'}}
-      class='nav-link {{if (or (eq changeTab "create") (not changeTab)) "active"}}'
-      href='#'
-    >
-      Create
-    </a>
-  </li>
+  {{#if details}}
+    <li class='nav-item'>
+      <a
+        {{action 'changeTab' 'cases'}}
+        class='nav-link {{if (or (eq changeTab "cases") (not changeTab)) "active"}}'
+        href='#'
+      >
+        Cases
+      </a>
+    </li>
+  {{else}}
+    <li class='nav-item'>
+      <a
+        {{action 'changeTab' 'create'}}
+        class='nav-link {{if (or (eq changeTab "create") (not changeTab)) "active"}}'
+        href='#'
+      >
+        Create Case
+      </a>
+    </li>
+  {{/if}}
 </ul>
 
 {{#if (eq changeTab 'cases')}}
@@ -110,37 +112,42 @@
 {{/if}}
 
 {{#if (eq changeTab 'create')}}
-  <form class='case-creation-form' {{action 'submit' on='submit'}}>
+  <div class='case-creation-form'>
     <table class='case-inputs'>
       <tr>
         <td> <label for='title'>Title: </label></td>
-        <td>{{input value=titleInput placeholder='Title'}}</td>
+        <div>{{input
+            class='case-title'
+            onclick=(action (mut titleInput value='target.value'))
+            value=titleInput
+            placeholder='Title'
+          }}</div>
       </tr>
 
       <tr>
         <td> <label for='severity'>Severity: </label></td>
         <div class='severity-options'>
           <button
-            style='background-color: {{lowSeverity}}'
-            {{action 'getSeverityInputAndSeverityColor' 'low' '#5cb85c'}}
+            style='background-color: {{whiteSeverity}}'
+            {{action 'getSeverityInputAndSeverityColor' 'white' '#5cb85c'}}
           >
             L
           </button>
           <button
-            style='background-color: {{mediumSeverity}}'
-            {{action 'getSeverityInputAndSeverityColor' 'medium' '#5bc0de'}}
+            style='background-color: {{greenSeverity}}'
+            {{action 'getSeverityInputAndSeverityColor' 'green' '#5bc0de'}}
           >
             M
           </button>
           <button
-            style='background-color: {{highSeverity}}'
-            {{action 'getSeverityInputAndSeverityColor' 'high' '#f0ad4e'}}
+            style='background-color: {{amberSeverity}}'
+            {{action 'getSeverityInputAndSeverityColor' 'amber' '#f0ad4e'}}
           >
             H
           </button>
           <button
-            style='background-color: {{criticalSeverity}}'
-            {{action 'getSeverityInputAndSeverityColor' 'critical' '#d9534f'}}
+            style='background-color: {{redSeverity}}'
+            {{action 'getSeverityInputAndSeverityColor' 'red' '#d9534f'}}
           >
             !!
           </button>
@@ -184,10 +191,48 @@
       </tr>
     </table>
 
-    <div class='case-description'>
-      {{textarea value=descriptionInput cols='30' rows='4' placeholder='Case Description'}}
+    <div>
+      {{textarea
+        class='case-description'
+        onchange=(action (mut descriptionInput value='target.value'))
+        value=descriptionInput
+        cols='30'
+        rows='4'
+        placeholder='Case Description'
+      }}
     </div>
 
-    <button class='create-case-btn' type='submit'>Create Case</button>
-  </form>
+    <button class='create-case-btn' type='button' {{action 'submit'}}>
+      {{#if isRunning}}
+        {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
+      {{/if}}
+      Create Case
+    </button>
+    {{#if caseCreated}}
+      <span class='highlight alert alert-info mt-1'>
+        Case Created!
+      </span>
+    {{/if}}
+    <button class='add-observable-btn' disabled={{enableAddObservable}} {{action 'toggleShowModal'}}>Add Observable</button>
+
+    {{#if modalOpen}}
+      <div class='containment-modal'>
+        <div class='modal-container'>
+          <div class='modal-text'>
+            <span>
+              Are you sure you want to
+              {{if (eq device.status 'contained') 'lift containment on' 'contain'}}
+              this host:
+              <span class='bold'>{{device.hostname}}</span>?
+            </span>
+          </div>
+          <div class='modal-options'>
+            <div>
+              <button {{action 'addObservable'}} class='modal-btn'>Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    {{/if}}
+  </div>
 {{/if}}

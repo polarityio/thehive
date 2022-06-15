@@ -154,6 +154,12 @@ const getApiData = async (entity, requestWithDefaults, options) => {
   }
 };
 
+// const createAndAddObservable = (caseId, requestWithDefaults, options) => {
+//   const query = ''
+//   const requestOptions = await buildRequestOptions()
+
+// };
+
 const getCases = async (entity, requestWithDefaults, options) => {
   const query = { query: { _string: entity.value } };
   Logger.trace({ QUERY: query });
@@ -165,16 +171,21 @@ const getCases = async (entity, requestWithDefaults, options) => {
 
   const response = await requestWithDefaults(requestOptions);
 
-  Logger.trace({ RESPONSE: response });
   return response;
 };
 
 const createCase = async (caseInputs, requestWithDefaults, options) => {
-  const query = caseInputs;
-  const requestOptions = await buildRequestOptions(query, '/api/case', options);
+  try {
+    const query = caseInputs;
 
-  const createdCase = await requestWithDefaults(requestOptions);
-  return createdCase;
+    const requestOptions = await buildRequestOptions(query, '/api/case', options);
+    const createdCase = await requestWithDefaults(requestOptions);
+    Logger.trace({ createCase });
+
+    return createdCase;
+  } catch (err) {
+    Logger.trace({ ERR: err });
+  }
   // should return a status to the front telling USEr case was created.
 };
 
@@ -182,13 +193,19 @@ const onMessage = async (payload, options, cb) => {
   const { caseInputs } = payload.data;
 
   switch (payload.action) {
-    case 'createCase': {
-      // should return a 201 to the front end
-      Logger.trace({ PAYLOAD: payload });
-      const createdCase = await createCase(caseInputs, requestWithDefaults, options);
-      Logger.trace({ CREATED_CASE: createdCase });
-      cb(null, createCase);
-    }
+    case 'createCase':
+      try {
+        const createdCase = await createCase(caseInputs, requestWithDefaults, options);
+        // check this, there is an inconsistent integration error:
+        // (Notif) <injected: #64> {"title":"Integration Error Message","detail":"[Detail Not Provided]","status":"500","meta":{"message":"Unexpected end of JSON input","stack":"SyntaxError: Unexpected end of JSON input\n    at parse (<anonymous>)\n    at b (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:4157:12)\n    at g (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:4155:128)\n    at invokeWithOnError (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3724:206)\n    at h.flush (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3716:74)\n    at flush (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3727:292)\n    at j._end (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3778:9)\n    at _boundAutorunEnd (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3736:605)"}}
+        Logger.trace({ CREATED_CASE: createdCase });
+        // going to return this mock data to prevent creating cases
+        return cb(null, JSON.stringify(createCase));
+        // return cb(null, data.CREATED_CASE);
+      } catch (err) {
+        Logger.trace({ ERR: err });
+      }
+      break;
     default:
       return;
   }
@@ -207,7 +224,6 @@ const emptyResponse = (entity) => ({
 });
 
 const polarityResponse = (entity, { body }) => {
-  Logger.trace({ IN_RESPONSE: body });
   return [
     {
       entity,
@@ -293,6 +309,13 @@ module.exports = {
 
 // Users creating cases around indicators:
 // - Users should also be able to create a case if one does not exist for an indicator - POST /api/case
+// ** IF THE INDICATOR DOES NOT EXIST:
+// ** A user searches using an indicator -> The Api responds with a status of 200 and an empty body ->
+// ** The UI should render "create" option, and the user should be able to create a case for the missed indicator
+// **
+// ** IF THE INDICATOR DOES EXIST:
+// ** Then the
+
 // - Users should be able to create a new case on an existing indicator.
 
 // ENTITIES:
@@ -397,3 +420,67 @@ module.exports = {
 //     cb(null, lookupResults);
 //   });
 // }
+
+const data = {
+  name: 'TheHive',
+  hostname: 'dev.polarity',
+  pid: 14487,
+  level: 10,
+  CREATED_CASE: {
+    statusCode: 201,
+    body: {
+      owner: 'admin',
+      severity: 2,
+      _routing: 'AYFFEH2X9IjF18k1tr8f',
+      flag: false,
+      customFields: {},
+      _type: 'case',
+      description: 'asdasdasdasd',
+      title: 'asdasd',
+      createdAt: 1654721117305,
+      _parent: null,
+      createdBy: 'admin',
+      caseId: 24,
+      tlp: 1,
+      metrics: {},
+      _id: 'AYFFEH2X9IjF18k1tr8f',
+      id: 'AYFFEH2X9IjF18k1tr8f',
+      _version: 1,
+      pap: 2,
+      startDate: 1654721117591,
+      status: 'Open'
+    },
+    headers: {
+      date: 'Wed, 08 Jun 2022 20:45:18 GMT',
+      connection: 'close',
+      'content-type': 'application/json',
+      'content-length': '370'
+    },
+    request: {
+      uri: {
+        protocol: 'http:',
+        slashes: true,
+        auth: null,
+        host: '54.226.8.208:9000',
+        port: '9000',
+        hostname: '54.226.8.208',
+        hash: null,
+        search: null,
+        query: null,
+        pathname: '/api/case',
+        path: '/api/case',
+        href: 'http://54.226.8.208:9000/api/case'
+      },
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer IWPcPkikfFlpkn8jiFD7x3s6OmfV2Wpi',
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'Content-Length': 71
+      }
+    }
+  },
+  msg: '',
+  time: '2022-06-08T20:45:18.760Z',
+  v: 0
+};

@@ -6,32 +6,45 @@ pre {
   margin-top: 5px;
 }
 
-.email-container { 
+.email-container {
   margin-top: 5px;
 }
 
 .pulse-tag {
-    background-color: #dedede;
-    border-radius: 4px;
-    margin-bottom: 2px;
-    padding: 3px;
-    display: inline-block;
-    padding-bottom: 3px;
+  background-color: #dedede;
+  border-radius: 4px;
+  margin-bottom: 2px;
+  padding: 3px;
+  display: inline-block;
+  padding-bottom: 3px;
 }
 
 .create-case-btn {
   background-color: #3c8dbc;
   border-color: #367fa9;
   border-radius: 3px;
-  color:white;
+  color: white;
   margin-top: 5px;
   font-weight: bold;
   font-size: 10px;
   height: 30px;
 }
 
+.create-case-btn button:hover {
+  border: 1px solid #0099cc;
+  background-color: #00aacc;
+  color: #ffffff;
+  padding: 5px 10px;
+}
+
 .case-description {
   width: 80%;
+  border: 1px solid #dedede;
+}
+
+.title {
+  width: 80%;
+  border: 1px solid #dedede;
 }
 
 .severity-options button {
@@ -40,8 +53,127 @@ pre {
   border-radius: 3px;
   background-color: #d2d6de;
   box-shadow: 5px 10px;
-  font-size: 8px
+  font-size: 8px;
 }
+
+.add-observable-btn {
+  background-color: #3c8dbc;
+  border-color: #367fa9;
+  border-radius: 3px;
+  color: white;
+  margin-top: 5px;
+  font-weight: bold;
+  font-size: 10px;
+  height: 30px;
+}
+
+.add-observable-btn button:disabled,
+button[disabled] {
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+  border-radius: 3px;
+  margin-top: 5px;
+  font-weight: bold;
+  font-size: 10px;
+  height: 30px;
+}
+
+.containment-modal {
+  position: absolute;
+  z-index: 9999;
+  bottom: 16px;
+  right: 0;
+  background-color: white;
+  box-shadow: rgba(0, 0, 0, 0.5) 0px 0.5rem 2rem;
+  border-radius: 6px;
+  margin-right: 10%;
+  margin-left: 17%;
+  border: 1px solid white;
+
+  & .modal-container {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    max-width: 200px;
+
+    .modal-text {
+      display: flex;
+      width: 170px;
+      font-size: 14px;
+      font-weight: 500px;
+      line-height: 17px;
+    }
+
+    .modal-options {
+      display: flex;
+      justify-content: center;
+      & > * {
+        margin-right: 5px;
+      }
+      button.modal-btn {
+        padding: 7px 12px 7px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 700;
+        color: white;
+        background-color: #404041;
+      }
+    }
+  }
+}
+
+.alert {
+  margin-bottom: 0;
+}
+
+.alert-information {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.highlight {
+  position: absolute;
+  z-index: 9999;
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10px;
+  background-color: lightgreen;
+  border: green;
+  color: grey;
+  text-align: center;
+  animation: highlight 0.5s 1;
+  -webkit-animation: highlight 0.5s 1;
+  animation-fill-mode: forwards;
+  animation-delay: 2s;
+  -webkit-animation-delay: 1s; /* Safari and Chrome */
+  -webkit-animation-fill-mode: forwards;
+}
+
+@keyframes highlight {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes highlight {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+// button {
+//   border: 1px solid #0066cc;
+//   background-color: #0099cc;
+//   color: #ffffff;
+//   padding: 5px 10px;
+// }
 
 label {
   font-weight: bold;
