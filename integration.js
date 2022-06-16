@@ -51,9 +51,12 @@ function startup(logger) {
         if (err) return reject(err);
         let response = { ...res, body };
 
+        Logger.trace({ response }, 'Response in requestWithDefaults');
+
         try {
           checkForStatusError(response, requestOptions);
         } catch (err) {
+          Logger.trace({ ERR: err });
           reject(err);
         }
 
@@ -63,13 +66,15 @@ function startup(logger) {
 }
 
 const checkForStatusError = (response, requestOptions) => {
+  Logger.trace({ RESPONSE: response });
   let statusCode = response.statusCode;
 
   if (![200, 201, 429, 500, 502, 504].includes(statusCode)) {
-    let requestError = Error('Request Error');
-    requestError.status = statusCode;
-    requestError.description = JSON.stringify(response.body);
-    requestError.requestOptions = requestOptions;
+    const errorMessage = _.get(response, 'body.err', 'Request Error');
+    const requestError = new RequestError(errorMessage, statusCode, response.body, {
+      ...requestOptions,
+      headers: '********'
+    });
     throw requestError;
   }
 };
@@ -110,8 +115,10 @@ const doLookup = async (entities, options, cb) => {
     }
 
     cb(null, results);
-  } catch (err) {
-    Logger.trace({ err }, 'err in dolookup');
+  } catch (error) {
+    const err = parseErrorToReadableJSON(error);
+    Logger.error({ err }, 'error in doLookup');
+    return cb(polarityError(err));
   }
 
   // try {
@@ -129,7 +136,6 @@ const doLookup = async (entities, options, cb) => {
 };
 
 const buildRequestOptions = async (query, path, options) => {
-  Logger.trace({ QUERY: query });
   const data = {
     method: 'POST',
     uri: options.url + `${path}`,
@@ -144,13 +150,12 @@ const buildRequestOptions = async (query, path, options) => {
 };
 
 const getApiData = async (entity, requestWithDefaults, options) => {
-  let cases;
   try {
-    cases = await getCases(entity, requestWithDefaults, options);
-    Logger.trace({ CASES: cases });
+    const cases = await getCases(entity, requestWithDefaults, options);
     return polarityResponse(entity, cases);
   } catch (err) {
     Logger.trace({ err });
+    throw err;
   }
 };
 
@@ -161,8 +166,8 @@ const getApiData = async (entity, requestWithDefaults, options) => {
 // };
 
 const getCases = async (entity, requestWithDefaults, options) => {
+  // need to validate for description and  title
   const query = { query: { _string: entity.value } };
-  Logger.trace({ QUERY: query });
   const requestOptions = await buildRequestOptions(
     query,
     '/api/case/artifact/_search?range=all&sort=-createdAt',
@@ -170,7 +175,7 @@ const getCases = async (entity, requestWithDefaults, options) => {
   );
 
   const response = await requestWithDefaults(requestOptions);
-
+  Logger.trace({ response }, 'Get Cases response');
   return response;
 };
 
@@ -195,12 +200,12 @@ const onMessage = async (payload, options, cb) => {
   switch (payload.action) {
     case 'createCase':
       try {
-        const createdCase = await createCase(caseInputs, requestWithDefaults, options);
+        // const createdCase = await createCase(caseInputs, requestWithDefaults, options);
         // check this, there is an inconsistent integration error:
         // (Notif) <injected: #64> {"title":"Integration Error Message","detail":"[Detail Not Provided]","status":"500","meta":{"message":"Unexpected end of JSON input","stack":"SyntaxError: Unexpected end of JSON input\n    at parse (<anonymous>)\n    at b (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:4157:12)\n    at g (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:4155:128)\n    at invokeWithOnError (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3724:206)\n    at h.flush (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3716:74)\n    at flush (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3727:292)\n    at j._end (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3778:9)\n    at _boundAutorunEnd (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3736:605)"}}
-        Logger.trace({ CREATED_CASE: createdCase });
+        // Logger.trace({ CREATED_CASE: createdCase });
         // going to return this mock data to prevent creating cases
-        return cb(null, JSON.stringify(createCase));
+        return cb(null, data.CREATED_CASE);
         // return cb(null, data.CREATED_CASE);
       } catch (err) {
         Logger.trace({ ERR: err });
@@ -250,6 +255,28 @@ const retryablePolarityResponse = (entity) => {
       }
     }
   };
+};
+
+class RequestError extends Error {
+  constructor(message, status, description, requestOptions) {
+    super(message);
+    this.name = 'requestError';
+    this.status = status;
+    this.description = description;
+    this.requestOptions = requestOptions;
+  }
+}
+
+const parseErrorToReadableJSON = (err) => {
+  return err instanceof Error
+    ? {
+        ...err,
+        name: err.name,
+        message: err.message,
+        stack: err.stack,
+        detail: err.message ? err.message : 'Unexpected error encountered'
+      }
+    : err;
 };
 
 function _isEntityBlocklisted(entity, options) {

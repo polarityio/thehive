@@ -3,27 +3,20 @@
 polarity.export = PolarityComponent.extend({
   details: Ember.computed.alias('block.data.details'),
   changeTab: 'cases',
+  levels: { white: '#5bc0de', green: '#5cb85c', amber: '#f0ad4e', red: '#d9534f' },
+  severityLevels: { L: '#5cb85c', M: '#5bc0de', H: '#f0ad4e', '!!': '#d9534f' },
   titleInput: '',
-  whiteSeverity: '',
-  greenSeverity: '',
-  amberSeverity: '',
-  redSeverity: '',
   severityInput: '',
-  whiteTlp: '',
-  greenTlp: '',
-  amberTlp: '',
-  redTlp: '',
   tlpInput: '',
-  whitePap: '',
-  greenPap: '',
-  amberPap: '',
-  redPap: '',
   papInput: '',
+  currentSeverityElement: '',
+  currentTlpElement: '',
+  currentPapElement: '',
   enableAddObservable: true,
   modalOpen: false,
   caseCreated: false,
   isRunning: false,
-  COLOR_VALUES: {
+  LEVELS: {
     white: '1',
     green: '2',
     amber: '3',
@@ -39,6 +32,7 @@ polarity.export = PolarityComponent.extend({
     },
     submit: function () {
       this.set('isRunning', true);
+      this.set('errorMessage', '');
       const title = this.get('titleInput');
       const severity = Number(this.get('severityInput'));
       const description = this.get('descriptionInput');
@@ -53,7 +47,7 @@ polarity.export = PolarityComponent.extend({
         pap
       };
 
-      console.log('inputs', JSON.stringify(caseInputs));
+      console.log('INPUTS:', JSON.stringify(caseInputs));
       this.sendIntegrationMessage({
         action: 'createCase',
         data: { caseInputs }
@@ -69,63 +63,61 @@ polarity.export = PolarityComponent.extend({
           }
         })
         .catch((err) => {
-          console.log(err);
+          this.set('details.errorMessage', JSON.stringify(err, null, 4));
         })
         .finally(() => {
           this.set('isRunning', false);
           this.get('block').notifyPropertyChange('data');
         });
     },
-    // addObservable: function () {
+    selectSeverityLevelAndSetInput: function (level, colorValue) {
+      const SEVERITY_LEVELS = { L: 1, M: 2, H: 3, '!!': 4 };
+      console.log(level, colorValue);
+      this.set('severityInput', SEVERITY_LEVELS[level]);
+      if (level !== this.get('currentSeverityElement')) {
+        const cachedElementValue = this.get('currentSeverityElement');
+        let cachedElement = document.getElementById(`severity-${cachedElementValue}`);
 
-    //   this.sendIntegrationMessage({
-    //     action: 'addObservable',
-    //     data: {}
-    //   });
-    // },
-    getSeverityInputAndSeverityColor: function (severityLevel, color) {
-      this.set('severityInput', this.COLOR_VALUES[severityLevel]);
-      this.set(`${severityLevel}Severity`, color);
-
-      ['white', 'green', 'amber', 'red'].forEach((level) => {
-        if (level !== severityLevel) {
-          this.set(`${level}Severity`, '');
+        if (cachedElement) {
+          cachedElement.style['background-color'] = '#d2d6de';
         }
-      });
-    },
-    getTlpInputAndToggleColor: function (tlpLevel, color) {
-      this.set('tlpInput', this.COLOR_VALUES[tlpLevel]);
-      this.set(`${tlpLevel}Tlp`, color);
 
-      ['white', 'green', 'amber', 'red'].forEach((level) => {
-        if (level !== tlpLevel) {
-          this.set(`${level}Tlp`, '');
+        this.set('currentSeverityElement', level);
+        let element = document.getElementById(`severity-${level}`);
+        if (element) {
+          element.style['background-color'] = `${colorValue}`;
         }
-      });
-    },
-    getPapInputAndToggleColor: function (papLevel, color) {
-      this.set('papInput', this.COLOR_VALUES[papLevel]);
-      this.set(`${papLevel}Pap`, color);
+      }
 
-      ['white', 'green', 'amber', 'red'].forEach((level) => {
-        if (level !== papLevel) {
-          this.set(`${level}Pap`, '');
+      this.set('currentSeverityElement', level);
+    },
+    selectLevelAndSetInput: function (level, colorValue, type) {
+      // Rather than have another method for selecting pap levels, this will take
+      // a type in order to set the inputs and style properties
+      const LEVELS = {
+        white: '1',
+        green: '2',
+        amber: '3',
+        red: '4'
+      };
+
+      this.set(`${type === 'tlp' ? 'tlpInput' : 'papInput'}`, LEVELS[level]);
+      const currentElement = type === 'tlp' ? 'currentTlpElement' : 'currentPapElement';
+      if (level !== this.get(`${currentElement}`)) {
+        const cachedElementValue = this.get(`${currentElement}`);
+        let cachedElement = document.getElementById(`${type}-${cachedElementValue}`);
+
+        if (cachedElement) {
+          cachedElement.style['background-color'] = '#d2d6de';
         }
-      });
-    },
-    showMessage: function () {
-      this.set('caseCreatedMessage', true);
-      setTimeout(() => {
-        this.set('caseCreatedMessage', false);
-      }, 3000);
-    },
-    flashElement: function (element, flashCount = 3, flashTime = 280) {
-      if (!flashCount) return;
-      element.classList.add('highlight');
-      setTimeout(() => {
-        element.classList.remove('highlight');
-        setTimeout(() => this.flashElement(element, flashCount - 1), flashTime);
-      }, flashTime);
+
+        this.set(`${currentElement}`, level);
+        let element = document.getElementById(`${type}-${level}`);
+        if (element) {
+          element.style['background-color'] = `${colorValue}`;
+        }
+      }
+      this.set(`${currentElement}`, level);
     },
     toggleShowModal: function () {
       this.toggleProperty('modalOpen');

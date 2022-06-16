@@ -1,238 +1,221 @@
-<ul class='nav nav-tabs'>
-  {{#if details}}
-    <li class='nav-item'>
-      <a
-        {{action 'changeTab' 'cases'}}
-        class='nav-link {{if (or (eq changeTab "cases") (not changeTab)) "active"}}'
-        href='#'
-      >
-        Cases
-      </a>
-    </li>
-  {{else}}
-    <li class='nav-item'>
-      <a
-        {{action 'changeTab' 'create'}}
-        class='nav-link {{if (or (eq changeTab "create") (not changeTab)) "active"}}'
-        href='#'
-      >
-        Create Case
-      </a>
-    </li>
-  {{/if}}
-</ul>
-
-{{#if (eq changeTab 'cases')}}
-  <div class='p-non-exfoliate-outer-padding'>
-    {{#each details as |object|}}
-      {{#if object.id}}
-        <div>
-          <a href='{{block.userOptions.url}}/index.html#/case/{{object._parent}}/details' class='p-link'>(Pivot To Case
-            Details)</a>
-        </div>
-
-        <h1 class='p-title'>
-          {{fa-icon 'eye' fixedWidth=true}}
-          Observable Information
-        </h1>
-
-        {{#if (eq object.tlp 0)}}
-          <div>
-            <span class='p-key'>TLP: </span>
-            <span class='p-value'>WHITE</span>
-          </div>
-        {{/if}}
-        {{#if (eq object.tlp 1)}}
-          <div>
-            <span class='p-key'>TLP: </span>
-            <span class='p-value' style='color:green'>GREEN</span>
-          </div>
-        {{/if}}
-        {{#if (eq object.tlp 2)}}
-          <div>
-            <span class='p-key'>TLP: </span>
-            <span class='p-value' style='color:orange'>AMBER</span>
-          </div>
-        {{/if}}
-        {{#if (eq object.tlp 3)}}
-          <div>
-            <span class='p-key'>TLP: </span>
-            <span class='p-value' style='color:red'>RED</span>
-          </div>
-        {{/if}}
-        <div>
-          <span class='p-key'>Case Ceated Date </span>
-          <span class='p-value'>{{moment-time object.createdAt}}</span>
-        </div>
-
-        <div>
-          <span class='p-key'>Case Start Date </span>
-          <span class='p-value'>{{moment-time object.startDate}}</span>
-        </div>
-
-        <div>
-          <span class='p-key'>Observable Message: </span>
-          <span class='p-value'>{{object.message}}</span>
-        </div>
-        <div>
-          <span class='p-key'>Observable Type: </span>
-          <span class='p-value'>{{object.dataType}}</span>
-        </div>
-        <div>
-          <span class='p-key'>Created By: </span>
-          <span class='p-value'>{{object.createdBy}}</span>
-        </div>
-        <div>
-          <span class='p-key'>Is IOC? </span>
-          <span class='p-value'>{{object.ioc}}</span>
-        </div>
-        <div>
-          <span class='p-key'>Observable Sighted? </span>
-          <span class='p-value'>{{object.sighted}}</span>
-        </div>
-
-        <div>
-          <span class='p-key'>Hive Type? </span>
-          <span class='p-value'>{{object._type}}</span>
-        </div>
-
-        <div class='p-title'>
-          {{fa-icon 'tag' fixedWidth=true}}
-          Tags
-        </div>
-        <div class='tags'>
-          {{#each object.tags as |tag|}}
-            <span class='pulse-tag'>{{tag}}</span>
-          {{/each}}
-        </div>
-
-      {{/if}}
-    {{/each}}
-  </div>
-{{/if}}
-
-{{#if (eq changeTab 'create')}}
-  <div class='case-creation-form'>
-    <table class='case-inputs'>
-      <tr>
-        <td> <label for='title'>Title: </label></td>
-        <div>{{input
-            class='case-title'
-            onclick=(action (mut titleInput value='target.value'))
-            value=titleInput
-            placeholder='Title'
-          }}</div>
-      </tr>
-
-      <tr>
-        <td> <label for='severity'>Severity: </label></td>
-        <div class='severity-options'>
-          <button
-            style='background-color: {{whiteSeverity}}'
-            {{action 'getSeverityInputAndSeverityColor' 'white' '#5cb85c'}}
-          >
-            L
-          </button>
-          <button
-            style='background-color: {{greenSeverity}}'
-            {{action 'getSeverityInputAndSeverityColor' 'green' '#5bc0de'}}
-          >
-            M
-          </button>
-          <button
-            style='background-color: {{amberSeverity}}'
-            {{action 'getSeverityInputAndSeverityColor' 'amber' '#f0ad4e'}}
-          >
-            H
-          </button>
-          <button
-            style='background-color: {{redSeverity}}'
-            {{action 'getSeverityInputAndSeverityColor' 'red' '#d9534f'}}
-          >
-            !!
-          </button>
-        </div>
-      </tr>
-
-      <tr>
-        <td> <label for='tlp'>TLP: </label></td>
-        <div class='severity-options'>
-          <button style='background-color: {{whiteTlp}}' {{action 'getTlpInputAndToggleColor' 'white' '#5bc0de'}}>
-            WHITE
-          </button>
-          <button style='background-color: {{greenTlp}}' {{action 'getTlpInputAndToggleColor' 'green' '#5cb85c'}}>
-            GREEN
-          </button>
-          <button style='background-color: {{amberTlp}}' {{action 'getTlpInputAndToggleColor' 'amber' '#f0ad4e'}}>
-            AMBER
-          </button>
-          <button style='background-color: {{redTlp}}' {{action 'getTlpInputAndToggleColor' 'red' '#d9534f'}}>
-            RED
-          </button>
-        </div>
-      </tr>
-
-      <tr>
-        <td> <label for='tlp'>PAP: </label></td>
-        <div class='severity-options'>
-          <button style='background-color: {{whitePap}}' {{action 'getPapInputAndToggleColor' 'white' '#5bc0de'}}>
-            WHITE
-          </button>
-          <button style='background-color: {{greenPap}}' {{action 'getPapInputAndToggleColor' 'green' '#5cb85c'}}>
-            GREEN
-          </button>
-          <button style='background-color: {{amberPap}}' {{action 'getPapInputAndToggleColor' 'amber' '#f0ad4e'}}>
-            AMBER
-          </button>
-          <button style='background-color: {{redPap}}' {{action 'getPapInputAndToggleColor' 'red' '#d9534f'}}>
-            RED
-          </button>
-        </div>
-      </tr>
-    </table>
-
-    <div>
-      {{textarea
-        class='case-description'
-        onchange=(action (mut descriptionInput value='target.value'))
-        value=descriptionInput
-        cols='30'
-        rows='4'
-        placeholder='Case Description'
-      }}
+{{#if details.errorMessage}}
+  <div class='mt-2'>
+    <div class='alert alert-danger'>
+      <pre>{{details.errorMessage}}</pre>
     </div>
-
-    <button class='create-case-btn' type='button' {{action 'submit'}}>
-      {{#if isRunning}}
-        {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
-      {{/if}}
-      Create Case
-    </button>
-    {{#if caseCreated}}
-      <span class='highlight alert alert-info mt-1'>
-        Case Created!
-      </span>
-    {{/if}}
-    <button class='add-observable-btn' disabled={{enableAddObservable}} {{action 'toggleShowModal'}}>Add Observable</button>
-
-    {{#if modalOpen}}
-      <div class='containment-modal'>
-        <div class='modal-container'>
-          <div class='modal-text'>
-            <span>
-              Are you sure you want to
-              {{if (eq device.status 'contained') 'lift containment on' 'contain'}}
-              this host:
-              <span class='bold'>{{device.hostname}}</span>?
-            </span>
-          </div>
-          <div class='modal-options'>
-            <div>
-              <button {{action 'addObservable'}} class='modal-btn'>Confirm</button>
-            </div>
-          </div>
-        </div>
+    {{#if (not (eq details.allowRetry false))}}
+      <button type='button' class='p-btn btn btn-sm btn-secondary retry-btn mt-2' {{action 'retryLookup'}}>
+        {{#if running}}
+          {{fa-icon icon='spinner-third' fixedWidth=true spin=true}}
+        {{else}}
+          Retry Search
+        {{/if}}
+      </button>
+      <div class='mt-1'>
+        <span class='p-footnote'>
+          You can retry your search by pressing the "Retry Search" button.</span>
       </div>
     {{/if}}
   </div>
+{{else}}
+  <ul class='nav nav-tabs'>
+    {{#if details}}
+      <li class='nav-item'>
+        <a
+          {{action 'changeTab' 'cases'}}
+          class='nav-link {{if (or (eq changeTab "cases") (not changeTab)) "active"}}'
+          href='#'
+        >
+          Cases
+        </a>
+      </li>
+    {{else}}
+      <li class='nav-item'>
+        <a
+          {{action 'changeTab' 'create'}}
+          class='nav-link {{if (or (eq changeTab "create") (not changeTab)) "active"}}'
+          href='#'
+        >
+          Create Case
+        </a>
+      </li>
+    {{/if}}
+  </ul>
+
+  {{#if (eq changeTab 'cases')}}
+    <div class='p-non-exfoliate-outer-padding'>
+      {{#each details as |object|}}
+        {{#if object.id}}
+          <div>
+            <a href='{{block.userOptions.url}}/index.html#/case/{{object._parent}}/details' class='p-link'>(Pivot To
+              Case Details)</a>
+          </div>
+
+          <h1 class='p-title'>
+            {{fa-icon 'eye' fixedWidth=true}}
+            Observable Information
+          </h1>
+
+          {{#if (eq object.tlp 0)}}
+            <div>
+              <span class='p-key'>TLP: </span>
+              <span class='p-value'>WHITE</span>
+            </div>
+          {{/if}}
+          {{#if (eq object.tlp 1)}}
+            <div>
+              <span class='p-key'>TLP: </span>
+              <span class='p-value' style='color:green'>GREEN</span>
+            </div>
+          {{/if}}
+          {{#if (eq object.tlp 2)}}
+            <div>
+              <span class='p-key'>TLP: </span>
+              <span class='p-value' style='color:orange'>AMBER</span>
+            </div>
+          {{/if}}
+          {{#if (eq object.tlp 3)}}
+            <div>
+              <span class='p-key'>TLP: </span>
+              <span class='p-value' style='color:red'>RED</span>
+            </div>
+          {{/if}}
+          <div>
+            <span class='p-key'>Case Ceated Date </span>
+            <span class='p-value'>{{moment-time object.createdAt}}</span>
+          </div>
+
+          <div>
+            <span class='p-key'>Case Start Date </span>
+            <span class='p-value'>{{moment-time object.startDate}}</span>
+          </div>
+
+          <div>
+            <span class='p-key'>Observable Message: </span>
+            <span class='p-value'>{{object.message}}</span>
+          </div>
+          <div>
+            <span class='p-key'>Observable Type: </span>
+            <span class='p-value'>{{object.dataType}}</span>
+          </div>
+          <div>
+            <span class='p-key'>Created By: </span>
+            <span class='p-value'>{{object.createdBy}}</span>
+          </div>
+          <div>
+            <span class='p-key'>Is IOC? </span>
+            <span class='p-value'>{{object.ioc}}</span>
+          </div>
+          <div>
+            <span class='p-key'>Observable Sighted? </span>
+            <span class='p-value'>{{object.sighted}}</span>
+          </div>
+
+          <div>
+            <span class='p-key'>Hive Type? </span>
+            <span class='p-value'>{{object._type}}</span>
+          </div>
+
+          <div class='p-title'>
+            {{fa-icon 'tag' fixedWidth=true}}
+            Tags
+          </div>
+          <div class='tags'>
+            {{#each object.tags as |tag|}}
+              <span class='pulse-tag'>{{tag}}</span>
+            {{/each}}
+          </div>
+
+        {{/if}}
+      {{/each}}
+    </div>
+  {{/if}}
+
+  {{#if (eq changeTab 'create')}}
+    <div class='case-creation-form'>
+      <table class='case-inputs'>
+        <tr>
+          <td> <label for='title'>Title: </label></td>
+          <div>{{input
+              class='case-title'
+              onclick=(action (mut titleInput value='target.value'))
+              value=titleInput
+              placeholder='Title'
+            }}</div>
+        </tr>
+        <tr>
+          <td> <label for='severity'>Severity: </label></td>
+          {{#each-in severityLevels as |level color|}}
+            <button id='severity-{{level}}' {{action 'selectSeverityLevelAndSetInput' level color}}>{{level}}</button>
+          {{/each-in}}
+        </tr>
+
+        <tr>
+          <td> <label for='tlp'>TLP: </label></td>
+          {{#each-in levels as |level color|}}
+            <button id='tlp-{{level}}' {{action 'selectLevelAndSetInput' level color 'tlp'}}>{{level}}</button>
+          {{/each-in}}
+        </tr>
+
+        <tr>
+          <td> <label for='tlp'>PAP: </label></td>
+          {{#each-in levels as |level color|}}
+            <button id='pap-{{level}}' {{action 'selectLevelAndSetInput' level color 'pap'}}>{{level}}</button>
+          {{/each-in}}
+        </tr>
+      </table>
+
+      <div>
+        {{textarea
+          class='case-description'
+          onchange=(action (mut descriptionInput value='target.value'))
+          value=descriptionInput
+          cols='30'
+          rows='4'
+          placeholder='Case Description'
+        }}
+      </div>
+
+      <button class='create-case-btn' type='button' {{action 'submit'}}>
+        {{#if isRunning}}
+          {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
+        {{/if}}
+        New Case
+      </button>
+
+      {{#if caseCreated}}
+        <span class='highlight alert alert-info mt-1'>
+          Case Created!
+        </span>
+      {{/if}}
+
+      <button class='add-observable-btn' disabled={{enableAddObservable}} {{action 'toggleShowModal'}}>Add Observable</button>
+
+      {{#if (not caseCreated)}}
+        <div class='mb-2 create-case-footnote'>
+          <span class='p-footnote'>The option to add an Observable is available after a case a created.</span>
+        </div>
+      {{/if}}
+
+      {{#if modalOpen}}
+        <div class='containment-modal'>
+          <div class='modal-container'>
+            <div class='modal-text'>
+              <span>
+                Are you sure you want to
+                {{if (eq device.status 'contained') 'lift containment on' 'contain'}}
+                this host:
+                <span class='bold'>{{device.hostname}}</span>?
+              </span>
+            </div>
+            <div class='modal-options'>
+              <div>
+                <button {{action 'addObservable'}} class='modal-btn'>Confirm</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      {{/if}}
+    </div>
+  {{/if}}
 {{/if}}

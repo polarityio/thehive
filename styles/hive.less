@@ -47,13 +47,40 @@ pre {
   border: 1px solid #dedede;
 }
 
-.severity-options button {
+button[id^='severity'] {
   margin: 1px;
   color: white;
   border-radius: 3px;
   background-color: #d2d6de;
   box-shadow: 5px 10px;
   font-size: 8px;
+}
+
+button[id^='tlp'] {
+  margin: 1px;
+  color: white;
+  border-radius: 3px;
+  background-color: #d2d6de;
+  box-shadow: 5px 10px;
+  font-size: 8px;
+}
+
+button[id^='pap'] {
+  margin: 1px;
+  color: white;
+  border-radius: 3px;
+  background-color: #d2d6de;
+  box-shadow: 5px 10px;
+  font-size: 8px;
+}
+
+.create-case-footnote {
+  margin-top: 5px;
+  margin-bottom: 0;
+}
+
+.case-creation-form {
+  margin-top: 10px;
 }
 
 .add-observable-btn {
@@ -168,12 +195,6 @@ button[disabled] {
     opacity: 0;
   }
 }
-// button {
-//   border: 1px solid #0066cc;
-//   background-color: #0099cc;
-//   color: #ffffff;
-//   padding: 5px 10px;
-// }
 
 label {
   font-weight: bold;
