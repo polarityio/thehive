@@ -114,7 +114,6 @@ const getApiData = async (entity, requestWithDefaults, options) => {
 };
 
 const getCases = async (entity, requestWithDefaults, options) => {
-  // need to validate for description and  title
   const query = { query: { _string: entity.value } };
   const requestOptions = await buildRequestOptions(
     query,
@@ -142,23 +141,34 @@ const createCase = async (caseInputs, requestWithDefaults, options) => {
   }
 };
 
-const onMessage = async (payload, options, cb) => {
-  const { caseInputs } = payload.data;
+const addObservable = async (observableInputs, requestWithDefaults, options) => {
+  const query = observableInputs;
+  try {
+    const requestOptions = await buildRequestOptions(query, ' /api/v0/case/{caseId}/artifact', options);
+    const addedObservable = await requestWithDefaults(requestOptions);
+    return addedObservable;
+  } catch (err) {
+    Logger.error({ err });
+    throw err;
+  }
+};
 
+const onMessage = async (payload, options, cb) => {
   switch (payload.action) {
     case 'createCase':
-      try {
-        // const createdCase = await createCase(caseInputs, requestWithDefaults, options);
-        // check this, there is an inconsistent integration error:
-        // (Notif) <injected: #64> {"title":"Integration Error Message","detail":"[Detail Not Provided]","status":"500","meta":{"message":"Unexpected end of JSON input","stack":"SyntaxError: Unexpected end of JSON input\n    at parse (<anonymous>)\n    at b (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:4157:12)\n    at g (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:4155:128)\n    at invokeWithOnError (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3724:206)\n    at h.flush (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3716:74)\n    at flush (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3727:292)\n    at j._end (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3778:9)\n    at _boundAutorunEnd (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3736:605)"}}
-        // Logger.trace({ CREATED_CASE: createdCase });
-        // going to return this mock data to prevent creating cases
-        return cb(null, data.CREATED_CASE);
-        // return cb(null, data.CREATED_CASE);
-      } catch (err) {
-        Logger.error({ err }, 'Error in createCase');
-        throw err;
-      }
+      const caseInputs = payload.data.caseInputs;
+      // const createdCase = await createCase(caseInputs, requestWithDefaults, options);
+      // check this, there is an inconsistent integration error:
+      // (Notif) <injected: #64> {"title":"Integration Error Message","detail":"[Detail Not Provided]","status":"500","meta":{"message":"Unexpected end of JSON input","stack":"SyntaxError: Unexpected end of JSON input\n    at parse (<anonymous>)\n    at b (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:4157:12)\n    at g (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:4155:128)\n    at invokeWithOnError (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3724:206)\n    at h.flush (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3716:74)\n    at flush (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3727:292)\n    at j._end (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3778:9)\n    at _boundAutorunEnd (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3736:605)"}}
+      // Logger.trace({ CREATED_CASE: createdCase });
+      // going to return this mock data to prevent creating cases
+      cb(null, data.CREATED_CASE);
+      break;
+    // return cb(null, data.CREATED_CASE);
+    case 'addObservable':
+      const observableInputs = payload.data.observableInputs;
+      const addedObservable = await addObservable(observableInputs, requestWithDefaults, options);
+      cb(null, addedObservable);
       break;
     default:
       return;
@@ -303,14 +313,11 @@ module.exports = {
   validateOptions: validateOptions
 };
 
-// ENTITIES:
+// ENTITIES TO SEARCH:
 // 92.63.192.217
+// 192.42.116.18
 
 const data = {
-  name: 'TheHive',
-  hostname: 'dev.polarity',
-  pid: 14487,
-  level: 10,
   CREATED_CASE: {
     statusCode: 201,
     body: {
@@ -334,38 +341,6 @@ const data = {
       pap: 2,
       startDate: 1654721117591,
       status: 'Open'
-    },
-    headers: {
-      date: 'Wed, 08 Jun 2022 20:45:18 GMT',
-      connection: 'close',
-      'content-type': 'application/json',
-      'content-length': '370'
-    },
-    request: {
-      uri: {
-        protocol: 'http:',
-        slashes: true,
-        auth: null,
-        host: '54.226.8.208:9000',
-        port: '9000',
-        hostname: '54.226.8.208',
-        hash: null,
-        search: null,
-        query: null,
-        pathname: '/api/case',
-        path: '/api/case',
-        href: 'http://54.226.8.208:9000/api/case'
-      },
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer IWPcPkikfFlpkn8jiFD7x3s6OmfV2Wpi',
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        'Content-Length': 71
-      }
     }
-  },
-  msg: '',
-  time: '2022-06-08T20:45:18.760Z',
-  v: 0
+  }
 };

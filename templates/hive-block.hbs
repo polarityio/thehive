@@ -207,13 +207,19 @@
       {{#if modalOpen}}
         <div class='containment-modal'>
           <div class='modal-container'>
-            <div class='modal-text'>
-
-            </div>
+            <label for='title'>Type: </label>
+            {{! <div class='type-selection'> }}
+            <select class='w-100' onclick={{action (mut observableTypeInput) value='target.value'}}>
+              <option value='none' selected disabled hidden>Select Option</option>
+              <option value='hash'>hash</option>
+              <option value='ip'>ip</option>
+              <option value='domain'>domain</option>
+            </select>
+            {{! </div> }}
             <div class='modal-options'>
-              <div>
-                <button {{action 'addObservable'}} class='modal-btn'>Confirm</button>
-              </div>
+              <button class='add-observable-btn' type='button' {{action 'addObservable'}}>
+                Create Observable(s)
+              </button>
             </div>
           </div>
         </div>

@@ -5,14 +5,11 @@ polarity.export = PolarityComponent.extend({
   changeTab: 'cases',
   levels: { white: '#5bc0de', green: '#5cb85c', amber: '#f0ad4e', red: '#d9534f' },
   severityLevels: { L: '#5cb85c', M: '#5bc0de', H: '#f0ad4e', '!!': '#d9534f' },
-  titleInput: '',
-  severityInput: '',
-  tlpInput: '',
-  papInput: '',
-  dateInput: '',
+  observableTypes: ['ip', 'hash', 'domain'],
   currentSeverityElement: '',
   currentTlpElement: '',
   currentPapElement: '',
+  caseId: '',
   enableAddObservable: true,
   modalOpen: false,
   caseCreated: false,
@@ -59,6 +56,7 @@ polarity.export = PolarityComponent.extend({
           if (data.statusCode === 201) {
             this.set('enableAddObservable', false);
             this.set('caseCreated', true);
+            this.set('caseId', data.body.id);
 
             setTimeout(() => {
               this.set('caseCreated', false);
@@ -73,7 +71,23 @@ polarity.export = PolarityComponent.extend({
           this.get('block').notifyPropertyChange('data');
         });
     },
+    addObservable: function () {
+      console.log('ASDASDS');
+      const typeInput = this.get('observableTypeInput');
+      const caseId = this.get('caseId');
 
+      const observableInputs = {
+        caseId,
+        typeInput
+      };
+
+      console.log('Observable input', JSON.stringify(observableInputs));
+
+      this.sendIntegrationMessage({
+        action: 'addObservable',
+        data: { observableInputs }
+      }).then((data) => {});
+    },
     selectSeverityLevelAndSetInput: function (level, colorValue) {
       const SEVERITY_LEVELS = { L: 1, M: 2, H: 3, '!!': 4 };
       this.set('severityInput', SEVERITY_LEVELS[level]);
