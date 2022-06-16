@@ -1,8 +1,10 @@
 'use strict';
+const config = require('./config/config');
 let fs = require('fs');
+const { map } = require('lodash/fp');
 let request = require('postman-request');
 let _ = require('lodash');
-let config = require('./config/config');
+const _configFieldIsValid = (field) => typeof field === 'string' && field.length > 0;
 
 let Logger;
 
@@ -21,27 +23,19 @@ let requestWithDefaults;
 
 function startup(logger) {
   Logger = logger;
-  let defaults = {};
 
-  if (typeof config.request.cert === 'string' && config.request.cert.length > 0) {
-    defaults.cert = fs.readFileSync(config.request.cert);
-  }
+  const {
+    request: { ca, cert, key, passphrase, rejectUnauthorized, proxy }
+  } = config;
 
-  if (typeof config.request.key === 'string' && config.request.key.length > 0) {
-    defaults.key = fs.readFileSync(config.request.key);
-  }
-
-  if (typeof config.request.passphrase === 'string' && config.request.passphrase.length > 0) {
-    defaults.passphrase = config.request.passphrase;
-  }
-
-  if (typeof config.request.ca === 'string' && config.request.ca.length > 0) {
-    defaults.ca = fs.readFileSync(config.request.ca);
-  }
-
-  if (typeof config.request.proxy === 'string' && config.request.proxy.length > 0) {
-    defaults.proxy = config.request.proxy;
-  }
+  const defaults = {
+    ...(_configFieldIsValid(ca) && { ca: fs.readFileSync(ca) }),
+    ...(_configFieldIsValid(cert) && { cert: fs.readFileSync(cert) }),
+    ...(_configFieldIsValid(key) && { key: fs.readFileSync(key) }),
+    ...(_configFieldIsValid(passphrase) && { passphrase }),
+    ...(_configFieldIsValid(proxy) && { proxy }),
+    ...(typeof rejectUnauthorized === 'boolean' && { rejectUnauthorized })
+  };
 
   let _requestWithDefaults = request.defaults(defaults);
 
@@ -56,7 +50,7 @@ function startup(logger) {
         try {
           checkForStatusError(response, requestOptions);
         } catch (err) {
-          Logger.trace({ ERR: err });
+          Logger.trace({ err }, 'Error in _requestWithDefaults');
           reject(err);
         }
 
@@ -66,7 +60,6 @@ function startup(logger) {
 }
 
 const checkForStatusError = (response, requestOptions) => {
-  Logger.trace({ RESPONSE: response });
   let statusCode = response.statusCode;
 
   if (![200, 201, 429, 500, 502, 504].includes(statusCode)) {
@@ -79,60 +72,20 @@ const checkForStatusError = (response, requestOptions) => {
   }
 };
 
-// function _setupRegexBlocklists(options) {
-//   if (options.domainBlocklistRegex !== previousDomainRegexAsString && options.domainBlocklistRegex.length === 0) {
-//     Logger.debug('Removing Domain Blocklist Regex Filtering');
-//     previousDomainRegexAsString = '';
-//     domainBlocklistRegex = null;
-//   } else {
-//     if (options.domainBlocklistRegex !== previousDomainRegexAsString) {
-//       previousDomainRegexAsString = options.domainBlocklistRegex;
-//       Logger.debug({ domainBlocklistRegex: previousDomainRegexAsString }, 'Modifying Domain Blocklist Regex');
-//       domainBlocklistRegex = new RegExp(options.domainBlocklistRegex, 'i');
-//     }
-//   }
-
-//   if (options.ipBlocklistRegex !== previousIpRegexAsString && options.ipBlocklistRegex.length === 0) {
-//     Logger.debug('Removing IP Blocklist Regex Filtering');
-//     previousIpRegexAsString = '';
-//     ipBlocklistRegex = null;
-//   } else {
-//     if (options.ipBlocklistRegex !== previousIpRegexAsString) {
-//       previousIpRegexAsString = options.ipBlocklistRegex;
-//       Logger.debug({ ipBlocklistRegex: previousIpRegexAsString }, 'Modifying IP Blocklist Regex');
-//       ipBlocklistRegex = new RegExp(options.ipBlocklistRegex, 'i');
-//     }
-//   }
-// }
-
 const doLookup = async (entities, options, cb) => {
-  let results;
-
+  _setupRegexBlocklists(options);
   try {
-    for (const ent of entities) {
-      results = await getApiData(ent, requestWithDefaults, options);
-      Logger.trace({ RES: results });
-    }
+    const lookupResults = await Promise.all(
+      map(async (entity) => await getApiData(entity, requestWithDefaults, options), entities)
+    );
 
-    cb(null, results);
+    Logger.trace({ lookupResults }, 'lookup results');
+    return cb(null, lookupResults);
   } catch (error) {
     const err = parseErrorToReadableJSON(error);
     Logger.error({ err }, 'error in doLookup');
     return cb(polarityError(err));
   }
-
-  // try {
-  //   results = await Promise.all(
-  //     _.map(async (entity) => await getApiData(entity, requestWithDefaults, options)),
-  //     entities
-  //   );
-
-  //   return cb(null, results);
-  // } catch (err) {
-  //   Logger.trace({ err });
-  // }
-  // Logger.trace({ RESULTS: results });
-  // return cb(null, results);
 };
 
 const buildRequestOptions = async (query, path, options) => {
@@ -151,19 +104,14 @@ const buildRequestOptions = async (query, path, options) => {
 
 const getApiData = async (entity, requestWithDefaults, options) => {
   try {
-    const cases = await getCases(entity, requestWithDefaults, options);
-    return polarityResponse(entity, cases);
+    return _isEntityBlocklisted
+      ? polarityResponse(entity, await getCases(entity, requestWithDefaults, options))
+      : emptyResponse(entity);
   } catch (err) {
-    Logger.trace({ err });
+    Logger.trace({ err }, 'Error in getApiData');
     throw err;
   }
 };
-
-// const createAndAddObservable = (caseId, requestWithDefaults, options) => {
-//   const query = ''
-//   const requestOptions = await buildRequestOptions()
-
-// };
 
 const getCases = async (entity, requestWithDefaults, options) => {
   // need to validate for description and  title
@@ -189,9 +137,9 @@ const createCase = async (caseInputs, requestWithDefaults, options) => {
 
     return createdCase;
   } catch (err) {
-    Logger.trace({ ERR: err });
+    Logger.error({ ERR: err }, 'Error in createCase');
+    throw err;
   }
-  // should return a status to the front telling USEr case was created.
 };
 
 const onMessage = async (payload, options, cb) => {
@@ -208,7 +156,8 @@ const onMessage = async (payload, options, cb) => {
         return cb(null, data.CREATED_CASE);
         // return cb(null, data.CREATED_CASE);
       } catch (err) {
-        Logger.trace({ ERR: err });
+        Logger.error({ err }, 'Error in createCase');
+        throw err;
       }
       break;
     default:
@@ -229,17 +178,15 @@ const emptyResponse = (entity) => ({
 });
 
 const polarityResponse = (entity, { body }) => {
-  return [
-    {
-      entity,
-      data: body
-        ? {
-            summary: [],
-            details: body
-          }
-        : null
-    }
-  ];
+  return {
+    entity,
+    data: body
+      ? {
+          summary: [],
+          details: body
+        }
+      : null
+  };
 };
 
 const retryablePolarityResponse = (entity) => {
@@ -323,6 +270,32 @@ function validateOptions(userOptions, cb) {
   cb(null, errors);
 }
 
+function _setupRegexBlocklists(options) {
+  if (options.domainBlocklistRegex !== previousDomainRegexAsString && options.domainBlocklistRegex.length === 0) {
+    Logger.debug('Removing Domain Blocklist Regex Filtering');
+    previousDomainRegexAsString = '';
+    domainBlocklistRegex = null;
+  } else {
+    if (options.domainBlocklistRegex !== previousDomainRegexAsString) {
+      previousDomainRegexAsString = options.domainBlocklistRegex;
+      Logger.debug({ domainBlocklistRegex: previousDomainRegexAsString }, 'Modifying Domain Blocklist Regex');
+      domainBlocklistRegex = new RegExp(options.domainBlocklistRegex, 'i');
+    }
+  }
+
+  if (options.ipBlocklistRegex !== previousIpRegexAsString && options.ipBlocklistRegex.length === 0) {
+    Logger.debug('Removing IP Blocklist Regex Filtering');
+    previousIpRegexAsString = '';
+    ipBlocklistRegex = null;
+  } else {
+    if (options.ipBlocklistRegex !== previousIpRegexAsString) {
+      previousIpRegexAsString = options.ipBlocklistRegex;
+      Logger.debug({ ipBlocklistRegex: previousIpRegexAsString }, 'Modifying IP Blocklist Regex');
+      ipBlocklistRegex = new RegExp(options.ipBlocklistRegex, 'i');
+    }
+  }
+}
+
 module.exports = {
   doLookup: doLookup,
   onMessage: onMessage,
@@ -330,123 +303,8 @@ module.exports = {
   validateOptions: validateOptions
 };
 
-// Given a user wants to change the status of the tickets:
-// - Update different fields such as description
-// - Close out the cases if needed.
-
-// Users creating cases around indicators:
-// - Users should also be able to create a case if one does not exist for an indicator - POST /api/case
-// ** IF THE INDICATOR DOES NOT EXIST:
-// ** A user searches using an indicator -> The Api responds with a status of 200 and an empty body ->
-// ** The UI should render "create" option, and the user should be able to create a case for the missed indicator
-// **
-// ** IF THE INDICATOR DOES EXIST:
-// ** Then the
-
-// - Users should be able to create a new case on an existing indicator.
-
 // ENTITIES:
 // 92.63.192.217
-
-// Should users  be able to create a Case, and add IOC observable to the case? - POST	/api/case/:caseId/artifact	Create an observable
-
-// function doLookup(entities, options, cb) {
-//   let lookupResults = [];
-//   let tasks = [];
-
-//   _setupRegexBlocklists(options);
-
-//   Logger.trace({ entities: entities }, 'Loging the entity coming through');
-
-//   entities.forEach((entity) => {
-//     if (_isEntityBlocklisted(entity, options)) {
-//       next(null);
-//     } else if (entity.value) {
-//       //do the lookup
-//       let postData = { query: { _string: entity.value } };
-//       let requestOptions = {
-//         method: 'POST',
-//         uri: options.url + '/api/case/artifact/_search?range=all&sort=-createdAt',
-//         body: postData,
-//         headers: {
-//           Authorization: 'Bearer ' + options.apiKey,
-//           'Content-Type': 'application/json'
-//         },
-//         json: true
-//       };
-
-//       Logger.trace({ uri: options }, 'Request URI');
-
-//       tasks.push(function (done) {
-//         requestWithDefaults(requestOptions, function (err, res, body) {
-//           if (err) {
-//             Logger.error({ err: err }, 'Error Executing Request');
-//             done(err);
-//             return;
-//           }
-
-//           Logger.trace({ body: body, statusCode: res.statusCode }, 'Result of Lookup');
-
-//           let result = {};
-
-//           if (res.statusCode === 200) {
-//             // we got data!
-//             result = {
-//               entity: entity,
-//               body: body
-//             };
-//           } else if (res.statusCode === 404) {
-//             // no result found
-//             result = {
-//               entity: entity,
-//               body: null
-//             };
-//           } else if (res.statusCode === 202) {
-//             // no result found
-//             result = {
-//               entity: entity,
-//               body: null
-//             };
-//           }
-//           if (body.error) {
-//             // entity not found
-//             result = {
-//               entity: entity,
-//               body: null
-//             };
-//           }
-//           done(null, result);
-//         });
-//       });
-//     }
-//   });
-
-//   async.parallelLimit(tasks, MAX_PARALLEL_LOOKUPS, (err, results) => {
-//     if (err) {
-//       cb(err);
-//       return;
-//     }
-
-//     results.forEach((result) => {
-//       if (result.body === null || (Array.isArray(result.body) && result.body.length === 0)) {
-//         lookupResults.push({
-//           entity: result.entity,
-//           data: null
-//         });
-//       } else {
-//         lookupResults.push({
-//           entity: result.entity,
-//           data: {
-//             summary: [],
-//             details: result.body
-//           }
-//         });
-//       }
-//     });
-
-//     cb(null, lookupResults);
-//   });
-// }
 
 const data = {
   name: 'TheHive',
