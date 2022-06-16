@@ -1,12 +1,12 @@
-"use strict";
+'use strict';
 
-let request = require("request");
-let _ = require("lodash");
-let util = require("util");
-let net = require("net");
-let config = require("./config/config");
-let async = require("async");
-let fs = require("fs");
+let request = require('request');
+let _ = require('lodash');
+let util = require('util');
+let net = require('net');
+let config = require('./config/config');
+let async = require('async');
+let fs = require('fs');
 let Logger;
 
 let requestWithDefaults;
@@ -27,60 +27,42 @@ function startup(logger) {
   Logger = logger;
   let defaults = {};
 
-  if (
-    typeof config.request.cert === "string" &&
-    config.request.cert.length > 0
-  ) {
+  if (typeof config.request.cert === 'string' && config.request.cert.length > 0) {
     defaults.cert = fs.readFileSync(config.request.cert);
   }
 
-  if (typeof config.request.key === "string" && config.request.key.length > 0) {
+  if (typeof config.request.key === 'string' && config.request.key.length > 0) {
     defaults.key = fs.readFileSync(config.request.key);
   }
 
-  if (
-    typeof config.request.passphrase === "string" &&
-    config.request.passphrase.length > 0
-  ) {
+  if (typeof config.request.passphrase === 'string' && config.request.passphrase.length > 0) {
     defaults.passphrase = config.request.passphrase;
   }
 
-  if (typeof config.request.ca === "string" && config.request.ca.length > 0) {
+  if (typeof config.request.ca === 'string' && config.request.ca.length > 0) {
     defaults.ca = fs.readFileSync(config.request.ca);
   }
 
-  if (
-    typeof config.request.proxy === "string" &&
-    config.request.proxy.length > 0
-  ) {
+  if (typeof config.request.proxy === 'string' && config.request.proxy.length > 0) {
     defaults.proxy = config.request.proxy;
   }
   requestWithDefaults = request.defaults(defaults);
 }
 
 function _setupRegexBlocklists(options) {
-  if (
-    options.domainBlocklistRegex !== previousDomainRegexAsString &&
-    options.domainBlocklistRegex.length === 0
-  ) {
+  if (options.domainBlocklistRegex !== previousDomainRegexAsString && options.domainBlocklistRegex.length === 0) {
     Logger.debug('Removing Domain Blocklist Regex Filtering');
     previousDomainRegexAsString = '';
     domainBlocklistRegex = null;
   } else {
     if (options.domainBlocklistRegex !== previousDomainRegexAsString) {
       previousDomainRegexAsString = options.domainBlocklistRegex;
-      Logger.debug(
-        { domainBlocklistRegex: previousDomainRegexAsString },
-        'Modifying Domain Blocklist Regex'
-      );
+      Logger.debug({ domainBlocklistRegex: previousDomainRegexAsString }, 'Modifying Domain Blocklist Regex');
       domainBlocklistRegex = new RegExp(options.domainBlocklistRegex, 'i');
     }
   }
 
-  if (
-    options.ipBlocklistRegex !== previousIpRegexAsString &&
-    options.ipBlocklistRegex.length === 0
-  ) {
+  if (options.ipBlocklistRegex !== previousIpRegexAsString && options.ipBlocklistRegex.length === 0) {
     Logger.debug('Removing IP Blocklist Regex Filtering');
     previousIpRegexAsString = '';
     ipBlocklistRegex = null;
@@ -99,39 +81,36 @@ function doLookup(entities, options, cb) {
 
   _setupRegexBlocklists(options);
 
-  Logger.trace({entities: entities}, "Loging the entity coming through");
+  Logger.trace({ entities: entities }, 'Loging the entity coming through');
 
-  entities.forEach(entity => {
+  entities.forEach((entity) => {
     if (_isEntityBlocklisted(entity, options)) {
-        next(null);
-      } else if (entity.value) {
+      next(null);
+    } else if (entity.value) {
       //do the lookup
-      let postData = {"query": {"_string": entity.value}};
+      let postData = { query: { _string: entity.value } };
       let requestOptions = {
-        method: "POST",
-        uri: options.url + "/api/case/artifact/_search?range=all&sort=-createdAt",
+        method: 'POST',
+        uri: options.url + '/api/case/artifact/_search?range=all&sort=-createdAt',
         body: postData,
         headers: {
-            Authorization: "Bearer " + options.apiKey,
-            'Content-Type': 'application/json'
+          Authorization: 'Bearer ' + options.apiKey,
+          'Content-Type': 'application/json'
         },
         json: true
       };
 
-      Logger.trace({ uri: options }, "Request URI");
+      Logger.trace({ uri: options }, 'Request URI');
 
-      tasks.push(function(done) {
-        requestWithDefaults(requestOptions, function(err, res, body) {
+      tasks.push(function (done) {
+        requestWithDefaults(requestOptions, function (err, res, body) {
           if (err) {
             Logger.error({ err: err }, 'Error Executing Request');
             done(err);
             return;
           }
 
-          Logger.trace(
-            { body: body, statusCode: res.statusCode },
-            "Result of Lookup"
-          );
+          Logger.trace({ body: body, statusCode: res.statusCode }, 'Result of Lookup');
 
           let result = {};
 
@@ -173,7 +152,7 @@ function doLookup(entities, options, cb) {
       return;
     }
 
-    results.forEach(result => {
+    results.forEach((result) => {
       if (result.body === null || (Array.isArray(result.body) && result.body.length === 0)) {
         lookupResults.push({
           entity: result.entity,
@@ -227,18 +206,16 @@ function _isEntityBlocklisted(entity, options) {
 function validateOptions(userOptions, cb) {
   let errors = [];
   if (
-    typeof userOptions.apiKey.value !== "string" ||
-    (typeof userOptions.apiKey.value === "string" &&
-      userOptions.apiKey.value.length === 0)
+    typeof userOptions.apiKey.value !== 'string' ||
+    (typeof userOptions.apiKey.value === 'string' && userOptions.apiKey.value.length === 0)
   ) {
     errors.push({
-      key: "apiKey",
-      message: "You must provide a valid API key"
+      key: 'apiKey',
+      message: 'You must provide a valid API key'
     });
   }
   cb(null, errors);
 }
-
 
 module.exports = {
   doLookup: doLookup,
