@@ -144,6 +144,14 @@
             }}</div>
         </tr>
         <tr>
+          <td> <label for='date'>Date: </label></td>
+          <div>{{input
+              type='datetime-local'
+              onclick=(action (mut dateInput value='target.vale'))
+              value=dateInput
+            }}</div>
+        </tr>
+        <tr>
           <td> <label for='severity'>Severity: </label></td>
           {{#each-in severityLevels as |level color|}}
             <button id='severity-{{level}}' {{action 'selectSeverityLevelAndSetInput' level color}}>{{level}}</button>
@@ -176,19 +184,18 @@
         }}
       </div>
 
-      <button class='create-case-btn' type='button' {{action 'submit'}}>
-        {{#if isRunning}}
-          {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
-        {{/if}}
-        New Case
-      </button>
-
       {{#if caseCreated}}
         <span class='highlight alert alert-info mt-1'>
           Case Created!
         </span>
       {{/if}}
 
+      <button class='create-case-btn' type='button' {{action 'submit'}}>
+        {{#if isRunning}}
+          {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
+        {{/if}}
+        New Case
+      </button>
       <button class='add-observable-btn' disabled={{enableAddObservable}} {{action 'toggleShowModal'}}>Add Observable</button>
 
       {{#if (not caseCreated)}}
@@ -201,12 +208,7 @@
         <div class='containment-modal'>
           <div class='modal-container'>
             <div class='modal-text'>
-              <span>
-                Are you sure you want to
-                {{if (eq device.status 'contained') 'lift containment on' 'contain'}}
-                this host:
-                <span class='bold'>{{device.hostname}}</span>?
-              </span>
+
             </div>
             <div class='modal-options'>
               <div>

@@ -9,6 +9,7 @@ polarity.export = PolarityComponent.extend({
   severityInput: '',
   tlpInput: '',
   papInput: '',
+  dateInput: '',
   currentSeverityElement: '',
   currentTlpElement: '',
   currentPapElement: '',
@@ -38,8 +39,10 @@ polarity.export = PolarityComponent.extend({
       const description = this.get('descriptionInput');
       const tlp = Number(this.get('tlpInput'));
       const pap = Number(this.get('papInput'));
+      const date = this.get('dateInput');
 
       const caseInputs = {
+        date,
         description,
         title,
         severity,
@@ -70,9 +73,9 @@ polarity.export = PolarityComponent.extend({
           this.get('block').notifyPropertyChange('data');
         });
     },
+
     selectSeverityLevelAndSetInput: function (level, colorValue) {
       const SEVERITY_LEVELS = { L: 1, M: 2, H: 3, '!!': 4 };
-      console.log(level, colorValue);
       this.set('severityInput', SEVERITY_LEVELS[level]);
       if (level !== this.get('currentSeverityElement')) {
         const cachedElementValue = this.get('currentSeverityElement');
@@ -119,6 +122,7 @@ polarity.export = PolarityComponent.extend({
       }
       this.set(`${currentElement}`, level);
     },
+
     toggleShowModal: function () {
       this.toggleProperty('modalOpen');
     }
