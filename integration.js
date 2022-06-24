@@ -333,35 +333,3 @@ module.exports = {
 // ENTITIES TO SEARCH:
 // 92.63.192.217
 // 192.42.116.18
-
-/**NOTES - CHECK THESE */
-// limit for characters in case description
-// why the the case created footnote re-appears
-
-const data = {
-  CREATED_CASE: {
-    statusCode: 201,
-    body: {
-      owner: 'admin',
-      severity: 2,
-      _routing: 'AYFFEH2X9IjF18k1tr8f',
-      flag: false,
-      customFields: {},
-      _type: 'case',
-      description: 'asdasdasdasd',
-      title: 'asdasd',
-      createdAt: 1654721117305,
-      _parent: null,
-      createdBy: 'admin',
-      caseId: 24,
-      tlp: 1,
-      metrics: {},
-      _id: 'AYFFEH2X9IjF18k1tr8f',
-      id: 'AYFFEH2X9IjF18k1tr8f',
-      _version: 1,
-      pap: 2,
-      startDate: 1654721117591,
-      status: 'Open'
-    }
-  }
-};

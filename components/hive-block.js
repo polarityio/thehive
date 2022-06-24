@@ -16,7 +16,7 @@ polarity.export = PolarityComponent.extend({
   editModalOpen: false,
   caseCreated: false,
   isRunning: false,
-  modalCase: {},
+  editCaseModalOpen: {},
   observableModalOpen: {},
   cases: {},
   init() {
@@ -27,17 +27,12 @@ polarity.export = PolarityComponent.extend({
     changeTab: function (tabName) {
       this.set('changeTab', tabName);
     },
-    toggleShowEditModal: function (caseObj, index) {
-      this.toggleProperty('details.' + index + '.__modalOpen');
-      this.set('modalCase', { caseObj, index });
+    toggleModal: function (caseObj, index, type) {
+      this.toggleProperty('details.' + index + `.__${type}Open`);
+      this.set(`${type}Open`, { caseObj, index });
     },
-    closeEditModal: function (caseObj, index) {
-      this.toggleProperty('details.' + index + '.__modalOpen');
-      this.set('modalCase', { caseObj, index });
-    },
-    toggleObservableModal: function (caseObj, index) {
-      this.toggleProperty('details.' + index + '.__observableModalOpen');
-      this.set(' observableModal', { caseObj, index });
+    addObservableToCreatedCase: function () {
+      this.toggleProperty('observableModal');
     },
     submit: function () {
       this.set('isRunning', true);
