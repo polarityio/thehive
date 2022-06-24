@@ -29,7 +29,6 @@
           Cases
         </a>
       </li>
-    {{else}}
       <li class='nav-item'>
         <a
           {{action 'changeTab' 'create'}}
@@ -42,7 +41,7 @@
     {{/if}}
   </ul>
 
-  {{#if (eq changeTab 'cases')}}
+  {{!-- {{#if (eq changeTab 'cases')}}
     <div class='p-non-exfoliate-outer-padding'>
       {{#each details as |object|}}
         {{#if object.id}}
@@ -129,6 +128,302 @@
         {{/if}}
       {{/each}}
     </div>
+  {{/if}} --}}
+
+  {{#if (eq changeTab 'cases')}}
+    {{#each details as |case index|}}
+      {{#if (not-eq index 0)}}
+        <hr />
+      {{/if}}
+      <div class='case-container'>
+        <h1 class='p-title'>
+          Case #{{case.number}}
+        </h1>
+
+        {{#if case.title}}
+          <div>
+            <span class='p-key'>Title: </span>
+            <span class='p-value'>{{case.title}}</span>
+          </div>
+        {{/if}}
+
+        {{#if case.severity}}
+          {{#if (eq case.severity 0)}}
+            <div>
+              <span class='p-key'>Severity: </span>
+              <span class='p-value'>WHITE</span>
+            </div>
+          {{/if}}
+          {{#if (eq case.severity 1)}}
+            <div>
+              <span class='p-key'>Severity: </span>
+              <span class='p-value' style='color:green'>GREEN</span>
+            </div>
+          {{/if}}
+          {{#if (eq case.severity 2)}}
+            <div>
+              <span class='p-key'>Severity: </span>
+              <span class='p-value' style='color:orange'>AMBER</span>
+            </div>
+          {{/if}}
+          {{#if (eq case.severity 3)}}
+            <div>
+              <span class='p-key'>Severity: </span>
+              <span class='p-value' style='color:red'>RED</span>
+            </div>
+          {{/if}}
+        {{/if}}
+        {{#if case.tlp}}
+          {{#if (eq case.tlp 0)}}
+            <div>
+              <span class='p-key'>TLP: </span>
+              <span class='p-value'>WHITE</span>
+            </div>
+          {{/if}}
+          {{#if (eq case.tlp 1)}}
+            <div>
+              <span class='p-key'>TLP: </span>
+              <span class='p-value' style='color:green'>GREEN</span>
+            </div>
+          {{/if}}
+          {{#if (eq case.tlp 2)}}
+            <div>
+              <span class='p-key'>TLP: </span>
+              <span class='p-value' style='color:orange'>AMBER</span>
+            </div>
+          {{/if}}
+          {{#if (eq case.tlp 3)}}
+            <div>
+              <span class='p-key'>TLP: </span>
+              <span class='p-value' style='color:red'>RED</span>
+            </div>
+          {{/if}}
+        {{/if}}
+
+        {{#if case.pap}}
+          {{#if (eq case.pap 0)}}
+            <div>
+              <span class='p-key'>PAP: </span>
+              <span class='p-value'>WHITE</span>
+            </div>
+          {{/if}}
+          {{#if (eq case.pap 1)}}
+            <div>
+              <span class='p-key'>PAP: </span>
+              <span class='p-value' style='color:green'>GREEN</span>
+            </div>
+          {{/if}}
+          {{#if (eq case.pap 2)}}
+            <div>
+              <span class='p-key'>PAP: </span>
+              <span class='p-value' style='color:orange'>AMBER</span>
+            </div>
+          {{/if}}
+          {{#if (eq case.pap 3)}}
+            <div>
+              <span class='p-key'>PAP: </span>
+              <span class='p-value' style='color:red'>RED</span>
+            </div>
+          {{/if}}
+        {{/if}}
+        {{#if case.tags}}
+          <span class='p-key'>Tags: </span>
+          {{#each case.tags as |tag|}}
+            <div>
+              <span class='tag'>{{tag}}</span>
+            </div>
+          {{/each}}
+        {{/if}}
+        {{#if case.startDate}}
+          <div>
+            <span class='p-key'>Start Date: </span>
+            <span class='p-value'>{{moment-format case.startDate timeZone=timezone}}</span>
+          </div>
+        {{/if}}
+        {{#if case.status}}
+          <div>
+            <span class='p-key'>Status: </span>
+            <span class='p-value'>{{case.status}}</span>
+          </div>
+        {{/if}}
+        {{#if case.stage}}
+          <div>
+            <span class='p-key'>Stage: </span>
+            <span class='p-value'>{{case.stage}}</span>
+          </div>
+        {{/if}}
+
+        <span class='p-key'>Description:</span>
+        <div class='scrollable-block'>
+          <table>
+            <tbody>
+              <tr>
+                <td class='pr-3'>
+                  <div>
+                    <span class='p-value'>{{case.description}}</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class='case-options'>
+          <button type='button' class='edit-case-btn' {{action 'toggleShowEditModal' case index}}>Edit</button>
+          <button
+            class='add-observable-btn'
+            type='button'
+            disabled={{addObservableIsDisabled}}
+            {{action 'toggleObservableModal' case index}}
+          >Add Observable</button>
+        </div>
+      </div>
+
+      {{#if case.__observableModalOpen}}
+        <div class='add-observable-modal'>
+          <div class='add-observable-container'>
+            <table>
+              <tr>
+                <td><label for='title'>Type: </label></td>
+                <select class='modal-select' onclick={{action (mut observableTypeInput) value='target.value'}}>
+                  <option value='none' selected disabled hidden>Select Type</option>
+                  <option value='hash'>hash</option>
+                  <option value='ip'>ip</option>
+                  <option value='domain'>domain</option>
+                </select>
+              </tr>
+              <tr>
+                <td> <label for='value'>Value: </label></td>
+                {{input
+                  class='observable-title'
+                  onclick=(action (mut valueInput value='target.value'))
+                  value=valueInput
+                  placeholder='Value'
+                }}
+              </tr>
+              <tr>
+                <td> <label for='tlp'>TLP: </label></td>
+                {{#each-in levels as |level color|}}
+                  <button
+                    id='observable-tlp-{{color}}'
+                    {{action 'selectLevelAndSetInput' level color 'observable-tlp'}}
+                  >{{level}}</button>
+                {{/each-in}}
+              </tr>
+
+              <tr>
+                <td> <label for='ioc'>is IOC: </label></td>
+                {{{input type='checkbox' value=isIocInput onchange=(action (mut isIocInput value='target.value'))}}}
+              </tr>
+
+              <tr>
+                <td> <label for='sighted'>Has been sighted: </label></td>
+                {{{input type='checkbox' value=sightedInput onchange=(action (mut sightedInput value='target.value'))}}}
+              </tr>
+
+              <tr>
+                <td> <label for='tags'>Tags: </label></td>
+                {{input onclick=(action (mut tagsInput value='target.value')) value=tagsInput placeholder='Tags'}}
+                <div class='mb-2 create-case-footnote'>
+                  <span class='p-footnote'>Add space separated strings.</span>
+                </div>
+              </tr>
+            </table>
+
+            <div>
+              {{textarea
+                class='observable-case-description'
+                onchange=(action (mut observableDescriptionInput value='target.value'))
+                value=observableDescriptionInput
+                cols='30'
+                rows='4'
+                placeholder='Observable Description'
+              }}
+            </div>
+
+            <div class='observable-modal-options'>
+              <button class='add-observable-btn' type='button' {{action 'toggleObservableModal' index}}>
+                Cancel
+              </button>
+              <button class='add-observable-btn' type='button' {{action 'addObservable' case}}>
+                {{#if isRunning}}
+                  {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
+                {{/if}}
+                Create Observable(s)
+              </button>
+            </div>
+          </div>
+        </div>
+      {{/if}}
+
+      {{#if case.__modalOpen}}
+        <div class='edit-modal'>
+          <div class='edit-container'>
+            <h1 class='p-title'>
+              Editing Case #{{case.number}}
+            </h1>
+            <table class='case-inputs'>
+              <tr>
+                <td> <label for='title'>Title: </label></td>
+                <div>{{input
+                    class='case-title'
+                    onclick=(action (mut titleInput value='target.value'))
+                    value=updatedTitleInput
+                    placeholder='Title'
+                  }}</div>
+              </tr>
+              <tr>
+                <td> <label for='severity'>Severity: </label></td>
+                {{#each-in severityLevels as |level color|}}
+                  <button
+                    id='severity-{{color}}'
+                    {{action 'selectSeverityLevelAndSetInput' level color}}
+                  >{{level}}</button>
+                {{/each-in}}
+              </tr>
+
+              <tr>
+                <td> <label for='tlp'>TLP: </label></td>
+                {{#each-in levels as |level color|}}
+                  <button id='tlp-{{color}}' {{action 'selectLevelAndSetInput' level color 'tlp'}}>{{capitalize
+                      level
+                    }}</button>
+                {{/each-in}}
+              </tr>
+
+              <tr>
+                <td> <label for='tlp'>PAP: </label></td>
+                {{#each-in levels as |level color|}}
+                  <button id='pap-{{color}}' {{action 'selectLevelAndSetInput' level color 'pap'}}>{{level}}</button>
+                {{/each-in}}
+              </tr>
+            </table>
+
+            <div>
+              {{textarea
+                class='edit-case-description'
+                onchange=(action (mut descriptionInput value='target.value'))
+                value=updatedDescriptionInput
+                cols='30'
+                rows='4'
+                placeholder='Case Description'
+              }}
+            </div>
+            <div class='edit-modal-options'>
+              <button class='close-edit-modal-btn' type='button' {{action 'closeEditModal' case index}}>
+                Cancel
+              </button>
+              <button class='confirm-edit-modal-btn' type='button' {{action 'submitUpdate' case index}}>
+                {{#if isRunning}}
+                  {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
+                {{/if}}
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      {{/if}}
+    {{/each}}
   {{/if}}
 
   {{#if (eq changeTab 'create')}}
@@ -143,32 +438,34 @@
               placeholder='Title'
             }}</div>
         </tr>
-        <tr>
+        {{!-- <tr>
           <td> <label for='date'>Date: </label></td>
           <div>{{input
               type='datetime-local'
-              onclick=(action (mut dateInput value='target.vale'))
+              onclick=(action (mut dateInput value='target.value'))
               value=dateInput
             }}</div>
-        </tr>
+        </tr> --}}
         <tr>
           <td> <label for='severity'>Severity: </label></td>
           {{#each-in severityLevels as |level color|}}
-            <button id='severity-{{level}}' {{action 'selectSeverityLevelAndSetInput' level color}}>{{level}}</button>
+            <button id='severity-{{color}}' {{action 'selectSeverityLevelAndSetInput' level color}}>{{level}}</button>
           {{/each-in}}
         </tr>
 
         <tr>
           <td> <label for='tlp'>TLP: </label></td>
           {{#each-in levels as |level color|}}
-            <button id='tlp-{{level}}' {{action 'selectLevelAndSetInput' level color 'tlp'}}>{{level}}</button>
+            <button id='tlp-{{color}}' {{action 'selectLevelAndSetInput' level color 'tlp'}}>{{capitalize
+                level
+              }}</button>
           {{/each-in}}
         </tr>
 
         <tr>
           <td> <label for='tlp'>PAP: </label></td>
           {{#each-in levels as |level color|}}
-            <button id='pap-{{level}}' {{action 'selectLevelAndSetInput' level color 'pap'}}>{{level}}</button>
+            <button id='pap-{{color}}' {{action 'selectLevelAndSetInput' level color 'pap'}}>{{level}}</button>
           {{/each-in}}
         </tr>
       </table>
@@ -184,19 +481,18 @@
         }}
       </div>
 
-      {{#if caseCreated}}
-        <span class='highlight alert alert-info mt-1'>
-          Case Created!
-        </span>
-      {{/if}}
-
       <button class='create-case-btn' type='button' {{action 'submit'}}>
         {{#if isRunning}}
           {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
         {{/if}}
         New Case
       </button>
-      <button class='add-observable-btn' disabled={{enableAddObservable}} {{action 'toggleShowModal'}}>Add Observable</button>
+      <button
+        class='add-observable-btn'
+        type='button'
+        disabled={{addObservableIsDisabled}}
+        {{action 'toggleObservableModal'}}
+      >Add Observable</button>
 
       {{#if (not caseCreated)}}
         <div class='mb-2 create-case-footnote'>
@@ -204,20 +500,76 @@
         </div>
       {{/if}}
 
-      {{#if modalOpen}}
-        <div class='containment-modal'>
-          <div class='modal-container'>
-            <label for='title'>Type: </label>
-            {{! <div class='type-selection'> }}
-            <select class='w-100' onclick={{action (mut observableTypeInput) value='target.value'}}>
-              <option value='none' selected disabled hidden>Select Option</option>
-              <option value='hash'>hash</option>
-              <option value='ip'>ip</option>
-              <option value='domain'>domain</option>
-            </select>
-            {{! </div> }}
-            <div class='modal-options'>
+      {{#if observableModal}}
+        <div class='add-observable-modal'>
+          <div class='add-observable-container'>
+            <table>
+              <tr>
+                <td><label for='title'>Type: </label></td>
+                <select class='modal-select' onclick={{action (mut observableTypeInput) value='target.value'}}>
+                  <option value='none' selected disabled hidden>Select Type</option>
+                  <option value='hash'>hash</option>
+                  <option value='ip'>ip</option>
+                  <option value='domain'>domain</option>
+                </select>
+              </tr>
+              <tr>
+                <td> <label for='value'>Value: </label></td>
+                {{input
+                  class='observable-title'
+                  onclick=(action (mut valueInput value='target.value'))
+                  value=valueInput
+                  placeholder='Value'
+                }}
+              </tr>
+              <tr>
+                <td> <label for='tlp'>TLP: </label></td>
+                {{#each-in levels as |level color|}}
+                  <button
+                    id='observable-tlp-{{color}}'
+                    {{action 'selectLevelAndSetInput' level color 'observable-tlp'}}
+                  >{{level}}</button>
+                {{/each-in}}
+              </tr>
+
+              <tr>
+                <td> <label for='ioc'>is IOC: </label></td>
+                {{{input type='checkbox' value=isIocInput onchange=(action (mut isIocInput value='target.value'))}}}
+              </tr>
+
+              <tr>
+                <td> <label for='sighted'>Has been sighted: </label></td>
+                {{{input type='checkbox' value=sightedInput onchange=(action (mut sightedInput value='target.value'))}}}
+              </tr>
+
+              <tr>
+                <td> <label for='tags'>Tags: </label></td>
+                {{input onclick=(action (mut tagsInput value='target.value')) value=tagsInput placeholder='Tags'}}
+                <div class='mb-2 create-case-footnote'>
+                  <span class='p-footnote'>Add space separated strings.</span>
+                </div>
+              </tr>
+            </table>
+
+            <div>
+              {{textarea
+                class='observable-case-description'
+                onchange=(action (mut observableDescriptionInput value='target.value'))
+                value=observableDescriptionInput
+                cols='30'
+                rows='4'
+                placeholder='Observable Description'
+              }}
+            </div>
+
+            <div class='observable-modal-options'>
+              <button class='add-observable-btn' type='button' {{action 'toggleObservableModal'}}>
+                Cancel
+              </button>
               <button class='add-observable-btn' type='button' {{action 'addObservable'}}>
+                {{#if isRunning}}
+                  {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
+                {{/if}}
                 Create Observable(s)
               </button>
             </div>

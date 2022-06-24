@@ -1,11 +1,10 @@
 'use strict';
 const config = require('./config/config');
-let fs = require('fs');
 const { map } = require('lodash/fp');
-let request = require('postman-request');
-let _ = require('lodash');
+const fs = require('fs');
+const request = require('postman-request');
+const _ = require('lodash');
 const _configFieldIsValid = (field) => typeof field === 'string' && field.length > 0;
-
 let Logger;
 
 let previousDomainRegexAsString = '';
@@ -41,6 +40,7 @@ function startup(logger) {
 
   requestWithDefaults = (requestOptions) =>
     new Promise((resolve, reject) => {
+      Logger.trace({ REQ_OPTIONS: requestOptions });
       _requestWithDefaults(requestOptions, (err, res, body) => {
         if (err) return reject(err);
         let response = { ...res, body };
@@ -62,7 +62,7 @@ function startup(logger) {
 const checkForStatusError = (response, requestOptions) => {
   let statusCode = response.statusCode;
 
-  if (![200, 201, 429, 500, 502, 504].includes(statusCode)) {
+  if (![200, 201, 204, 429, 500, 502, 504].includes(statusCode)) {
     const errorMessage = _.get(response, 'body.err', 'Request Error');
     const requestError = new RequestError(errorMessage, statusCode, response.body, {
       ...requestOptions,
@@ -88,9 +88,9 @@ const doLookup = async (entities, options, cb) => {
   }
 };
 
-const buildRequestOptions = async (query, path, options) => {
+const buildRequestOptions = async (query, restVerb, path, options) => {
   const data = {
-    method: 'POST',
+    method: restVerb,
     uri: options.url + `${path}`,
     body: query,
     headers: {
@@ -114,12 +114,8 @@ const getApiData = async (entity, requestWithDefaults, options) => {
 };
 
 const getCases = async (entity, requestWithDefaults, options) => {
-  const query = { query: { _string: entity.value } };
-  const requestOptions = await buildRequestOptions(
-    query,
-    '/api/case/artifact/_search?range=all&sort=-createdAt',
-    options
-  );
+  const query = { query: [{ _name: 'listCase' }] };
+  const requestOptions = await buildRequestOptions(query, 'POST', '/api/v1/query', options);
 
   const response = await requestWithDefaults(requestOptions);
   Logger.trace({ response }, 'Get Cases response');
@@ -129,8 +125,7 @@ const getCases = async (entity, requestWithDefaults, options) => {
 const createCase = async (caseInputs, requestWithDefaults, options) => {
   try {
     const query = caseInputs;
-
-    const requestOptions = await buildRequestOptions(query, '/api/case', options);
+    const requestOptions = await buildRequestOptions(query, 'POST', '/api/v1/case', options);
     const createdCase = await requestWithDefaults(requestOptions);
     Logger.trace({ createCase });
 
@@ -141,11 +136,30 @@ const createCase = async (caseInputs, requestWithDefaults, options) => {
   }
 };
 
-const addObservable = async (observableInputs, requestWithDefaults, options) => {
-  const query = observableInputs;
+const updateCase = async (updatedInputs, requestWithDefaults, options) => {
   try {
-    const requestOptions = await buildRequestOptions(query, ' /api/v0/case/{caseId}/artifact', options);
+    const query = updatedInputs.inputs;
+    const caseId = updatedInputs.caseId;
+
+    const requestOptions = await buildRequestOptions(query, 'PATCH', `/api/v1/case/${caseId}`, options);
+    const updatedCase = await requestWithDefaults(requestOptions);
+    Logger.trace({ UPDATED_CASE: updateCase });
+    return updatedCase;
+  } catch (err) {
+    Logger.error({ err });
+    throw err;
+  }
+};
+
+const addObservable = async (observableInputs, requestWithDefaults, options) => {
+  Logger.trace({ OBSERVABLE_INPUTS: observableInputs });
+  const query = observableInputs.inputs;
+  const caseId = observableInputs.caseId;
+
+  try {
+    const requestOptions = await buildRequestOptions(query, 'POST', `/api/v1/case/${caseId}/observable`, options);
     const addedObservable = await requestWithDefaults(requestOptions);
+
     return addedObservable;
   } catch (err) {
     Logger.error({ err });
@@ -157,18 +171,21 @@ const onMessage = async (payload, options, cb) => {
   switch (payload.action) {
     case 'createCase':
       const caseInputs = payload.data.caseInputs;
-      // const createdCase = await createCase(caseInputs, requestWithDefaults, options);
-      // check this, there is an inconsistent integration error:
-      // (Notif) <injected: #64> {"title":"Integration Error Message","detail":"[Detail Not Provided]","status":"500","meta":{"message":"Unexpected end of JSON input","stack":"SyntaxError: Unexpected end of JSON input\n    at parse (<anonymous>)\n    at b (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:4157:12)\n    at g (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:4155:128)\n    at invokeWithOnError (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3724:206)\n    at h.flush (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3716:74)\n    at flush (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3727:292)\n    at j._end (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3778:9)\n    at _boundAutorunEnd (https://dev.polarity/assets/vendor-e85665e98c782a44b84f387e8c595a01.js:3736:605)"}}
-      // Logger.trace({ CREATED_CASE: createdCase });
-      // going to return this mock data to prevent creating cases
-      cb(null, data.CREATED_CASE);
+      const createdCase = await createCase(caseInputs, requestWithDefaults, options);
+      const response = _.get(createdCase, 'body', {});
+      cb(null, response);
       break;
-    // return cb(null, data.CREATED_CASE);
     case 'addObservable':
       const observableInputs = payload.data.observableInputs;
+      Logger.trace({ OBSERVABLE_INPUTS: observableInputs });
       const addedObservable = await addObservable(observableInputs, requestWithDefaults, options);
       cb(null, addedObservable);
+      break;
+    case 'updateCase':
+      const updatedInputs = payload.data.updatedInputs;
+      Logger.trace({ UPDATE_INPUTS: updatedInputs });
+      const updatedCase = await updateCase(updatedInputs, requestWithDefaults, options);
+      cb(null, updatedCase);
       break;
     default:
       return;
@@ -316,6 +333,10 @@ module.exports = {
 // ENTITIES TO SEARCH:
 // 92.63.192.217
 // 192.42.116.18
+
+/**NOTES - CHECK THESE */
+// limit for characters in case description
+// why the the case created footnote re-appears
 
 const data = {
   CREATED_CASE: {
