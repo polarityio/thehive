@@ -16,10 +16,12 @@ polarity.export = PolarityComponent.extend({
   editModalOpen: false,
   caseCreated: false,
   isRunning: false,
-  editCaseModalOpen: {},
+  editModalOpen: {},
   observableModalOpen: {},
+  closeCaseModalOpen: {},
+  closedCase: {},
   cases: {},
-  init() {
+  init () {
     this.set('changeTab', this.get('details.length') ? 'cases' : 'create');
     this._super(...arguments);
   },
@@ -28,6 +30,7 @@ polarity.export = PolarityComponent.extend({
       this.set('changeTab', tabName);
     },
     toggleModal: function (caseObj, index, type) {
+      console.log(JSON.stringify(type));
       this.toggleProperty('details.' + index + `.__${type}Open`);
       this.set(`${type}Open`, { caseObj, index });
     },
@@ -69,7 +72,26 @@ polarity.export = PolarityComponent.extend({
           this.get('block').notifyPropertyChange('data');
         });
     },
-    submitUpdate: function (caseObj) {
+    closeCase: function (caseToClose, index, type = 'closeCaseModal') {
+      this.set('isRunning', true);
+      this.sendIntegrationMessage({
+        action: 'closeCase',
+        data: caseToClose
+      })
+        .then((data) => {
+          console.log(JSON.stringify(data));
+        })
+        .catch((err) => {
+          console.log(JSON.stringify(err));
+        })
+        .finally(() => {
+          this.set('isRunning', false);
+          this.set('details.' + index + `.__${type}Open`, false);
+          // this.set('details.' + index + `.__closedCase`, true);
+          this.get('block').notifyPropertyChange('data');
+        });
+    },
+    submitEdit: function (caseObj, index, type) {
       this.set('isRunning', true);
       const title = this.get('updatedTitleInput');
       const severity = Number(this.get('severityInput'));
@@ -82,8 +104,8 @@ polarity.export = PolarityComponent.extend({
         inputs: {
           title,
           description,
-          tlp,
-          pap,
+          tlp: tlp,
+          pap: pap,
           severity
         }
       };
@@ -101,6 +123,7 @@ polarity.export = PolarityComponent.extend({
         })
         .finally(() => {
           this.set('isRunning', false);
+          this.set('details.' + index + `.__${type}Open`, false);
           this.get('block').notifyPropertyChange('data');
         });
     },
@@ -114,7 +137,6 @@ polarity.export = PolarityComponent.extend({
       const tagsInputs = this.get('tagsInputs');
       const observableDescriptionInput = this.get('observableDescriptionInput');
 
-      console.log(JSON.stringify(caseObj));
       const observableInputs = {
         caseId: caseObj._id,
         inputs: {
@@ -165,10 +187,10 @@ polarity.export = PolarityComponent.extend({
     },
     selectLevelAndSetInput: function (level, colorValue, type) {
       const LEVELS = {
-        white: '1',
-        green: '2',
-        amber: '3',
-        red: '4'
+        white: '0',
+        green: '1',
+        amber: '2',
+        red: '3'
       };
 
       let currentElement;

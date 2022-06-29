@@ -62,82 +62,70 @@ input {
   border: 1px solid #dedede;
 }
 
-.create-case-footnote {
-  margin-top: 5px;
-  margin-bottom: 0;
-}
+.case-options {
+  display: flex;
+  flex-direction: row;
+  margin-top: 6%;
+  margin-bottom: 4%;
 
-.case-creation-form {
-  margin-top: 10px;
-}
-
-.case-container {
-  margin-top: 5%;
-
-  .case-options {
-    display: flex;
+  .case-btn {
     justify-content: space-between;
-    margin-top: 4%;
-
-    & .edit-case-btn {
-      background-color: #3c8dbc;
-      border-color: #367fa9;
-      border-radius: 3px;
-      margin-top: 5px;
-      color: white;
-      font-weight: bold;
-      font-size: 10px;
-      height: 30px;
-    }
+    background-color: #3c8dbc;
+    border-color: #367fa9;
+    border-radius: 3px;
+    color: white;
+    font-weight: bold;
+    font-size: 10px;
+    height: 30px;
+    width: 15%;
+    padding: 2%;
+    text-align: center;
+    position: relative;
+    right: -100px;
+    margin: 1px;
   }
 }
 
-.edit-modal {
-  position: absolute;
-  height: 280px;
-  width: 95%;
+.edit-case-modal {
+  display: flex;
+  position: fixed;
+  width: 80%;
+  height: 40%;
   z-index: 9999;
-  bottom: 16px;
-  right: 0;
+  bottom: 30%;
+  right: 3%;
   background-color: white;
   box-shadow: rgba(0, 0, 0, 0.5) 0px 0.5rem 2rem;
-  border-radius: 6px;
-  margin-right: 3%;
+  border-radius: 2%;
+  margin-right: 7%;
   margin-left: 3%;
   border: 1px solid white;
+  padding-left: 2%;
 
-  & .edit-container {
+  & .edit-case-container {
     flex-direction: row;
-    padding: 4px;
+    margin-left: 5%;
     justify-content: space-between;
     margin-top: 13px;
     height: 100%;
-
-    // .modal-text {
-    //   display: flex;
-    //   width: 170px;
-    //   font-size: 14px;
-    //   font-weight: 500px;
-    //   line-height: 17px;
-    // }
+    padding: 0%;
 
     .p-title {
-      margin-bottom: 15px;
-      margin-top: 1px;
+      margin-bottom: 8%;
     }
 
     .edit-case-description {
-      margin-bottom: 3px;
+      width: 100%;
+      margin-bottom: 3%;
     }
-
-    .edit-modal-options {
+    .edit-case-options {
       display: flex;
-      margin-top: 3%;
+      margin: 0%;
       justify-content: space-between;
       & > * {
         margin-right: 5px;
       }
-      button {
+      button.edit-modal-btn {
         background-color: #3c8dbc;
         border-color: #367fa9;
         border-radius: 3px;
@@ -151,48 +139,79 @@ input {
   }
 }
 
-.add-observable-btn {
-  background-color: #3c8dbc;
-  border-color: #367fa9;
-  border-radius: 3px;
-  color: white;
-  font-weight: bold;
-  font-size: 10px;
-  height: 30px;
+.case-modal {
+  display: flex;
+  position: fixed;
+  width: 90%;
+  height: 50%;
+  z-index: 9999;
+  bottom: 30%;
+  right: 6%;
+  background-color: white;
+  box-shadow: rgba(0, 0, 0, 0.5) 0px 0.5rem 2rem;
+  border-radius: 2%;
+  border: 1px solid white;
+
+  & .case-container {
+    flex-direction: row;
+    padding: 0%;
+    justify-content: space-between;
+    margin-top: 13px;
+    margin-left: 5%;
+    height: 100%;
+
+    .p-title {
+      margin-bottom: 4%;
+      margin-top: 0%;
+    }
+
+    .case-options {
+      display: flex;
+      justify-content: space-between;
+      & > * {
+        margin-right: 5px;
+      }
+      button.case-modal-btn {
+        background-color: #3c8dbc;
+        border-color: #367fa9;
+        border-radius: 3px;
+        color: white;
+        margin-top: 5px;
+        margin-bottom: 5%;
+        font-weight: bold;
+        font-size: 10px;
+        height: 30px;
+      }
+    }
+  }
 }
 
-.add-observable-btn button:disabled,
-button[disabled] {
-  border: 1px solid #999999;
-  background-color: #cccccc;
-  color: #666666;
-  border-radius: 3px;
-  margin-top: 5px;
-  font-weight: bold;
-  font-size: 10px;
-  height: 30px;
+.modal-options {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-right: 0;
+  margin-left: 0;
+  display: inline-block;
 }
 
-.add-observable-modal {
-  position: absolute;
-  height: 100%;
-  width: 97%;
+.containment-modal {
+  position: fixed;
   z-index: 9999;
   bottom: 16px;
-  right: 0;
+  right: 10%;
+  margin-bottom: 100%;
   background-color: white;
   box-shadow: rgba(0, 0, 0, 0.5) 0px 0.5rem 2rem;
   border-radius: 6px;
-  margin-right: 3%;
-  margin-left: 3%;
+  margin-right: 10%;
+  margin-left: 17%;
   border: 1px solid white;
 
-  & .add-observable-container {
-    flex-direction: row;
-    padding: 4px;
-    justify-content: space-between;
-    margin-top: 13px;
-    height: 100%;
+  & .modal-container {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    max-width: 200px;
 
     .modal-text {
       display: flex;
@@ -202,27 +221,19 @@ button[disabled] {
       line-height: 17px;
     }
 
-    .observable-title {
-      width: 100%;
-    }
-    .observable-case-description {
-      margin-top: 3%;
-      width: 100%;
-    }
-
-    .observable-modal-options {
+    .modal-options {
       display: flex;
-      margin-top: 6%;
-      justify-content: space-between;
+      justify-content: center;
       & > * {
         margin-right: 5px;
       }
-      button.add-observable-btn {
+      button.modal-btn {
         background-color: #3c8dbc;
         border-color: #367fa9;
         border-radius: 3px;
         color: white;
         margin-top: 5px;
+        margin-bottom: 5%;
         font-weight: bold;
         font-size: 10px;
         height: 30px;

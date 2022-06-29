@@ -1,4 +1,5 @@
 'use strict';
+
 const config = require('./config/config');
 const { map } = require('lodash/fp');
 const fs = require('fs');
@@ -20,7 +21,7 @@ let requestWithDefaults;
  * @param cb
  */
 
-function startup(logger) {
+function startup (logger) {
   Logger = logger;
 
   const {
@@ -40,7 +41,6 @@ function startup(logger) {
 
   requestWithDefaults = (requestOptions) =>
     new Promise((resolve, reject) => {
-      Logger.trace({ REQ_OPTIONS: requestOptions });
       _requestWithDefaults(requestOptions, (err, res, body) => {
         if (err) return reject(err);
         let response = { ...res, body };
@@ -89,7 +89,7 @@ const doLookup = async (entities, options, cb) => {
 };
 
 const buildRequestOptions = async (query, restVerb, path, options) => {
-  const data = {
+  const requestOptions = {
     method: restVerb,
     uri: options.url + `${path}`,
     body: query,
@@ -99,7 +99,9 @@ const buildRequestOptions = async (query, restVerb, path, options) => {
     },
     json: true
   };
-  return data;
+
+  Logger.trace({ OPTIONS: requestOptions });
+  return requestOptions;
 };
 
 const getApiData = async (entity, requestWithDefaults, options) => {
@@ -114,12 +116,38 @@ const getApiData = async (entity, requestWithDefaults, options) => {
 };
 
 const getCases = async (entity, requestWithDefaults, options) => {
-  const query = { query: [{ _name: 'listCase' }] };
-  const requestOptions = await buildRequestOptions(query, 'POST', '/api/v1/query', options);
+  // const queryCaseForObservableRequestOptions = await buildRequestOptions(
+  //   queryCaseForObservable,
+  //   'POST',
+  //   '/api/v1/query',
+  //   options
+  // );
+  // const caseResponse = await requestWithDefaults(queryCaseForObservableRequestOptions);
 
-  const response = await requestWithDefaults(requestOptions);
-  Logger.trace({ response }, 'Get Cases response');
-  return response;
+  // const queryObservable = {
+  //   query: [{ _name: 'getCase', idOrName: caseResponse}]
+  // };
+
+  const queryCaseForObservable = {
+    query: [
+      { _name: 'listObservable' },
+      { _name: 'filter', _eq: { _field: 'data', _value: entity.value } },
+      { _name: 'case' }
+    ]
+  };
+
+  const queryObservableRequestOptions = await buildRequestOptions(
+    queryCaseForObservable,
+    'POST',
+    '/api/v1/query',
+    options
+  );
+  const observableResponse = await requestWithDefaults(queryObservableRequestOptions);
+
+  // Logger.trace({ QUERY_CASE_FOR_OBSERVABLE: caseResponse });
+  // Logger.trace({ QUERY_OBSERVABLE: observableResponse });
+
+  return observableResponse;
 };
 
 const createCase = async (caseInputs, requestWithDefaults, options) => {
@@ -145,6 +173,18 @@ const updateCase = async (updatedInputs, requestWithDefaults, options) => {
     const updatedCase = await requestWithDefaults(requestOptions);
     Logger.trace({ UPDATED_CASE: updateCase });
     return updatedCase;
+  } catch (err) {
+    Logger.error({ err });
+    throw err;
+  }
+};
+
+const closeCase = async (caseToClose, requestWithDefaults, options) => {
+  try {
+    const requestOptions = await buildRequestOptions({}, 'DELETE', `/api/v1/case/${caseToClose}`, options);
+    const closedCase = await requestWithDefaults(requestOptions);
+    Logger.trace({ CLOSED_CASE: closeCase });
+    return closedCase;
   } catch (err) {
     Logger.error({ err });
     throw err;
@@ -186,6 +226,11 @@ const onMessage = async (payload, options, cb) => {
       Logger.trace({ UPDATE_INPUTS: updatedInputs });
       const updatedCase = await updateCase(updatedInputs, requestWithDefaults, options);
       cb(null, updatedCase);
+      break;
+    case 'closeCase':
+      const caseToClose = payload.data._id;
+      const closedCase = await closeCase(caseToClose, requestWithDefaults, options);
+      cb(null, closedCase);
       break;
     default:
       return;
@@ -232,7 +277,7 @@ const retryablePolarityResponse = (entity) => {
 };
 
 class RequestError extends Error {
-  constructor(message, status, description, requestOptions) {
+  constructor (message, status, description, requestOptions) {
     super(message);
     this.name = 'requestError';
     this.status = status;
@@ -253,7 +298,7 @@ const parseErrorToReadableJSON = (err) => {
     : err;
 };
 
-function _isEntityBlocklisted(entity, options) {
+function _isEntityBlocklisted (entity, options) {
   const blocklist = options.blocklist;
 
   Logger.trace({ blocklist: blocklist }, 'checking to see what blocklist looks like');
@@ -283,7 +328,7 @@ function _isEntityBlocklisted(entity, options) {
   return false;
 }
 
-function validateOptions(userOptions, cb) {
+function validateOptions (userOptions, cb) {
   let errors = [];
   if (
     typeof userOptions.apiKey.value !== 'string' ||
@@ -297,7 +342,7 @@ function validateOptions(userOptions, cb) {
   cb(null, errors);
 }
 
-function _setupRegexBlocklists(options) {
+function _setupRegexBlocklists (options) {
   if (options.domainBlocklistRegex !== previousDomainRegexAsString && options.domainBlocklistRegex.length === 0) {
     Logger.debug('Removing Domain Blocklist Regex Filtering');
     previousDomainRegexAsString = '';
