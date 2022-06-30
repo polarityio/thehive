@@ -6,6 +6,7 @@ polarity.export = PolarityComponent.extend({
   levels: { white: '#5bc0de', green: '#5cb85c', amber: '#f0ad4e', red: '#d9534f' },
   severityLevels: { L: '#5cb85c', M: '#5bc0de', H: '#f0ad4e', '!!': '#d9534f' },
   observableTypes: ['ip', 'hash', 'domain'],
+  caseObservables: {},
   currentSeverityElement: '',
   currentTlpElement: '',
   currentPapElement: '',
@@ -14,12 +15,12 @@ polarity.export = PolarityComponent.extend({
   addObservableIsDisabled: false,
   observableModal: false,
   editModalOpen: false,
-  caseCreated: false,
   isRunning: false,
   editModalOpen: {},
   observableModalOpen: {},
   closeCaseModalOpen: {},
   closedCase: {},
+  editedCase: {},
   cases: {},
   init () {
     this.set('changeTab', this.get('details.length') ? 'cases' : 'create');
@@ -30,7 +31,6 @@ polarity.export = PolarityComponent.extend({
       this.set('changeTab', tabName);
     },
     toggleModal: function (caseObj, index, type) {
-      console.log(JSON.stringify(type));
       this.toggleProperty('details.' + index + `.__${type}Open`);
       this.set(`${type}Open`, { caseObj, index });
     },
@@ -79,6 +79,12 @@ polarity.export = PolarityComponent.extend({
         data: caseToClose
       })
         .then((data) => {
+          this.set(
+            `closedCase`,
+            Object.assign({}, this.get('closedCase'), {
+              [caseToClose._id]: !this.get('closedCase')[caseToClose._id]
+            })
+          );
           console.log(JSON.stringify(data));
         })
         .catch((err) => {
@@ -93,7 +99,7 @@ polarity.export = PolarityComponent.extend({
     },
     submitEdit: function (caseObj, index, type) {
       this.set('isRunning', true);
-      const title = this.get('updatedTitleInput');
+      const title = this.get('titleInput');
       const severity = Number(this.get('severityInput'));
       const description = this.get('updatedDescriptionInput');
       const tlp = Number(this.get('tlpInput'));
@@ -114,8 +120,16 @@ polarity.export = PolarityComponent.extend({
         action: 'updateCase',
         data: { updatedInputs }
       })
-        .then((data) => {
-          console.log(JSON.stringify(data));
+        .then(() => {
+          this.set(
+            'editedCase',
+            Object.assign({}, this.get('editedCase'), {
+              newInputs
+            })
+          );
+
+          const updatedCase = this.get('editedCase');
+          console.log('updated_case:', JSON.stringify(updatedCase));
         })
         .catch((err) => {
           console.log(err);
@@ -163,8 +177,15 @@ polarity.export = PolarityComponent.extend({
         })
         .finally(() => {
           this.set('isRunning', false);
+          this.set('details.' + index + `.__${type}Open`, false);
           this.get('block').notifyPropertyChange('data');
         });
+    },
+    toggleExpandableObservables: function (index) {
+      const modifiedExpandableTitleStates = Object.assign({}, this.get('caseObservables'), {
+        [index]: !this.get('caseObservables')[index]
+      });
+      this.set(`caseObservables`, modifiedExpandableTitleStates);
     },
     selectSeverityLevelAndSetInput: function (level, colorValue) {
       const SEVERITY_LEVELS = { L: 1, M: 2, H: 3, '!!': 4 };

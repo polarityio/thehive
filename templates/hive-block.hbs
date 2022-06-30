@@ -44,88 +44,7 @@
   {{!-- {{#if (eq changeTab 'cases')}}
     <div class='p-non-exfoliate-outer-padding'>
       {{#each details as |object|}}
-        {{#if object.id}}
-          <div>
-            <a href='{{block.userOptions.url}}/index.html#/case/{{object._parent}}/details' class='p-link'>(Pivot To
-              Case Details)</a>
-          </div>
 
-          <h1 class='p-title'>
-            {{fa-icon 'eye' fixedWidth=true}}
-            Observable Information
-          </h1>
-
-          {{#if (eq object.tlp 0)}}
-            <div>
-              <span class='p-key'>TLP: </span>
-              <span class='p-value'>WHITE</span>
-            </div>
-          {{/if}}
-          {{#if (eq object.tlp 1)}}
-            <div>
-              <span class='p-key'>TLP: </span>
-              <span class='p-value' style='color:green'>GREEN</span>
-            </div>
-          {{/if}}
-          {{#if (eq object.tlp 2)}}
-            <div>
-              <span class='p-key'>TLP: </span>
-              <span class='p-value' style='color:orange'>AMBER</span>
-            </div>
-          {{/if}}
-          {{#if (eq object.tlp 3)}}
-            <div>
-              <span class='p-key'>TLP: </span>
-              <span class='p-value' style='color:red'>RED</span>
-            </div>
-          {{/if}}
-          <div>
-            <span class='p-key'>Case Ceated Date </span>
-            <span class='p-value'>{{moment-time object.createdAt}}</span>
-          </div>
-
-          <div>
-            <span class='p-key'>Case Start Date </span>
-            <span class='p-value'>{{moment-time object.startDate}}</span>
-          </div>
-
-          <div>
-            <span class='p-key'>Observable Message: </span>
-            <span class='p-value'>{{object.message}}</span>
-          </div>
-          <div>
-            <span class='p-key'>Observable Type: </span>
-            <span class='p-value'>{{object.dataType}}</span>
-          </div>
-          <div>
-            <span class='p-key'>Created By: </span>
-            <span class='p-value'>{{object.createdBy}}</span>
-          </div>
-          <div>
-            <span class='p-key'>Is IOC? </span>
-            <span class='p-value'>{{object.ioc}}</span>
-          </div>
-          <div>
-            <span class='p-key'>Observable Sighted? </span>
-            <span class='p-value'>{{object.sighted}}</span>
-          </div>
-
-          <div>
-            <span class='p-key'>Hive Type? </span>
-            <span class='p-value'>{{object._type}}</span>
-          </div>
-
-          <div class='p-title'>
-            {{fa-icon 'tag' fixedWidth=true}}
-            Tags
-          </div>
-          <div class='tags'>
-            {{#each object.tags as |tag|}}
-              <span class='pulse-tag'>{{tag}}</span>
-            {{/each}}
-          </div>
-
-        {{/if}}
       {{/each}}
     </div>
   {{/if}} --}}
@@ -139,23 +58,25 @@
       <div class='case-options'>
         <h1 class='p-title'>
           Case #{{case.number}}
+          {{if (get closedCase case._id) '(CASE HAS BEEN CLOSED)'}}
         </h1>
-
-        <button
-          class='case-btn'
-          title='Add an observable to this case'
-          type='button'
-          {{action 'toggleModal' case index 'observableModal'}}
-        >{{fa-icon 'plus' fixedWidth=true}}</button>
-        <button class='case-btn' title='Edit this case' type='button' {{action 'toggleModal' case index 'editModal'}}>
-          {{fa-icon 'pen'}}</button>
-        <button
-          style='background-color: red'
-          title='Close this case'
-          class='case-btn'
-          type='button'
-          {{action 'toggleModal' case index 'closeCaseModal'}}
-        >X</button>
+        {{#unless (get closedCase case._id)}}
+          <button
+            class='case-btn'
+            title='Add an observable to this case'
+            type='button'
+            {{action 'toggleModal' case index 'observableModal'}}
+          >{{fa-icon 'plus' fixedWidth=true}}</button>
+          <button class='case-btn' title='Edit this case' type='button' {{action 'toggleModal' case index 'editModal'}}>
+            {{fa-icon 'pen'}}</button>
+          <button
+            style='background-color: red'
+            title='Close this case'
+            class='case-btn'
+            type='button'
+            {{action 'toggleModal' case index 'closeCaseModal'}}
+          >X</button>
+        {{/unless}}
       </div>
 
       <div class='case-container'>
@@ -286,6 +207,107 @@
             </tbody>
           </table>
         </div>
+
+        {{#if (get caseObservables index)}}
+          <a href='#' class='expandable-title' {{on 'click' (action 'toggleExpandableObservables' index)}}>
+            <span class='text'><span class='desc'>Observable(s)</span> {{UNIQUE_VALUE}}</span>
+            {{fa-icon 'angle-up'}}
+          </a>
+
+          {{#each case.caseObservables as |observable|}}
+            {{#if observable._id}}
+
+              <hr />
+
+              <div>
+                <a
+                  href='{{block.userOptions.url}}/index.html#/case/{{observable._parent}}/details'
+                  class='p-link'
+                >(Pivot To Case Details)</a>
+              </div>
+
+              <h1 class='p-title'>
+                {{fa-icon 'eye' fixedWidth=true}}
+                Observable Information
+              </h1>
+
+              {{#if (eq observable.tlp 0)}}
+                <div>
+                  <span class='p-key'>TLP: </span>
+                  <span class='p-value'>WHITE</span>
+                </div>
+              {{/if}}
+              {{#if (eq observable.tlp 1)}}
+                <div>
+                  <span class='p-key'>TLP: </span>
+                  <span class='p-value' style='color:green'>GREEN</span>
+                </div>
+              {{/if}}
+              {{#if (eq observable.tlp 2)}}
+                <div>
+                  <span class='p-key'>TLP: </span>
+                  <span class='p-value' style='color:orange'>AMBER</span>
+                </div>
+              {{/if}}
+              {{#if (eq observable.tlp 3)}}
+                <div>
+                  <span class='p-key'>TLP: </span>
+                  <span class='p-value' style='color:red'>RED</span>
+                </div>
+              {{/if}}
+              <div>
+                <span class='p-key'>Case Ceated Date </span>
+                <span class='p-value'>{{moment-time observable.createdAt}}</span>
+              </div>
+              <div>
+                <span class='p-key'>Case Start Date </span>
+                <span class='p-value'>{{moment-time observable.startDate}}</span>
+              </div>
+
+              <div>
+                <span class='p-key'>Observable Message: </span>
+                <span class='p-value'>{{observable.message}}</span>
+              </div>
+              <div>
+                <span class='p-key'>Observable Type: </span>
+                <span class='p-value'>{{observable.dataType}}</span>
+              </div>
+              <div>
+                <span class='p-key'>Created By: </span>
+                <span class='p-value'>{{observable.createdBy}}</span>
+              </div>
+              <div>
+                <span class='p-key'>Is IOC? </span>
+                <span class='p-value'>{{observable.ioc}}</span>
+              </div>
+              <div>
+                <span class='p-key'>Observable Sighted? </span>
+                <span class='p-value'>{{observable.sighted}}</span>
+              </div>
+
+              <div>
+                <span class='p-key'>Hive Type? </span>
+                <span class='p-value'>{{observable._type}}</span>
+              </div>
+              {{#if observable.tags}}
+                <div class='p-title'>
+                  {{fa-icon 'tag' fixedWidth=true}}
+                  Tags
+                </div>
+                <div class='tags'>
+                  {{#each observable.tags as |tag|}}
+                    <span class='pulse-tag'>{{tag}}</span>
+                  {{/each}}
+                </div>
+              {{/if}}
+            {{/if}}
+          {{/each}}
+        {{else}}
+          <a href='#' class='expandable-title' {{on 'click' (action 'toggleExpandableObservables' index)}}>
+            <span class='text'>Observable(s)</span>
+            {{fa-icon 'angle-down'}}
+          </a>
+        {{/if}}
       </div>
 
       {{#if case.__editModalOpen}}
@@ -294,64 +316,68 @@
             <h1 class='p-title'>
               Editing Case #{{case.number}}
             </h1>
-            <table class='case-inputs'>
-              <tr>
-                <td> <label for='title'>Title: </label></td>
-                <div>{{input
-                    class='case-title'
-                    onclick=(action (mut titleInput value='target.value'))
-                    value=updatedTitleInput
-                    placeholder='Title'
-                  }}</div>
-              </tr>
-              <tr>
-                <td> <label for='severity'>Severity: </label></td>
-                {{#each-in severityLevels as |level color|}}
-                  <button
-                    id='severity-{{color}}'
-                    {{action 'selectSeverityLevelAndSetInput' level color}}
-                  >{{level}}</button>
-                {{/each-in}}
-              </tr>
-              <tr>
-                <td> <label for='tlp'>TLP: </label></td>
-                {{#each-in levels as |level color|}}
-                  <button id='tlp-{{color}}' {{action 'selectLevelAndSetInput' level color 'tlp'}}>{{capitalize
-                      level
-                    }}</button>
-                {{/each-in}}
-              </tr>
-              <tr>
-                <td> <label for='tlp'>PAP: </label></td>
-                {{#each-in levels as |level color|}}
-                  <button id='pap-{{color}}' {{action 'selectLevelAndSetInput' level color 'pap'}}>{{capitalize
-                      level
-                    }}</button>
-                {{/each-in}}
-              </tr>
-            </table>
 
-            <div>
-              {{textarea
-                class='edit-case-description'
-                onchange=(action (mut descriptionInput value='target.value'))
-                value=updatedDescriptionInput
-                cols='30'
-                rows='4'
-                placeholder='Case Description'
-              }}
-            </div>
-            <div class='edit-case-options'>
-              <button class='edit-modal-btn' type='button' {{action 'toggleModal' case index 'editModal'}}>
-                Cancel
-              </button>
-              <button class='edit-modal-btn' type='button' {{action 'submitEdit' case index 'editModal'}}>
-                {{#if isRunning}}
-                  {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
-                {{/if}}
-                Submit
-              </button>
-            </div>
+            <form {{action 'submit' on='submit'}}>
+              <table class='case-inputs'>
+                <tr>
+                  <td> <label for='title'>Title: </label></td>
+                  <div>{{input
+                      class='case-title'
+                      onclick=(action (mut titleInput value='target.value'))
+                      value=titleInput
+                      placeholder='Title'
+                      required='true'
+                    }}</div>
+                </tr>
+                <tr>
+                  <td> <label for='severity'>Severity: </label></td>
+                  {{#each-in severityLevels as |level color|}}
+                    <button
+                      id='severity-{{color}}'
+                      {{action 'selectSeverityLevelAndSetInput' level color}}
+                    >{{level}}</button>
+                  {{/each-in}}
+                </tr>
+                <tr>
+                  <td> <label for='tlp'>TLP: </label></td>
+                  {{#each-in levels as |level color|}}
+                    <button id='tlp-{{color}}' {{action 'selectLevelAndSetInput' level color 'tlp'}}>{{capitalize
+                        level
+                      }}</button>
+                  {{/each-in}}
+                </tr>
+                <tr>
+                  <td> <label for='tlp'>PAP: </label></td>
+                  {{#each-in levels as |level color|}}
+                    <button id='pap-{{color}}' {{action 'selectLevelAndSetInput' level color 'pap'}}>{{capitalize
+                        level
+                      }}</button>
+                  {{/each-in}}
+                </tr>
+              </table>
+
+              <div>
+                {{textarea
+                  class='edit-case-description'
+                  onchange=(action (mut descriptionInput value='target.value'))
+                  value=updatedDescriptionInput
+                  cols='30'
+                  rows='4'
+                  placeholder='Case Description'
+                }}
+              </div>
+              <div class='edit-case-options'>
+                <button class='edit-modal-btn' type='button' {{action 'toggleModal' case index 'editModal'}}>
+                  Cancel
+                </button>
+                <button class='edit-modal-btn' type='button' {{action 'submitEdit' case index 'editModal'}}>
+                  {{#if isRunning}}
+                    {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
+                  {{/if}}
+                  Submit
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       {{/if}}
@@ -431,7 +457,7 @@
               <button class='case-modal-btn' type='button' {{action 'toggleModal' case index 'observableModal'}}>
                 Cancel
               </button>
-              <button class='case-modal-btn' type='button' {{action 'addObservable' case}}>
+              <button class='case-modal-btn' type='button' {{action 'addObservable' case index 'observableModal'}}>
                 {{#if isRunning}}
                   {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
                 {{/if}}

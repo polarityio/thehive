@@ -99,8 +99,6 @@ const buildRequestOptions = async (query, restVerb, path, options) => {
     },
     json: true
   };
-
-  Logger.trace({ OPTIONS: requestOptions });
   return requestOptions;
 };
 
@@ -116,50 +114,61 @@ const getApiData = async (entity, requestWithDefaults, options) => {
 };
 
 const getCases = async (entity, requestWithDefaults, options) => {
-  // const queryCaseForObservableRequestOptions = await buildRequestOptions(
-  //   queryCaseForObservable,
-  //   'POST',
-  //   '/api/v1/query',
-  //   options
-  // );
-  // const caseResponse = await requestWithDefaults(queryCaseForObservableRequestOptions);
+  try {
+    if (entity.isHash) entity.value.toLowerCase();
+    const getCasesQuery = {
+      query: [
+        { _name: 'listObservable' },
+        { _name: 'filter', _eq: { _field: 'data', _value: entity.value.toLowerCase() } },
+        { _name: 'case' }
+      ]
+    };
+    const getCasesOptions = await buildRequestOptions(getCasesQuery, 'POST', '/api/v1/query', options);
+    const cases = await requestWithDefaults(getCasesOptions);
 
-  // const queryObservable = {
-  //   query: [{ _name: 'getCase', idOrName: caseResponse}]
-  // };
+    const response = await Promise.all(
+      map(async (currentCase) => await getObservablesForCase(currentCase, requestWithDefaults, options), cases.body)
+    );
 
-  const queryCaseForObservable = {
-    query: [
-      { _name: 'listObservable' },
-      { _name: 'filter', _eq: { _field: 'data', _value: entity.value } },
-      { _name: 'case' }
-    ]
-  };
+    return response;
+  } catch (err) {
+    Logger.error({ err }, 'Error in getCases');
+    throw err;
+  }
+};
 
-  const queryObservableRequestOptions = await buildRequestOptions(
-    queryCaseForObservable,
-    'POST',
-    '/api/v1/query',
-    options
-  );
-  const observableResponse = await requestWithDefaults(queryObservableRequestOptions);
+const getObservablesForCase = async (currentCase, requestWithDefaults, options) => {
+  try {
+    const getObservablesForCaseQuery = {
+      query: [{ _name: 'getCase', idOrName: currentCase._id }, { _name: 'observables' }]
+    };
 
-  // Logger.trace({ QUERY_CASE_FOR_OBSERVABLE: caseResponse });
-  // Logger.trace({ QUERY_OBSERVABLE: observableResponse });
+    const getObservableForCaseOptions = await buildRequestOptions(
+      getObservablesForCaseQuery,
+      'POST',
+      '/api/v1/query',
+      options
+    );
+    const observablesForCase = await requestWithDefaults(getObservableForCaseOptions);
+    currentCase.caseObservables = observablesForCase.body;
 
-  return observableResponse;
+    return currentCase;
+  } catch (err) {
+    Logger.error({ err }, 'Error in getObservablesForCase');
+    throw err;
+  }
 };
 
 const createCase = async (caseInputs, requestWithDefaults, options) => {
   try {
     const query = caseInputs;
+
     const requestOptions = await buildRequestOptions(query, 'POST', '/api/v1/case', options);
     const createdCase = await requestWithDefaults(requestOptions);
-    Logger.trace({ createCase });
 
     return createdCase;
   } catch (err) {
-    Logger.error({ ERR: err }, 'Error in createCase');
+    Logger.error({ err }, 'Error in createCase');
     throw err;
   }
 };
@@ -171,7 +180,7 @@ const updateCase = async (updatedInputs, requestWithDefaults, options) => {
 
     const requestOptions = await buildRequestOptions(query, 'PATCH', `/api/v1/case/${caseId}`, options);
     const updatedCase = await requestWithDefaults(requestOptions);
-    Logger.trace({ UPDATED_CASE: updateCase });
+
     return updatedCase;
   } catch (err) {
     Logger.error({ err });
@@ -183,7 +192,7 @@ const closeCase = async (caseToClose, requestWithDefaults, options) => {
   try {
     const requestOptions = await buildRequestOptions({}, 'DELETE', `/api/v1/case/${caseToClose}`, options);
     const closedCase = await requestWithDefaults(requestOptions);
-    Logger.trace({ CLOSED_CASE: closeCase });
+
     return closedCase;
   } catch (err) {
     Logger.error({ err });
@@ -192,7 +201,6 @@ const closeCase = async (caseToClose, requestWithDefaults, options) => {
 };
 
 const addObservable = async (observableInputs, requestWithDefaults, options) => {
-  Logger.trace({ OBSERVABLE_INPUTS: observableInputs });
   const query = observableInputs.inputs;
   const caseId = observableInputs.caseId;
 
@@ -217,13 +225,12 @@ const onMessage = async (payload, options, cb) => {
       break;
     case 'addObservable':
       const observableInputs = payload.data.observableInputs;
-      Logger.trace({ OBSERVABLE_INPUTS: observableInputs });
       const addedObservable = await addObservable(observableInputs, requestWithDefaults, options);
       cb(null, addedObservable);
       break;
     case 'updateCase':
       const updatedInputs = payload.data.updatedInputs;
-      Logger.trace({ UPDATE_INPUTS: updatedInputs });
+
       const updatedCase = await updateCase(updatedInputs, requestWithDefaults, options);
       cb(null, updatedCase);
       break;
@@ -249,15 +256,16 @@ const emptyResponse = (entity) => ({
   data: null
 });
 
-const polarityResponse = (entity, { body }) => {
+const polarityResponse = (entity, response) => {
   return {
     entity,
-    data: body
-      ? {
-          summary: [],
-          details: body
-        }
-      : null
+    data:
+      response.length > 0
+        ? {
+            summary: [],
+            details: response
+          }
+        : null
   };
 };
 
@@ -374,7 +382,3 @@ module.exports = {
   startup: startup,
   validateOptions: validateOptions
 };
-
-// ENTITIES TO SEARCH:
-// 92.63.192.217
-// 192.42.116.18
