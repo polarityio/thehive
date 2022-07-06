@@ -6,6 +6,10 @@ pre {
   margin-top: 5px;
 }
 
+button:disabled {
+  background-color: grey !important;
+}
+
 input {
   width: 100%;
 }
@@ -23,6 +27,16 @@ input {
 
 .email-container {
   margin-top: 5px;
+}
+
+.alert {
+  margin-bottom: 0;
+  overflow-wrap: break-word;
+}
+
+.alert-information {
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .pulse-tag {
@@ -137,6 +151,15 @@ input {
       }
     }
   }
+}
+
+.verification-err-msg {
+  background-color: white;
+  border-color: red;
+  border-width: 1px;
+  color: red;
+  font-size: 10px;
+  height: 20px;
 }
 
 .case-modal {
@@ -258,6 +281,22 @@ input {
   }
 }
 
+.expandable-title {
+  display: block;
+  color: #3c8dbc !important;
+  font-weight: 600;
+  margin-bottom: 7px;
+  margin-top: 5%;
+  .text {
+    color: #3c8dbc !important;
+    border-bottom: 1px solid #3c8dbc;
+    .desc {
+      color: black !important;
+      font-weight: 400 !important;
+    }
+  }
+}
+
 button[id^='severity'] {
   margin: 1px;
   color: white;
@@ -306,6 +345,15 @@ td {
 .alert-information {
   margin-top: 10px;
   margin-bottom: 10px;
+  background-color: lightgreen;
+  border-color: green;
+}
+
+.alert-danger {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  background-color: lightcoral;
+  border-color: red;
 }
 
 .highlight {

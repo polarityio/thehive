@@ -12,7 +12,6 @@ polarity.export = PolarityComponent.extend({
   currentPapElement: '',
   currentObservableTlpElement: '',
   caseId: '',
-  addObservableIsDisabled: false,
   observableModal: false,
   editModalOpen: false,
   isRunning: false,
@@ -21,83 +20,63 @@ polarity.export = PolarityComponent.extend({
   closeCaseModalOpen: {},
   closedCase: {},
   editedCase: {},
+  buttonDisabled: false,
+  verificationError: {},
+  addObservableErrorMessage: {},
+  addObservableMessage: {},
+  updateCaseErrorMessage: {},
+  updateCaseMessage: {},
+  uniqueIdPrefix: '',
   cases: {},
   init () {
     this.set('changeTab', this.get('details.length') ? 'cases' : 'create');
+
+    let array = new Uint32Array(5);
+    this.set('uniqueIdPrefix', window.crypto.getRandomValues(array).join(''));
+
     this._super(...arguments);
   },
   actions: {
     changeTab: function (tabName) {
       this.set('changeTab', tabName);
     },
-    toggleModal: function (caseObj, index, type) {
+    openModal: function (caseObj, index, type) {
+      this.set('titleInput', caseObj.title);
+      this.set('descriptionInput', caseObj.description)
       this.toggleProperty('details.' + index + `.__${type}Open`);
+
       this.set(`${type}Open`, { caseObj, index });
+      this.set('buttonDisabled', true);
     },
-    addObservableToCreatedCase: function () {
-      this.toggleProperty('observableModal');
+    closeModal: function (index, type) {
+      this.toggleProperty('details.' + index + `.__${type}Open`);
+      this.set('buttonDisabled', false);
     },
-    submit: function () {
-      this.set('isRunning', true);
-      this.set('errorMessage', '');
-      const title = this.get('titleInput');
-      const severity = Number(this.get('severityInput'));
-      const description = this.get('descriptionInput');
-      const tlp = Number(this.get('tlpInput'));
-      const pap = Number(this.get('papInput'));
-
-      const caseInputs = {
-        title,
-        description,
-        title,
-        severity,
-        tlp,
-        pap
-      };
-
-      this.sendIntegrationMessage({
-        action: 'createCase',
-        data: { caseInputs }
-      })
-        .then((data) => {
-          this.set('addObservableIsDisabled', false);
-          this.set('caseCreated', true);
-          this.set('caseId', data._id);
-        })
-        .catch((err) => {
-          this.set('details.errorMessage', JSON.stringify(err, null, 4));
-        })
-        .finally(() => {
-          this.set('isRunning', false);
-          this.get('block').notifyPropertyChange('data');
-        });
-    },
-    closeCase: function (caseToClose, index, type = 'closeCaseModal') {
+    closeCase: function (caseToClose, index) {
       this.set('isRunning', true);
       this.sendIntegrationMessage({
         action: 'closeCase',
         data: caseToClose
       })
-        .then((data) => {
+        .then(() => {
           this.set(
             `closedCase`,
             Object.assign({}, this.get('closedCase'), {
               [caseToClose._id]: !this.get('closedCase')[caseToClose._id]
             })
           );
-          console.log(JSON.stringify(data));
         })
         .catch((err) => {
-          console.log(JSON.stringify(err));
+          this.setErrorMessages(index, 'updateCase', `${JSON.stringify(err.meta.description.message)}`);
         })
         .finally(() => {
           this.set('isRunning', false);
-          this.set('details.' + index + `.__${type}Open`, false);
-          // this.set('details.' + index + `.__closedCase`, true);
+          this.set('details.' + index + `.__closeCaseModalOpen`, false);
+          this.set('buttonDisabled', false);
           this.get('block').notifyPropertyChange('data');
         });
     },
-    submitEdit: function (caseObj, index, type) {
+    updateCase: function (caseObj, index, type) {
       this.set('isRunning', true);
       const title = this.get('titleInput');
       const severity = Number(this.get('severityInput'));
@@ -110,7 +89,7 @@ polarity.export = PolarityComponent.extend({
         inputs: {
           title,
           description,
-          tlp: tlp,
+          tlp,
           pap: pap,
           severity
         }
@@ -121,31 +100,31 @@ polarity.export = PolarityComponent.extend({
         data: { updatedInputs }
       })
         .then(() => {
-          this.set(
-            'editedCase',
-            Object.assign({}, this.get('editedCase'), {
-              newInputs
-            })
-          );
-
-          const updatedCase = this.get('editedCase');
-          console.log('updated_case:', JSON.stringify(updatedCase));
+          this.setMessages(index, 'updateCase', 'Case was updated!');
         })
         .catch((err) => {
-          console.log(err);
-          this.set('details.errorMessage', JSON.stringify(err, null, 4));
+          this.setErrorMessages(index, 'updateCase', `${JSON.stringify(err.meta.description.message)}`);
         })
         .finally(() => {
           this.set('isRunning', false);
           this.set('details.' + index + `.__${type}Open`, false);
-          this.get('block').notifyPropertyChange('data');
+          this.set('buttonDisabled', false);
+          setTimeout(() => {
+            this.setErrorMessages(index, 'updateCase', '');
+            this.setMessages(index, 'updateCase', '');
+            this.get('block').notifyPropertyChange('data');
+          }, 5000);
+          a;
         });
     },
-    addObservable: function (caseObj) {
+    addObservable: function (caseObj, index, type) {
       this.set('isRunning', true);
-      const typeInput = this.get('observableTypeInput');
+      if (!this.validInputs()) return;
+
+      const observableDataType = this.get('observableDataType');
+      const observableData = this.get('observableData');
+
       const observableTlpInput = Number(this.get('observableTlpInput'));
-      const valueInput = this.get('valueInput');
       const isIoc = this.get('isIocInput');
       const sightedInput = this.get('sightedInput');
       const tagsInputs = this.get('tagsInputs');
@@ -154,9 +133,9 @@ polarity.export = PolarityComponent.extend({
       const observableInputs = {
         caseId: caseObj._id,
         inputs: {
-          dataType: typeInput,
+          dataType: observableDataType,
           tlp: observableTlpInput,
-          data: valueInput,
+          data: observableData,
           ioc: isIoc,
           sighted: sightedInput,
           tags: tagsInputs,
@@ -168,17 +147,22 @@ polarity.export = PolarityComponent.extend({
         action: 'addObservable',
         data: { observableInputs }
       })
-        .then((data) => {
-          console.log(JSON.stringify(data));
+        .then(() => {
+          this.setMessages(index, 'updateCase', `Observable ${observableData} was added to case #${caseObj.number}`);
         })
         .catch((err) => {
-          console.log(err);
-          this.set('details.errorMessage', JSON.stringify(err, null, 4));
+          this.setErrorMessages(index, 'addObservable', `${JSON.stringify(err.meta.description.message)}`);
         })
         .finally(() => {
           this.set('isRunning', false);
           this.set('details.' + index + `.__${type}Open`, false);
-          this.get('block').notifyPropertyChange('data');
+          this.set('buttonDisabled', false);
+
+          setTimeout(() => {
+            this.setErrorMessages(index, 'addObservable', '');
+            this.setMessages(index, 'addObservable', '');
+            this.get('block').notifyPropertyChange('data');
+          }, 5000);
         });
     },
     toggleExpandableObservables: function (index) {
@@ -187,26 +171,8 @@ polarity.export = PolarityComponent.extend({
       });
       this.set(`caseObservables`, modifiedExpandableTitleStates);
     },
-    selectSeverityLevelAndSetInput: function (level, colorValue) {
-      const SEVERITY_LEVELS = { L: 1, M: 2, H: 3, '!!': 4 };
-      this.set('severityInput', SEVERITY_LEVELS[level]);
-
-      if (colorValue !== this.get('currentSeverityElement')) {
-        const cachedElementValue = this.get('currentSeverityElement');
-
-        let cachedElement = document.getElementById(`severity-${cachedElementValue}`);
-        if (cachedElement) {
-          cachedElement.style['background-color'] = '#d2d6de';
-        }
-
-        let element = document.getElementById(`severity-${colorValue}`);
-        if (element) {
-          element.style['background-color'] = `${colorValue}`;
-        }
-      }
-      this.set('currentSeverityElement', colorValue);
-    },
     selectLevelAndSetInput: function (level, colorValue, type) {
+      console.log(level, colorValue);
       const LEVELS = {
         white: '0',
         green: '1',
@@ -239,6 +205,50 @@ polarity.export = PolarityComponent.extend({
         }
       }
       this.set(currentElement, colorValue);
+    },
+    selectSeverityLevelAndSetInput: function (level, colorValue) {
+      console.log(level, colorValue);
+      const SEVERITY_LEVELS = { L: 1, M: 2, H: 3, '!!': 4 };
+      this.set('severityInput', SEVERITY_LEVELS[level]);
+
+      if (colorValue !== this.get('currentSeverityElement')) {
+        const cachedElementValue = this.get('currentSeverityElement');
+
+        let cachedElement = document.getElementById(`severity-${cachedElementValue}`);
+        if (cachedElement) {
+          cachedElement.style['background-color'] = '#d2d6de';
+        }
+
+        let element = document.getElementById(`severity-${colorValue}`);
+        if (element) {
+          element.style['background-color'] = `${colorValue}`;
+        }
+      }
+      this.set('currentSeverityElement', colorValue);
     }
+  },
+  setErrorMessages: function (index, prefix, message) {
+    if (!this.isDestroyed) {
+      this.set(
+        `${prefix}ErrorMessage`,
+        Object.assign({}, this.get(`${prefix}ErrorMessage`), {
+          [index]: message
+        })
+      );
+    }
+  },
+  setMessages: function (index, prefix, message) {
+    if (!this.isDestroyed) {
+      this.set(`${prefix}Message`, Object.assign({}, this.get(`${prefix}Message`), { [index]: message }));
+    }
+  },
+  validInputs: function () {
+    if (!this.get('observableDataType') || !this.get('observableData')) {
+      this.set('observableDataTypeInput', 'Type is required');
+      this.set('observableDataInput', 'Data required');
+      this.set('isRunning', false);
+      return false;
+    }
+    return true;
   }
 });

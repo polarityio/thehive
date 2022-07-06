@@ -116,21 +116,22 @@ const getApiData = async (entity, requestWithDefaults, options) => {
 const getCases = async (entity, requestWithDefaults, options) => {
   try {
     if (entity.isHash) entity.value.toLowerCase();
+
     const getCasesQuery = {
       query: [
         { _name: 'listObservable' },
-        { _name: 'filter', _eq: { _field: 'data', _value: entity.value.toLowerCase() } },
+        { _name: 'filter', _eq: { _field: 'data', _value: entity.value } },
         { _name: 'case' }
       ]
     };
     const getCasesOptions = await buildRequestOptions(getCasesQuery, 'POST', '/api/v1/query', options);
     const cases = await requestWithDefaults(getCasesOptions);
 
-    const response = await Promise.all(
+    const casesWithObservables = await Promise.all(
       map(async (currentCase) => await getObservablesForCase(currentCase, requestWithDefaults, options), cases.body)
     );
 
-    return response;
+    return casesWithObservables;
   } catch (err) {
     Logger.error({ err }, 'Error in getCases');
     throw err;
@@ -150,6 +151,7 @@ const getObservablesForCase = async (currentCase, requestWithDefaults, options) 
       options
     );
     const observablesForCase = await requestWithDefaults(getObservableForCaseOptions);
+
     currentCase.caseObservables = observablesForCase.body;
 
     return currentCase;
@@ -159,19 +161,19 @@ const getObservablesForCase = async (currentCase, requestWithDefaults, options) 
   }
 };
 
-const createCase = async (caseInputs, requestWithDefaults, options) => {
-  try {
-    const query = caseInputs;
+// const createCase = async (caseInputs, requestWithDefaults, options) => {
+//   try {
+//     const query = caseInputs;
 
-    const requestOptions = await buildRequestOptions(query, 'POST', '/api/v1/case', options);
-    const createdCase = await requestWithDefaults(requestOptions);
+//     const requestOptions = await buildRequestOptions(query, 'POST', '/api/v1/case', options);
+//     const createdCase = await requestWithDefaults(requestOptions);
 
-    return createdCase;
-  } catch (err) {
-    Logger.error({ err }, 'Error in createCase');
-    throw err;
-  }
-};
+//     return createdCase;
+//   } catch (err) {
+//     Logger.error({ err }, 'Error in createCase');
+//     throw err;
+//   }
+// };
 
 const updateCase = async (updatedInputs, requestWithDefaults, options) => {
   try {
@@ -217,27 +219,46 @@ const addObservable = async (observableInputs, requestWithDefaults, options) => 
 
 const onMessage = async (payload, options, cb) => {
   switch (payload.action) {
-    case 'createCase':
-      const caseInputs = payload.data.caseInputs;
-      const createdCase = await createCase(caseInputs, requestWithDefaults, options);
-      const response = _.get(createdCase, 'body', {});
-      cb(null, response);
-      break;
+    // case 'createCase':
+    //   try {
+    //     const caseInputs = payload.data.caseInputs;
+    //     const createdCase = await createCase(caseInputs, requestWithDefaults, options);
+    //     const response = _.get(createdCase, 'body', {});
+    //     cb(null, response);
+    //   } catch (err) {
+    //     Logger.trace({ err }, 'error in createCase');
+    //     cb(err, {});
+    //   }
+    //   break;
     case 'addObservable':
-      const observableInputs = payload.data.observableInputs;
-      const addedObservable = await addObservable(observableInputs, requestWithDefaults, options);
-      cb(null, addedObservable);
+      try {
+        const observableInputs = payload.data.observableInputs;
+        const addedObservable = await addObservable(observableInputs, requestWithDefaults, options);
+        cb(null, addedObservable);
+      } catch (err) {
+        Logger.trace({ err }, 'error in addObservable');
+        cb(err, {});
+      }
       break;
     case 'updateCase':
-      const updatedInputs = payload.data.updatedInputs;
-
-      const updatedCase = await updateCase(updatedInputs, requestWithDefaults, options);
-      cb(null, updatedCase);
+      try {
+        const updatedInputs = payload.data.updatedInputs;
+        const updatedCase = await updateCase(updatedInputs, requestWithDefaults, options);
+        cb(null, updatedCase);
+      } catch (err) {
+        Logger.trace({ err }, 'error in updateCase');
+        cb(err, {});
+      }
       break;
     case 'closeCase':
-      const caseToClose = payload.data._id;
-      const closedCase = await closeCase(caseToClose, requestWithDefaults, options);
-      cb(null, closedCase);
+      try {
+        const caseToClose = payload.data._id;
+        const closedCase = await closeCase(caseToClose, requestWithDefaults, options);
+        cb(null, closedCase);
+      } catch (err) {
+        Logger.trace({ err }, 'error in closeCase');
+        cb(err, {});
+      }
       break;
     default:
       return;
@@ -266,21 +287,6 @@ const polarityResponse = (entity, response) => {
             details: response
           }
         : null
-  };
-};
-
-const retryablePolarityResponse = (entity) => {
-  return {
-    entity,
-    isVolatile: true,
-    data: {
-      summary: ['Lookup limit reached'],
-      details: {
-        summaryTag: 'Lookup limit reached',
-        errorMessage:
-          'A temporary TheHive API search limit was reached. You can retry your search by pressing the "Retry Search" button.'
-      }
-    }
   };
 };
 
