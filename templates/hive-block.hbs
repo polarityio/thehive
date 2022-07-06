@@ -17,15 +17,6 @@
             Cases
           </a>
         </li>
-        {{!-- <li class='nav-item'>
-          <a
-            {{action 'changeTab' 'create'}}
-            class='nav-link {{if (or (eq changeTab "create") (not changeTab)) "active"}}'
-            href='#'
-          >
-            Create Case
-          </a>
-        </li> --}}
       {{/if}}
     </ul>
 
@@ -34,7 +25,9 @@
         {{#if (not-eq index 0)}}
           <hr />
         {{/if}}
-
+        <div class='pivot-link'>
+          <a href='{{block.userOptions.url}}/cases/{{case._id}}/details' class='p-link'>(Pivot To Case Details)</a>
+        </div>
         {{#if (get addObservableErrorMessage index)}}
           <div class='alert alert-danger mt-1'>
             {{get addObservableErrorMessage index}}
@@ -58,6 +51,7 @@
             Case #{{case.number}}
             {{if (get closedCase case._id) '(CASE HAS BEEN CLOSED)'}}
           </h1>
+
           {{#unless (get closedCase case._id)}}
             <button
               disabled={{buttonDisabled}}

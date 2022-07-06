@@ -42,7 +42,7 @@ polarity.export = PolarityComponent.extend({
     },
     openModal: function (caseObj, index, type) {
       this.set('titleInput', caseObj.title);
-      this.set('descriptionInput', caseObj.description)
+      this.set('descriptionInput', caseObj.description);
       this.toggleProperty('details.' + index + `.__${type}Open`);
 
       this.set(`${type}Open`, { caseObj, index });
@@ -151,7 +151,13 @@ polarity.export = PolarityComponent.extend({
           this.setMessages(index, 'updateCase', `Observable ${observableData} was added to case #${caseObj.number}`);
         })
         .catch((err) => {
-          this.setErrorMessages(index, 'addObservable', `${JSON.stringify(err.meta.description.message)}`);
+          console.log(JSON.stringify(err));
+          let errMessage =
+            err.meta.status === 207
+              ? `${JSON.stringify(err.meta.description.failure[0].message)}`
+              : `${JSON.stringify(err.meta.description.message)}`;
+
+          this.setErrorMessages(index, 'addObservable', errMessage);
         })
         .finally(() => {
           this.set('isRunning', false);
