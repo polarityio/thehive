@@ -84,7 +84,7 @@ const doLookup = async (entities, options, cb) => {
     return cb(null, lookupResults);
   } catch (error) {
     const err = parseErrorToReadableJSON(error);
-    Logger.error({ err }, 'error in doLookup');
+    Logger.error({ err });
     return cb(polarityError(err));
   }
 };
@@ -109,7 +109,7 @@ const getApiData = async (entity, requestWithDefaults, options) => {
       ? polarityResponse(entity, await getCases(entity, requestWithDefaults, options))
       : emptyResponse(entity);
   } catch (err) {
-    Logger.trace({ err }, 'Error in getApiData');
+    Logger.trace({ err });
     throw err;
   }
 };
@@ -134,7 +134,7 @@ const getCases = async (entity, requestWithDefaults, options) => {
 
     return casesWithObservables;
   } catch (err) {
-    Logger.error({ err }, 'Error in getCases');
+    Logger.error({ err });
     throw err;
   }
 };
@@ -157,7 +157,7 @@ const getObservablesForCase = async (currentCase, requestWithDefaults, options) 
 
     return currentCase;
   } catch (err) {
-    Logger.error({ err }, 'Error in getObservablesForCase');
+    Logger.error({ err });
     throw err;
   }
 };
@@ -212,7 +212,7 @@ const onMessage = async (payload, options, cb) => {
         const addedObservable = await addObservable(observableInputs, requestWithDefaults, options);
         cb(null, addedObservable);
       } catch (err) {
-        Logger.trace({ err }, 'error in addObservable');
+        Logger.error({ err });
         cb(err, {});
       }
       break;
@@ -222,7 +222,7 @@ const onMessage = async (payload, options, cb) => {
         const updatedCase = await updateCase(updatedInputs, requestWithDefaults, options);
         cb(null, updatedCase);
       } catch (err) {
-        Logger.trace({ err }, 'error in updateCase');
+        Logger.error({ err });
         cb(err, {});
       }
       break;
@@ -232,7 +232,7 @@ const onMessage = async (payload, options, cb) => {
         const closedCase = await closeCase(caseToClose, requestWithDefaults, options);
         cb(null, closedCase);
       } catch (err) {
-        Logger.trace({ err }, 'error in closeCase');
+        Logger.error({ err });
         cb(err, {});
       }
       break;

@@ -75,8 +75,6 @@ polarity.export = PolarityComponent.extend({
       const pap = this.get('papInput');
       const severity = this.get('severityInput');
 
-      console.log(pap, tlp);
-
       const updatedInputs = {
         caseId: caseObj._id,
         inputs: {
@@ -89,7 +87,6 @@ polarity.export = PolarityComponent.extend({
         }
       };
 
-      console.log(JSON.stringify(updatedInputs));
       this.sendIntegrationMessage({
         action: 'updateCase',
         data: { updatedInputs }
@@ -140,8 +137,6 @@ polarity.export = PolarityComponent.extend({
         }
       };
 
-      console.log('INPUTS', JSON.stringify(observableInputs));
-
       this.sendIntegrationMessage({
         action: 'addObservable',
         data: { observableInputs }
@@ -150,7 +145,6 @@ polarity.export = PolarityComponent.extend({
           this.setMessages(index, 'updateCase', `Observable ${observableData} was added to case #${caseObj.number}`);
         })
         .catch((err) => {
-          console.log(JSON.stringify(err));
           let errMessage =
             err.meta.status === 207
               ? `${JSON.stringify(err.meta.description.failure[0].message)}`
