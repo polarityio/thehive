@@ -48,6 +48,7 @@ function startup (logger) {
         Logger.trace({ response }, 'Response in requestWithDefaults');
 
         try {
+          Logger.trace({ requestOptions });
           checkForStatusError(response, requestOptions);
         } catch (err) {
           Logger.trace({ err }, 'Error in _requestWithDefaults');
@@ -161,20 +162,6 @@ const getObservablesForCase = async (currentCase, requestWithDefaults, options) 
   }
 };
 
-// const createCase = async (caseInputs, requestWithDefaults, options) => {
-//   try {
-//     const query = caseInputs;
-
-//     const requestOptions = await buildRequestOptions(query, 'POST', '/api/v1/case', options);
-//     const createdCase = await requestWithDefaults(requestOptions);
-
-//     return createdCase;
-//   } catch (err) {
-//     Logger.error({ err }, 'Error in createCase');
-//     throw err;
-//   }
-// };
-
 const updateCase = async (updatedInputs, requestWithDefaults, options) => {
   try {
     const query = updatedInputs.inputs;
@@ -219,17 +206,6 @@ const addObservable = async (observableInputs, requestWithDefaults, options) => 
 
 const onMessage = async (payload, options, cb) => {
   switch (payload.action) {
-    // case 'createCase':
-    //   try {
-    //     const caseInputs = payload.data.caseInputs;
-    //     const createdCase = await createCase(caseInputs, requestWithDefaults, options);
-    //     const response = _.get(createdCase, 'body', {});
-    //     cb(null, response);
-    //   } catch (err) {
-    //     Logger.trace({ err }, 'error in createCase');
-    //     cb(err, {});
-    //   }
-    //   break;
     case 'addObservable':
       try {
         const observableInputs = payload.data.observableInputs;
