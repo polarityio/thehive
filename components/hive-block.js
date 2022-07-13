@@ -155,7 +155,6 @@ polarity.export = PolarityComponent.extend({
 
       const observableDataType = this.get('observableDataType');
       const observableDataInput = this.get('observableData');
-
       const observableTlpInput = Number(this.get('observableTlpInput'));
       const observablePapInput = Number(this.get('observablePapInput'));
       const isIoc = this.get('isIocInput');

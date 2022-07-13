@@ -32,6 +32,10 @@ This option allows you to specify a regex to set domains. Any domain matching th
 
 This option allows you to specify a regex to set IPv4 Addresses. Any IPv4 matching the regex will not be looked up.
 
+### Allow Create Case
+
+This option allows a user create case, if there is not one already associated with the searched indicator.
+
 ## Installation Instructions
 
 Installation instructions for integrations are provided on the [PolarityIO GitHub Page](https://polarityio.github.io/).
