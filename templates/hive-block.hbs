@@ -164,7 +164,6 @@
       New Case
     </button>
   </div>
-
 {{else}}
   <ul class='nav nav-tabs'>
     {{#if details}}
@@ -241,8 +240,7 @@
 
       <div class='case-container'>
         {{#if case.__editModalOpen}}
-          <div class='modal edit-case-modal'>
-
+          <div class='modal case-modal'>
             <h1 class='p-title'>
               Editing Case #{{case.number}}
             </h1>
@@ -398,7 +396,7 @@
 
             <div>
               {{textarea
-                class='edit-case-description'
+                class='case-description'
                 onchange=(action (mut descriptionInput value='target.value'))
                 value=descriptionInput
                 cols='30'
@@ -406,11 +404,11 @@
                 placeholder='Case Description'
               }}
             </div>
-            <div class='edit-case-options'>
-              <button class='edit-modal-btn' type='button' {{action 'closeModal' index 'editModal'}}>
+            <div class='case-options'>
+              <button class='case-modal-btn' type='button' {{action 'closeModal' index 'editModal'}}>
                 Cancel
               </button>
-              <button class='edit-modal-btn' type='button' {{action 'updateCase' case index 'editModal'}}>
+              <button class='case-modal-btn' type='button' {{action 'updateCase' case index 'editModal'}}>
                 {{#if isRunning}}
                   {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
                 {{/if}}
@@ -471,7 +469,6 @@
                     onclick={{action (mut observableTlpInput) 0}}
                     checked
                   />
-
                   <label for='white-{{uniqueIdPrefix}}'>White</label>
 
                   <input
@@ -482,7 +479,6 @@
                     onclick={{action (mut observableTlpInput) 1}}
                   />
                   <label for='green-{{uniqueIdPrefix}}'>Green</label>
-
                   <input
                     type='radio'
                     class='amber'
@@ -550,7 +546,7 @@
                 {{input type='checkbox' checked=isIocInput onchange=(action (mut isIocInput checked='target.value'))}}
               </tr>
               <tr>
-                <td> <label for='sighted'>Has been sighted: </label></td>
+                <td> <label for='sighted'>Sighted: </label></td>
                 {{input
                   type='checkbox'
                   checked=sightedInput

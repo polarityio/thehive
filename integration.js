@@ -105,10 +105,10 @@ const buildRequestOptions = async (query, restVerb, path, options) => {
 
 const getApiData = async (entity, requestWithDefaults, options) => {
   try {
-    // if (_isEntityBlocklisted(entity, options)) return;
+    if (_isEntityBlocklisted(entity, options)) return;
     const cases = await getCases(entity, requestWithDefaults, options);
     Logger.trace({ cases }, 'cases');
-    return polarityResponse(entity, cases);
+    return polarityResponse(entity, options, cases);
   } catch (err) {
     Logger.trace({ err });
     throw err;
@@ -134,7 +134,6 @@ const getCases = async (entity, requestWithDefaults, options) => {
     );
 
     Logger.trace({ cases: cases });
-
     return casesWithObservables;
   } catch (err) {
     Logger.error({ err });
@@ -276,18 +275,10 @@ const polarityError = (err) => ({
   error: err
 });
 
-const polarityResponse = (entity, response) => {
-  Logger.trace({ RESPONSE: 11111111, response });
-  return {
-    entity,
-    data:
-      response.length > 0
-        ? {
-            summary: [],
-            details: response
-          }
-        : { summary: [], details: { allowCreateCase: true } }
-  };
+const polarityResponse = (entity, options, cases) => {
+  if (options.allowCreateCase && !cases.length)
+    return { entity, data: { summary: [], details: { allowCreateCase: true } } };
+  else return { entity, data: cases.length > 0 ? { summary: [], details: cases } : null };
 };
 
 class RequestError extends Error {

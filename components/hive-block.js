@@ -24,8 +24,6 @@ polarity.export = PolarityComponent.extend({
   uniqueIdPrefix: '',
   cases: {},
   init () {
-    const data = this.get('block.data.details') 
-    console.log(JSON.stringify(data))
     this.set('changeTab', this.get('details.length') ? 'cases' : 'create');
     let array = new Uint32Array(5);
     this.set('uniqueIdPrefix', window.crypto.getRandomValues(array).join(''));
@@ -162,9 +160,10 @@ polarity.export = PolarityComponent.extend({
       const observablePapInput = Number(this.get('observablePapInput'));
       const isIoc = this.get('isIocInput');
       const sightedInput = this.get('sightedInput');
-      const tagsInput = this.get('tagsInputs');
+      const tagsInput = this.get('tagsInput');
       const observableDescriptionInput = this.get('observableDescriptionInput');
 
+      console.log('TAGS', JSON.stringify(tagsInput));
       const observableInputs = {
         caseId: caseObj._id,
         inputs: {
@@ -174,7 +173,7 @@ polarity.export = PolarityComponent.extend({
           data: observableDataInput,
           ioc: isIoc,
           sighted: sightedInput,
-          tags: tagsInput,
+          tags: tagsInput.split(' '),
           message: observableDescriptionInput
         }
       };
