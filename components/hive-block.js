@@ -2,6 +2,7 @@
 
 polarity.export = PolarityComponent.extend({
   details: Ember.computed.alias('block.data.details'),
+  allowCreateCase: false,
   changeTab: 'cases',
   observableTypes: ['ip', 'hash', 'domain'],
   caseObservables: {},
@@ -18,9 +19,13 @@ polarity.export = PolarityComponent.extend({
   addObservableMessage: {},
   updateCaseErrorMessage: {},
   updateCaseMessage: {},
+  createCaseErrorMessage: '',
+  createCaseMessage: '',
   uniqueIdPrefix: '',
   cases: {},
   init () {
+    const data = this.get('block.data.details') 
+    console.log(JSON.stringify(data))
     this.set('changeTab', this.get('details.length') ? 'cases' : 'create');
     let array = new Uint32Array(5);
     this.set('uniqueIdPrefix', window.crypto.getRandomValues(array).join(''));
@@ -67,6 +72,44 @@ polarity.export = PolarityComponent.extend({
           this.get('block').notifyPropertyChange('data');
         });
     },
+    createCase: function () {
+      this.set('isRunning', true);
+      this.set('errorMessage', '');
+
+      const title = this.get('titleInput');
+      const severity = Number(this.get('severityInput'));
+      const description = this.get('descriptionInput');
+      const tlp = Number(this.get('tlpInput'));
+      const pap = Number(this.get('papInput'));
+
+      const caseInputs = {
+        title,
+        description,
+        title,
+        severity,
+        tlp,
+        pap
+      };
+
+      this.sendIntegrationMessage({
+        action: 'createCase',
+        data: { caseInputs }
+      })
+        .then(() => {
+          this.set('createCaseMessage', 'Case was created!');
+        })
+        .catch((err) => {
+          this.set('createCaseErrorMessage', JSON.stringify(`${err.meta.description.message}`));
+        })
+        .finally(() => {
+          this.set('isRunning', false);
+          setTimeout(() => {
+            this.set('createCaseMessage', '');
+            this.set('createCaseErrorMessage', '');
+            this.get('block').notifyPropertyChange('data');
+          }, 5000);
+        });
+    },
     updateCase: function (caseObj, index, type) {
       this.set('isRunning', true);
       const title = this.get('titleInput');
@@ -106,7 +149,6 @@ polarity.export = PolarityComponent.extend({
             this.setMessages(index, 'updateCase', '');
             this.get('block').notifyPropertyChange('data');
           }, 5000);
-          a;
         });
     },
     addObservable: function (caseObj, index, type) {
@@ -114,13 +156,13 @@ polarity.export = PolarityComponent.extend({
       if (!this.validInputs()) return;
 
       const observableDataType = this.get('observableDataType');
-      const observableData = this.get('observableData');
+      const observableDataInput = this.get('observableData');
 
       const observableTlpInput = Number(this.get('observableTlpInput'));
       const observablePapInput = Number(this.get('observablePapInput'));
       const isIoc = this.get('isIocInput');
       const sightedInput = this.get('sightedInput');
-      const tagsInputs = this.get('tagsInputs');
+      const tagsInput = this.get('tagsInputs');
       const observableDescriptionInput = this.get('observableDescriptionInput');
 
       const observableInputs = {
@@ -129,10 +171,10 @@ polarity.export = PolarityComponent.extend({
           dataType: observableDataType,
           tlp: observableTlpInput,
           pap: observablePapInput,
-          data: observableData,
+          data: observableDataInput,
           ioc: isIoc,
           sighted: sightedInput,
-          tags: tagsInputs,
+          tags: tagsInput,
           message: observableDescriptionInput
         }
       };
@@ -142,7 +184,11 @@ polarity.export = PolarityComponent.extend({
         data: { observableInputs }
       })
         .then(() => {
-          this.setMessages(index, 'updateCase', `Observable ${observableData} was added to case #${caseObj.number}`);
+          this.setMessages(
+            index,
+            'updateCase',
+            `Observable ${observableDataInput} was added to case #${caseObj.number}`
+          );
         })
         .catch((err) => {
           let errMessage =

@@ -105,9 +105,10 @@ const buildRequestOptions = async (query, restVerb, path, options) => {
 
 const getApiData = async (entity, requestWithDefaults, options) => {
   try {
-    return _isEntityBlocklisted
-      ? polarityResponse(entity, await getCases(entity, requestWithDefaults, options))
-      : emptyResponse(entity);
+    // if (_isEntityBlocklisted(entity, options)) return;
+    const cases = await getCases(entity, requestWithDefaults, options);
+    Logger.trace({ cases }, 'cases');
+    return polarityResponse(entity, cases);
   } catch (err) {
     Logger.trace({ err });
     throw err;
@@ -131,6 +132,8 @@ const getCases = async (entity, requestWithDefaults, options) => {
     const casesWithObservables = await Promise.all(
       map(async (currentCase) => await getObservablesForCase(currentCase, requestWithDefaults, options), cases.body)
     );
+
+    Logger.trace({ cases: cases });
 
     return casesWithObservables;
   } catch (err) {
@@ -189,6 +192,20 @@ const closeCase = async (caseToClose, requestWithDefaults, options) => {
   }
 };
 
+const createCase = async (caseInputs, requestWithDefaults, options) => {
+  try {
+    const query = caseInputs;
+    const requestOptions = await buildRequestOptions(query, 'POST', '/api/v1/case', options);
+    const createdCase = await requestWithDefaults(requestOptions);
+    Logger.trace({ createCase });
+
+    return createdCase;
+  } catch (err) {
+    Logger.error({ ERR: err });
+    throw err;
+  }
+};
+
 const addObservable = async (observableInputs, requestWithDefaults, options) => {
   const query = observableInputs.inputs;
   const caseId = observableInputs.caseId;
@@ -206,6 +223,17 @@ const addObservable = async (observableInputs, requestWithDefaults, options) => 
 
 const onMessage = async (payload, options, cb) => {
   switch (payload.action) {
+    case 'createCase':
+      try {
+        const caseInputs = payload.data.caseInputs;
+        const createdCase = await createCase(caseInputs, requestWithDefaults, options);
+        const response = _.get(createdCase, 'body', {});
+        cb(null, response);
+      } catch (err) {
+        Logger.error({ err });
+        cb(err, {});
+      }
+      break;
     case 'addObservable':
       try {
         const observableInputs = payload.data.observableInputs;
@@ -248,12 +276,8 @@ const polarityError = (err) => ({
   error: err
 });
 
-const emptyResponse = (entity) => ({
-  entity,
-  data: null
-});
-
 const polarityResponse = (entity, response) => {
+  Logger.trace({ RESPONSE: 11111111, response });
   return {
     entity,
     data:
@@ -262,7 +286,7 @@ const polarityResponse = (entity, response) => {
             summary: [],
             details: response
           }
-        : null
+        : { summary: [], details: { allowCreateCase: true } }
   };
 };
 

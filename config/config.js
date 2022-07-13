@@ -24,6 +24,7 @@ module.exports = {
    */
   description: 'TheHive is a scalable, open source and free Security Incident Response Platform',
   entityTypes: ['IPv4', 'hash', 'domain'],
+  defaultColor: 'light-blue',
   /**
    * An array of style files (css or less) that will be included for your integration. Any styles specified in
    * the below files can be used in your custom template.
@@ -86,7 +87,6 @@ module.exports = {
    * @optional
    */
   options: [
-      
     {
       key: 'url',
       name: 'TheHive URL',
@@ -124,18 +124,18 @@ module.exports = {
       adminOnly: false
     },
     {
-      key: 'ipBlocklistRegex',
-      name: 'Ignore IP Regex',
-      description: 'IPs that match the given regex will not be looked up (if blank, no IPs will be ignored)',
-      default: '',
-      type: 'text',
+      key: 'allowCreateCase',
+      name: 'Create Case',
+      description: 'Allows user to create a case for an indicator that does not have one',
+      default: false,
+      type: 'boolean',
       userCanEdit: false,
       adminOnly: false
     },
     {
-      key: 'customFields',
-      name: 'Custom Fields',
-      description: 'Enter custom fields',
+      key: 'ipBlocklistRegex',
+      name: 'Ignore IP Regex',
+      description: 'IPs that match the given regex will not be looked up (if blank, no IPs will be ignored)',
       default: '',
       type: 'text',
       userCanEdit: false,
