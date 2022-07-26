@@ -28,6 +28,11 @@
             placeholder='Title'
           }}</div>
       </tr>
+      {{#if verificationError}}
+        <div class='verification-err-msg'>
+          {{verificationError}}
+        </div>
+      {{/if}}
       <tr>
         <td><label>Severity: </label></td>
         <div class='level-select'>
@@ -157,6 +162,11 @@
         placeholder='Case Description'
       }}
     </div>
+    {{#if verificationError}}
+      <div class='verification-err-msg'>
+        {{verificationError}}
+      </div>
+    {{/if}}
     <button class='create-case-btn' type='button' {{action 'createCase'}}>
       {{#if isRunning}}
         {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
@@ -430,7 +440,7 @@
                 <select
                   class='modal-select'
                   required='true'
-                  onclick={{action (mut observableDataType) value='target.value'}}
+                  onclick={{action (mut observableTypeInput) value='target.value'}}
                 >
                   <option value='none' selected disabled hidden>Select Type</option>
                   <option value='hash'>hash</option>
@@ -438,9 +448,9 @@
                   <option value='domain'>domain</option>
                 </select>
               </tr>
-              {{#if observableDataTypeInput}}
+              {{#if verificationError}}
                 <div class='verification-err-msg'>
-                  {{observableDataTypeInput}}
+                  {{verificationError}}
                 </div>
               {{/if}}
               <tr>
@@ -448,14 +458,14 @@
                 {{input
                   required=true
                   class='observable-title'
-                  onclick=(action (mut observableData value='target.value'))
-                  value=observableData
+                  onclick=(action (mut observableDataInput value='target.value'))
+                  value=observableDataInput
                   placeholder='Value'
                 }}
               </tr>
-              {{#if observableDataInput}}
+              {{#if verificationError}}
                 <div class='verification-err-msg'>
-                  {{observableDataInput}}
+                  {{verificationError}}
                 </div>
               {{/if}}
               <tr>

@@ -191,18 +191,32 @@ const closeCase = async (caseToClose, requestWithDefaults, options) => {
   }
 };
 
-const createCase = async (caseInputs, requestWithDefaults, options) => {
+const createCase = async (caseInputs, entity, requestWithDefaults, options) => {
   try {
     const query = caseInputs;
     const requestOptions = await buildRequestOptions(query, 'POST', '/api/v1/case', options);
     const createdCase = await requestWithDefaults(requestOptions);
-    Logger.trace({ createCase });
+
+    const defaultObservableInputs = {
+      caseId: createdCase.body._id,
+      inputs: { data: entity.value, dataType: getDataType(entity) }
+    };
+
+    if (createdCase.statusCode === 201) {
+      await addObservable(defaultObservableInputs, requestWithDefaults, options);
+    }
 
     return createdCase;
   } catch (err) {
     Logger.error({ ERR: err });
     throw err;
   }
+};
+
+const getDataType = (entity) => {
+  if (entity.isDomain) return 'domain';
+  if (entity.isHash) return 'hash';
+  if (entity.isIP) return 'ip';
 };
 
 const addObservable = async (observableInputs, requestWithDefaults, options) => {
@@ -221,12 +235,15 @@ const addObservable = async (observableInputs, requestWithDefaults, options) => 
 };
 
 const onMessage = async (payload, options, cb) => {
+  Logger.trace({ PAYLOAD: payload });
   switch (payload.action) {
     case 'createCase':
       try {
-        const caseInputs = payload.data.caseInputs;
-        const createdCase = await createCase(caseInputs, requestWithDefaults, options);
+        const caseInputs = payload.data.caseInputs.inputs;
+        const entity = payload.data.caseInputs.entity;
+        const createdCase = await createCase(caseInputs, entity, requestWithDefaults, options);
         const response = _.get(createdCase, 'body', {});
+        Logger.trace({ RESPONSE_FROM_CREATE: response });
         cb(null, response);
       } catch (err) {
         Logger.error({ err });

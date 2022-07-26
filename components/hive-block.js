@@ -6,15 +6,12 @@ polarity.export = PolarityComponent.extend({
   changeTab: 'cases',
   observableTypes: ['ip', 'hash', 'domain'],
   caseObservables: {},
-  caseId: '',
   observableModal: false,
   isRunning: false,
   observableModalOpen: {},
   closeCaseModalOpen: {},
   closedCase: {},
-  editedCase: {},
   buttonDisabled: false,
-  verificationError: {},
   addObservableErrorMessage: {},
   addObservableMessage: {},
   updateCaseErrorMessage: {},
@@ -22,7 +19,7 @@ polarity.export = PolarityComponent.extend({
   createCaseErrorMessage: '',
   createCaseMessage: '',
   uniqueIdPrefix: '',
-  cases: {},
+  verificationError: '',
   init () {
     this.set('changeTab', this.get('details.length') ? 'cases' : 'create');
     let array = new Uint32Array(5);
@@ -48,6 +45,7 @@ polarity.export = PolarityComponent.extend({
     },
     closeCase: function (caseToClose, index) {
       this.set('isRunning', true);
+
       this.sendIntegrationMessage({
         action: 'closeCase',
         data: caseToClose
@@ -71,6 +69,7 @@ polarity.export = PolarityComponent.extend({
         });
     },
     createCase: function () {
+      if (!this.validCaseInputs()) return;
       this.set('isRunning', true);
       this.set('errorMessage', '');
 
@@ -81,12 +80,15 @@ polarity.export = PolarityComponent.extend({
       const pap = Number(this.get('papInput'));
 
       const caseInputs = {
-        title,
-        description,
-        title,
-        severity,
-        tlp,
-        pap
+        entity: this.get('block.entity'),
+        inputs: {
+          title,
+          description,
+          title,
+          severity,
+          tlp,
+          pap
+        }
       };
 
       this.sendIntegrationMessage({
@@ -110,11 +112,13 @@ polarity.export = PolarityComponent.extend({
     },
     updateCase: function (caseObj, index, type) {
       this.set('isRunning', true);
-      const title = this.get('titleInput');
+      this.get('block').notifyPropertyChange('data');
+
       const description = this.get('descriptionInput');
       const tlp = this.get('tlpInput');
       const pap = this.get('papInput');
       const severity = this.get('severityInput');
+      const title = this.get('titleInput');
 
       const updatedInputs = {
         caseId: caseObj._id,
@@ -133,7 +137,15 @@ polarity.export = PolarityComponent.extend({
         data: { updatedInputs }
       })
         .then(() => {
+          this.set(`details.${index}.description`, description);
+          this.set(`details.${index}.title`, title);
+          this.set(`details.${index}.tlp`, tlp);
+          this.set(`details.${index}.pap`, pap);
+          this.set(`details.${index}.severity`, severity);
+
+          this.get('block').notifyPropertyChange('data');
           this.setMessages(index, 'updateCase', 'Case was updated!');
+          this.set('details.' + index + `.__${type}Open`, false);
         })
         .catch((err) => {
           this.setErrorMessages(index, 'updateCase', `${JSON.stringify(err.meta.description.message)}`);
@@ -153,28 +165,31 @@ polarity.export = PolarityComponent.extend({
       this.set('isRunning', true);
       if (!this.validInputs()) return;
 
-      const observableDataType = this.get('observableDataType');
-      const observableDataInput = this.get('observableData');
+      const observableType = this.get('observableTypeInput');
+      const observableDataInput = this.get('observableDataInput');
       const observableTlpInput = Number(this.get('observableTlpInput'));
       const observablePapInput = Number(this.get('observablePapInput'));
       const isIoc = this.get('isIocInput');
       const sightedInput = this.get('sightedInput');
-      const tagsInput = this.get('tagsInput');
       const observableDescriptionInput = this.get('observableDescriptionInput');
+      const tagsInput = this.get('tagsInput');
+
+      console.log('TAGGGGSSS', tagsInput);
 
       const observableInputs = {
         caseId: caseObj._id,
         inputs: {
-          dataType: observableDataType,
+          dataType: observableType,
           tlp: observableTlpInput,
           pap: observablePapInput,
           data: observableDataInput,
           ioc: isIoc,
           sighted: sightedInput,
-          tags: tagsInput.split(' '),
           message: observableDescriptionInput
         }
       };
+
+      if (tagsInput && tagsInput.length > 0) observableInputs.inputs.tags = [tagsInput];
 
       this.sendIntegrationMessage({
         action: 'addObservable',
@@ -183,7 +198,7 @@ polarity.export = PolarityComponent.extend({
         .then(() => {
           this.setMessages(
             index,
-            'updateCase',
+            'addObservable',
             `Observable ${observableDataInput} was added to case #${caseObj.number}`
           );
         })
@@ -199,6 +214,13 @@ polarity.export = PolarityComponent.extend({
           this.set('isRunning', false);
           this.set('details.' + index + `.__${type}Open`, false);
           this.set('buttonDisabled', false);
+
+          this.set('observableTypeInput', '');
+          this.set('observableDataInput', '');
+          this.set('observableDescriptionInput', '');
+          this.set('tagsInput', '');
+          this.set('observableTlpInput', '');
+          this.set('observablePapInput', '');
 
           setTimeout(() => {
             this.setErrorMessages(index, 'addObservable', '');
@@ -230,12 +252,38 @@ polarity.export = PolarityComponent.extend({
     }
   },
   validInputs: function () {
-    if (!this.get('observableDataType') || !this.get('observableData')) {
-      this.set('observableDataTypeInput', 'Type is required');
-      this.set('observableDataInput', 'Data required');
-      this.set('isRunning', false);
-      return false;
-    }
-    return true;
+    this.set('verificationError', '');
+    let allValid = true;
+
+    ['observableTypeInput', 'observableDataInput'].forEach((el) => {
+      const value = this.get(el);
+
+      if (!value || typeof value !== 'string') {
+        this.set('verificationError', 'Required');
+        this.set('isRunning', false);
+        allValid = false;
+      } else {
+        this.set('verificationError', '');
+      }
+    });
+    return allValid;
+  },
+  validCaseInputs: function () {
+    this.set('verificationError', '');
+    let allValid = true;
+
+    ['titleInput', 'descriptionInput'].forEach((el) => {
+      const value = this.get(el);
+
+      if (!value || typeof value !== 'string') {
+        this.set('verificationError', 'Required');
+        this.set('isRunning', false);
+        allValid = false;
+      } else {
+        this.set('verificationError', '');
+      }
+    });
+
+    return allValid;
   }
 });
