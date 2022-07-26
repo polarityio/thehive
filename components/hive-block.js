@@ -174,8 +174,6 @@ polarity.export = PolarityComponent.extend({
       const observableDescriptionInput = this.get('observableDescriptionInput');
       const tagsInput = this.get('tagsInput');
 
-      console.log('TAGGGGSSS', tagsInput);
-
       const observableInputs = {
         caseId: caseObj._id,
         inputs: {
