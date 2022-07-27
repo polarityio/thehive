@@ -214,6 +214,12 @@
         </div>
       {{/if}}
 
+      {{#if (get addObservableMessage index)}}
+        <div class='alert alert-information mt-1'>
+          {{get addObservableMessage index}}
+        </div>
+      {{/if}}
+
       <div class='case-options'>
         <h1 class='p-title'>
           Case #{{case.number}}
@@ -779,6 +785,30 @@
               {{#if (eq observable.tlp 3)}}
                 <div>
                   <span class='p-key'>TLP: </span>
+                  <span class='p-value' style='color:red'>RED</span>
+                </div>
+              {{/if}}
+              {{#if (eq observable.pap 0)}}
+                <div>
+                  <span class='p-key'>PAP: </span>
+                  <span class='p-value'>WHITE</span>
+                </div>
+              {{/if}}
+              {{#if (eq observable.pap 1)}}
+                <div>
+                  <span class='p-key'>PAP: </span>
+                  <span class='p-value' style='color:green'>GREEN</span>
+                </div>
+              {{/if}}
+              {{#if (eq observable.pap 2)}}
+                <div>
+                  <span class='p-key'>PAP: </span>
+                  <span class='p-value' style='color:orange'>AMBER</span>
+                </div>
+              {{/if}}
+              {{#if (eq observable.pap 3)}}
+                <div>
+                  <span class='p-key'>PAP: </span>
                   <span class='p-value' style='color:red'>RED</span>
                 </div>
               {{/if}}

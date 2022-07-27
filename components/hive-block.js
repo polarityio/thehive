@@ -205,7 +205,7 @@ polarity.export = PolarityComponent.extend({
             err.meta.status === 207
               ? `${JSON.stringify(err.meta.description.failure[0].message)}`
               : `${JSON.stringify(err.meta.description.message)}`;
-
+              
           this.setErrorMessages(index, 'addObservable', errMessage);
         })
         .finally(() => {
