@@ -1,432 +1,572 @@
 {{#if details.errorMessage}}
-  <div class="mt-2">
-    <div class="alert alert-danger">
+  <div class='mt-2'>
+    <div class='alert alert-danger'>
       <pre>{{details.errorMessage}}</pre>
     </div>
   </div>
 {{else if details.allowCreateCase}}
-  <div class="case-creation-form">
-    <table class="case-inputs">
-      {{#if createCaseMessage}}
-        <div class="alert alert-information mt-1">
-          {{createCaseMessage}}
-        </div>
-      {{/if}}
+  {{#if (not newCaseCreated)}}
+    <div class='case-creation-form'>
+      <table class='case-inputs'>
+        {{#if createCaseMessage}}
+          <div class='alert alert-information mt-1'>
+            {{createCaseMessage}}
+          </div>
+        {{/if}}
 
-      {{#if createCaseErrorMessage}}
-        <div class="alert alert-information mt-1">
-          {{createCaseErrorMessage}}
-        </div>
-      {{/if}}
+        {{#if createCaseErrorMessage}}
+          <div class='alert alert-information mt-1'>
+            {{createCaseErrorMessage}}
+          </div>
+        {{/if}}
 
-      <tr>
-        <td> <label for="title">Title: </label></td>
-        <div>{{input
-            class="case-title"
-            onclick=(action (mut titleInput value="target.value"))
-            value=titleInput
-            placeholder="Title"
-          }}</div>
-      </tr>
+        <tr>
+          <td> <label for='title'>Title: </label></td>
+          <div>{{input
+              class='case-title'
+              onclick=(action (mut titleInput value='target.value'))
+              value=titleInput
+              placeholder='Title'
+            }}</div>
+        </tr>
+        {{#if verificationError}}
+          <div class='verification-err-msg'>
+            {{verificationError}}
+          </div>
+        {{/if}}
+        <tr>
+          <td><label>Severity: </label></td>
+          <div class='level-select'>
+            <input
+              type='radio'
+              class='white'
+              id='severity-white-{{uniqueIdPrefix}}'
+              name='severityLevel'
+              onclick={{action (mut severityInput) 1}}
+            />
+            <label for='severity-white-{{uniqueIdPrefix}}'>White</label>
+            <input
+              type='radio'
+              class='green'
+              id='severity-green-{{uniqueIdPrefix}}'
+              name='severityLevel'
+              onclick={{action (mut severityInput) 2}}
+            />
+            <label for='severity-green-{{uniqueIdPrefix}}'>Green</label>
+            <input
+              type='radio'
+              class='amber'
+              id='severity-amber-{{uniqueIdPrefix}}'
+              name='severityLevel'
+              onclick={{action (mut severityInput) 3}}
+            />
+            <label for='severity-amber-{{uniqueIdPrefix}}'>Amber</label>
+            <input
+              type='radio'
+              class='red'
+              id='severity-red-{{uniqueIdPrefix}}'
+              name='severityLevel'
+              onclick={{action (mut severityInput) 4}}
+            />
+            <label for='severity-red-{{uniqueIdPrefix}}'>Red</label>
+          </div>
+        </tr>
+
+        <tr>
+          <td><label>TLP: </label></td>
+          <div class='level-select'>
+            <input
+              type='radio'
+              class='white'
+              id='tlp-white-{{uniqueIdPrefix}}'
+              name='tlpLevel'
+              onclick={{action (mut tlpInput) 0}}
+            />
+            <label for='tlp-white-{{uniqueIdPrefix}}'>White</label>
+            <input
+              type='radio'
+              class='green'
+              id='tlp-green-{{uniqueIdPrefix}}'
+              name='tlpLevel'
+              onclick={{action (mut tlpInput) 1}}
+            />
+            <label for='tlp-green-{{uniqueIdPrefix}}'>Green</label>
+            <input
+              type='radio'
+              class='amber'
+              id='tlp-amber-{{uniqueIdPrefix}}'
+              name='tlpLevel'
+              onclick={{action (mut tlpInput) 2}}
+            />
+            <label for='tlp-amber-{{uniqueIdPrefix}}'>Amber</label>
+            <input
+              type='radio'
+              class='red'
+              id='tlp-red-{{uniqueIdPrefix}}'
+              name='tlpLevel'
+              onclick={{action (mut tlpInput) 3}}
+            />
+            <label for='tlp-red-{{uniqueIdPrefix}}'>Red</label>
+          </div>
+        </tr>
+
+        <tr>
+          <td><label>PAP: </label></td>
+          <div class='level-select'>
+            <input
+              type='radio'
+              class='white'
+              id='pap-white-{{uniqueIdPrefix}}'
+              name='papLevel'
+              onclick={{action (mut papInput) 0}}
+              checked={{if (eq case.pap 0) 'true'}}
+            />
+            <label for='pap-white-{{uniqueIdPrefix}}'>White</label>
+            <input
+              type='radio'
+              class='green'
+              id='pap-green-{{uniqueIdPrefix}}'
+              name='papLevel'
+              onclick={{action (mut papInput) 1}}
+              checked={{if (eq case.pap 1) 'true'}}
+            />
+            <label for='pap-green-{{uniqueIdPrefix}}'>Green</label>
+            <input
+              type='radio'
+              class='amber'
+              id='pap-amber-{{uniqueIdPrefix}}'
+              name='papLevel'
+              onclick={{action (mut papInput) 2}}
+              checked={{if (eq case.pap 2) 'true'}}
+            />
+            <label for='pap-amber-{{uniqueIdPrefix}}'>Amber</label>
+            <input
+              type='radio'
+              class='red'
+              id='pap-red-{{uniqueIdPrefix}}'
+              name='papLevel'
+              onclick={{action (mut papInput) 3}}
+              checked={{if (eq case.pap 3) 'true'}}
+            />
+            <label for='pap-red-{{uniqueIdPrefix}}'>Red</label>
+          </div>
+        </tr>
+      </table>
+      <div>
+        {{textarea
+          class='case-description'
+          onchange=(action (mut descriptionInput value='target.value'))
+          value=descriptionInput
+          cols='30'
+          rows='4'
+          placeholder='Case Description'
+        }}
+      </div>
       {{#if verificationError}}
-        <div class="verification-err-msg">
+        <div class='verification-err-msg'>
           {{verificationError}}
         </div>
       {{/if}}
-      <tr>
-        <td><label>Severity: </label></td>
-        <div class="level-select">
-          <input
-            type="radio"
-            class="white"
-            id="severity-white-{{uniqueIdPrefix}}"
-            name="severityLevel"
-            onclick={{action (mut severityInput) 1}}
-          />
-          <label for="severity-white-{{uniqueIdPrefix}}">White</label>
-          <input
-            type="radio"
-            class="green"
-            id="severity-green-{{uniqueIdPrefix}}"
-            name="severityLevel"
-            onclick={{action (mut severityInput) 2}}
-          />
-          <label for="severity-green-{{uniqueIdPrefix}}">Green</label>
-          <input
-            type="radio"
-            class="amber"
-            id="severity-amber-{{uniqueIdPrefix}}"
-            name="severityLevel"
-            onclick={{action (mut severityInput) 3}}
-          />
-          <label for="severity-amber-{{uniqueIdPrefix}}">Amber</label>
-          <input
-            type="radio"
-            class="red"
-            id="severity-red-{{uniqueIdPrefix}}"
-            name="severityLevel"
-            onclick={{action (mut severityInput) 4}}
-          />
-          <label for="severity-red-{{uniqueIdPrefix}}">Red</label>
-        </div>
-      </tr>
-
-      <tr>
-        <td><label>TLP: </label></td>
-        <div class="level-select">
-          <input
-            type="radio"
-            class="white"
-            id="tlp-white-{{uniqueIdPrefix}}"
-            name="tlpLevel"
-            onclick={{action (mut tlpInput) 0}}
-          />
-          <label for="tlp-white-{{uniqueIdPrefix}}">White</label>
-          <input
-            type="radio"
-            class="green"
-            id="tlp-green-{{uniqueIdPrefix}}"
-            name="tlpLevel"
-            onclick={{action (mut tlpInput) 1}}
-          />
-          <label for="tlp-green-{{uniqueIdPrefix}}">Green</label>
-          <input
-            type="radio"
-            class="amber"
-            id="tlp-amber-{{uniqueIdPrefix}}"
-            name="tlpLevel"
-            onclick={{action (mut tlpInput) 2}}
-          />
-          <label for="tlp-amber-{{uniqueIdPrefix}}">Amber</label>
-          <input
-            type="radio"
-            class="red"
-            id="tlp-red-{{uniqueIdPrefix}}"
-            name="tlpLevel"
-            onclick={{action (mut tlpInput) 3}}
-          />
-          <label for="tlp-red-{{uniqueIdPrefix}}">Red</label>
-        </div>
-      </tr>
-
-      <tr>
-        <td><label>PAP: </label></td>
-        <div class="level-select">
-          <input
-            type="radio"
-            class="white"
-            id="pap-white-{{uniqueIdPrefix}}"
-            name="papLevel"
-            onclick={{action (mut papInput) 0}}
-            checked={{if (eq case.pap 0) "true"}}
-          />
-          <label for="pap-white-{{uniqueIdPrefix}}">White</label>
-          <input
-            type="radio"
-            class="green"
-            id="pap-green-{{uniqueIdPrefix}}"
-            name="papLevel"
-            onclick={{action (mut papInput) 1}}
-            checked={{if (eq case.pap 1) "true"}}
-          />
-          <label for="pap-green-{{uniqueIdPrefix}}">Green</label>
-          <input
-            type="radio"
-            class="amber"
-            id="pap-amber-{{uniqueIdPrefix}}"
-            name="papLevel"
-            onclick={{action (mut papInput) 2}}
-            checked={{if (eq case.pap 2) "true"}}
-          />
-          <label for="pap-amber-{{uniqueIdPrefix}}">Amber</label>
-          <input
-            type="radio"
-            class="red"
-            id="pap-red-{{uniqueIdPrefix}}"
-            name="papLevel"
-            onclick={{action (mut papInput) 3}}
-            checked={{if (eq case.pap 3) "true"}}
-          />
-          <label for="pap-red-{{uniqueIdPrefix}}">Red</label>
-        </div>
-      </tr>
-    </table>
-
-    <div>
-      {{textarea
-        class="case-description"
-        onchange=(action (mut descriptionInput value="target.value"))
-        value=descriptionInput
-        cols="30"
-        rows="4"
-        placeholder="Case Description"
-      }}
+      <button class='create-case-btn' type='button' {{action 'createCase'}}>
+        {{#if isRunning}}
+          {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
+        {{/if}}
+        New Case
+      </button>
     </div>
-    {{#if verificationError}}
-      <div class="verification-err-msg">
-        {{verificationError}}
+  {{/if}}
+
+  {{#if newCaseCreated}}
+    <h1 class='p-title'>
+      Case #{{newCase.number}}
+    </h1>
+    {{#if newCase.title}}
+      <div>
+        <span class='p-key'>Title: </span>
+        <span class='p-value'>{{newCase.title}}</span>
       </div>
     {{/if}}
-    <button class="create-case-btn" type="button" {{action "createCase"}}>
-      {{#if isRunning}}
-        {{fa-icon "spinner-third" fixedWidth=true spin=true}}
+
+    {{#if newCase.severity}}
+      {{#if (eq newCase.severity 1)}}
+        <div>
+          <span class='p-key'>Severity: </span>
+          <span class='p-value'>WHITE</span>
+        </div>
       {{/if}}
-      New Case
-    </button>
-  </div>
+      {{#if (eq newCase.severity 2)}}
+        <div>
+          <span class='p-key'>Severity: </span>
+          <span class='p-value' style='color:green'>GREEN</span>
+        </div>
+      {{/if}}
+      {{#if (eq newCase.severity 3)}}
+        <div>
+          <span class='p-key'>Severity: </span>
+          <span class='p-value' style='color:orange'>AMBER</span>
+        </div>
+      {{/if}}
+      {{#if (eq newCase.severity 4)}}
+        <div>
+          <span class='p-key'>Severity: </span>
+          <span class='p-value' style='color:red'>RED</span>
+        </div>
+      {{/if}}
+    {{/if}}
+
+    {{#if (eq newCase.tlp 0)}}
+      <div>
+        <span class='p-key'>TLP: </span>
+        <span class='p-value'>WHITE</span>
+      </div>
+    {{/if}}
+    {{#if (eq newCase.tlp 1)}}
+      <div>
+        <span class='p-key'>TLP: </span>
+        <span class='p-value' style='color:green'>GREEN</span>
+      </div>
+    {{/if}}
+    {{#if (eq newCase.tlp 2)}}
+      <div>
+        <span class='p-key'>TLP: </span>
+        <span class='p-value' style='color:orange'>AMBER</span>
+      </div>
+    {{/if}}
+    {{#if (eq newCase.tlp 3)}}
+      <div>
+        <span class='p-key'>TLP: </span>
+        <span class='p-value' style='color:red'>RED</span>
+      </div>
+    {{/if}}
+
+    {{#if (eq newCase.pap 0)}}
+      <div>
+        <span class='p-key'>PAP: </span>
+        <span class='p-value'>WHITE</span>
+      </div>
+    {{/if}}
+    {{#if (eq newCase.pap 1)}}
+      <div>
+        <span class='p-key'>PAP: </span>
+        <span class='p-value' style='color:green'>GREEN</span>
+      </div>
+    {{/if}}
+    {{#if (eq newCase.pap 2)}}
+      <div>
+        <span class='p-key'>PAP: </span>
+        <span class='p-value' style='color:orange'>AMBER</span>
+      </div>
+    {{/if}}
+    {{#if (eq newCase.pap 3)}}
+      <div>
+        <span class='p-key'>PAP: </span>
+        <span class='p-value' style='color:red'>RED</span>
+      </div>
+    {{/if}}
+
+    {{#if newCase.tags}}
+      <span class='p-key'>Tags: </span>
+      {{#each newCase.tags as |tag|}}
+        <div>
+          <span class='tag'>{{tag}}</span>
+        </div>
+      {{/each}}
+    {{/if}}
+    {{#if newCase.startDate}}
+      <div>
+        <span class='p-key'>Start Date: </span>
+        <span class='p-value'>{{moment-format newCase.startDate timeZone=timezone}}</span>
+      </div>
+    {{/if}}
+    {{#if newCase.status}}
+      <div>
+        <span class='p-key'>Status: </span>
+        <span class='p-value'>{{newCase.status}}</span>
+      </div>
+    {{/if}}
+    {{#if newCase.stage}}
+      <div>
+        <span class='p-key'>Stage: </span>
+        <span class='p-value'>{{newCase.stage}}</span>
+      </div>
+    {{/if}}
+
+    <span class='p-key'>Description:</span>
+    <div class='scrollable-block'>
+      <table>
+        <tbody>
+          <tr>
+            <td class='pr-3'>
+              <div>
+                <span class='p-value'>{{newCase.description}}</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  {{/if}}
 {{else}}
-  <ul class="nav nav-tabs">
+  <ul class='nav nav-tabs'>
     {{#if details}}
-      <li class="nav-item">
+      <li class='nav-item'>
         <a
-          {{action "changeTab" "cases"}}
-          class="nav-link {{if (or (eq changeTab "cases") (not changeTab)) "active"}}"
-          href="#"
+          {{action 'changeTab' 'cases'}}
+          class='nav-link {{if (or (eq changeTab "cases") (not changeTab)) "active"}}'
+          href='#'
         >
           Cases
         </a>
       </li>
     {{/if}}
   </ul>
-  {{#if (eq changeTab "cases")}}
+  {{#if (eq changeTab 'cases')}}
     {{#each details as |case index|}}
       {{#if (not-eq index 0)}}
         <hr />
       {{/if}}
-      <div class="pivot-link">
-        <a href="{{block.userOptions.url}}/cases/{{case._id}}/details" class="p-link">(Pivot To Case Details)</a>
+      <div class='pivot-link'>
+        <a href='{{block.userOptions.url}}/cases/{{case._id}}/details' class='p-link'>(Pivot To Case Details)</a>
       </div>
       {{#if (get addObservableErrorMessage index)}}
-        <div class="alert alert-danger mt-1">
+        <div class='alert alert-danger mt-1'>
           {{get addObservableErrorMessage index}}
         </div>
       {{/if}}
 
       {{#if (get updateCaseErrorMessage index)}}
-        <div class="alert alert-danger mt-1">
+        <div class='alert alert-danger mt-1'>
           {{get updateCaseErrorMessage index}}
         </div>
       {{/if}}
 
       {{#if (get updateCaseMessage index)}}
-        <div class="alert alert-information mt-1">
+        <div class='alert alert-information mt-1'>
           {{get updateCaseMessage index}}
         </div>
       {{/if}}
 
       {{#if (get addObservableMessage index)}}
-        <div class="alert alert-information mt-1">
+        <div class='alert alert-information mt-1'>
           {{get addObservableMessage index}}
         </div>
       {{/if}}
 
-      <div class="case-options">
-        <h1 class="p-title">
+      <div class='case-options'>
+        <h1 class='p-title'>
           Case #{{case.number}}
-          {{if (get closedCase case._id) "(CASE HAS BEEN CLOSED)"}}
+          {{if (get closedCase case._id) '(CASE HAS BEEN CLOSED)'}}
         </h1>
 
         {{#unless (get closedCase case._id)}}
           <button
             disabled={{buttonDisabled}}
-            class="case-btn"
-            title="Add an observable to this case"
-            type="button"
-            {{action "openModal" case index "observableModal"}}
-          >{{fa-icon "plus" fixedWidth=true}}</button>
+            class='case-btn'
+            title='Add an observable to this case'
+            type='button'
+            {{action 'openModal' case index 'observableModal'}}
+          >{{fa-icon 'plus' fixedWidth=true}}</button>
           <button
-            id="hey-btn"
+            id='hey-btn'
             disabled={{buttonDisabled}}
-            class="case-btn"
-            title="Edit this case"
-            type="button"
-            {{action "openModal" case index "editModal"}}
+            class='case-btn'
+            title='Edit this case'
+            type='button'
+            {{action 'openModal' case index 'editModal'}}
           >
-            {{fa-icon "pen"}}</button>
+            {{fa-icon 'pen'}}</button>
           <button
-            style="background-color: red"
+            style='background-color: red'
             disabled={{buttonDisabled}}
-            title="Close this case"
-            class="case-btn"
-            type="button"
-            {{action "openModal" case index "closeCaseModal"}}
+            title='Close this case'
+            class='case-btn'
+            type='button'
+            {{action 'openModal' case index 'closeCaseModal'}}
           >X</button>
         {{/unless}}
       </div>
 
-      <div class="case-container">
+      <div class='case-container'>
         {{#if case.__editModalOpen}}
-          <div class="modal case-modal">
-            <h1 class="p-title">
+          <div class='modal case-modal'>
+            <h1 class='p-title'>
               Editing Case #{{case.number}}
             </h1>
-
-            <table class="case-inputs">
+            <table class='case-inputs'>
               <tr>
-                <td> <label for="title">Title: </label></td>
+                <td> <label for='title'>Title: </label></td>
                 {{#if case.title}}
                   <div>{{input
-                      class="case-title"
-                      onclick=(action (mut titleInput value="target.value"))
+                      class='case-title'
+                      onclick=(action (mut titleInput value='target.value'))
                       value=titleInput
-                      placeholder="Title"
-                      required="true"
+                      placeholder='Title'
+                      required='true'
                     }}</div>
                 {{/if}}
               </tr>
+              {{#if verificationError}}
+                <div class='verification-err-msg'>
+                  {{verificationError}}
+                </div>
+              {{/if}}
               <tr>
                 <td><label>Severity: </label></td>
-                <div class="level-select">
+                <div class='level-select'>
                   <input
-                    type="radio"
-                    class="white"
-                    id="severity-white-{{uniqueIdPrefix}}"
-                    name="severityLevel"
+                    type='radio'
+                    class='white'
+                    id='severity-white-{{uniqueIdPrefix}}'
+                    name='severityLevel'
                     onclick={{action (mut severityInput) 1}}
-                    checked={{if (eq case.severity 1) "true"}}
+                    checked={{if (eq case.severity 1) 'true'}}
                   />
-                  <label for="severity-white-{{uniqueIdPrefix}}">White</label>
+                  <label for='severity-white-{{uniqueIdPrefix}}'>White</label>
 
                   <input
-                    type="radio"
-                    class="green"
-                    id="severity-green-{{uniqueIdPrefix}}"
-                    name="severityLevel"
+                    type='radio'
+                    class='green'
+                    id='severity-green-{{uniqueIdPrefix}}'
+                    name='severityLevel'
                     onclick={{action (mut severityInput) 2}}
-                    checked={{if (eq case.severity 2) "true"}}
+                    checked={{if (eq case.severity 2) 'true'}}
                   />
-                  <label for="severity-green-{{uniqueIdPrefix}}">Green</label>
+                  <label for='severity-green-{{uniqueIdPrefix}}'>Green</label>
 
                   <input
-                    type="radio"
-                    class="amber"
-                    id="severity-amber-{{uniqueIdPrefix}}"
-                    name="severityLevel"
+                    type='radio'
+                    class='amber'
+                    id='severity-amber-{{uniqueIdPrefix}}'
+                    name='severityLevel'
                     onclick={{action (mut severityInput) 3}}
-                    checked={{if (eq case.severity 3) "true"}}
+                    checked={{if (eq case.severity 3) 'true'}}
                   />
-                  <label for="severity-amber-{{uniqueIdPrefix}}">Amber</label>
+                  <label for='severity-amber-{{uniqueIdPrefix}}'>Amber</label>
 
                   <input
-                    type="radio"
-                    class="red"
-                    id="severity-red-{{uniqueIdPrefix}}"
-                    name="severityLevel"
+                    type='radio'
+                    class='red'
+                    id='severity-red-{{uniqueIdPrefix}}'
+                    name='severityLevel'
                     onclick={{action (mut severityInput) 4}}
-                    checked={{if (eq case.severity 4) "true"}}
+                    checked={{if (eq case.severity 4) 'true'}}
                   />
-                  <label for="severity-red-{{uniqueIdPrefix}}">Red</label>
+                  <label for='severity-red-{{uniqueIdPrefix}}'>Red</label>
                 </div>
               </tr>
 
               <tr>
                 <td><label>TLP: </label></td>
-                <div class="level-select">
+                <div class='level-select'>
                   <input
-                    type="radio"
-                    class="white"
-                    id="tlp-white-{{uniqueIdPrefix}}"
-                    name="tlpLevel"
+                    type='radio'
+                    class='white'
+                    id='tlp-white-{{uniqueIdPrefix}}'
+                    name='tlpLevel'
                     onclick={{action (mut tlpInput) 0}}
-                    checked={{if (eq case.tlp 0) "true"}}
+                    checked={{if (eq case.tlp 0) 'true'}}
                   />
-                  <label for="tlp-white-{{uniqueIdPrefix}}">White</label>
+                  <label for='tlp-white-{{uniqueIdPrefix}}'>White</label>
 
                   <input
-                    type="radio"
-                    class="green"
-                    id="tlp-green-{{uniqueIdPrefix}}"
-                    name="tlpLevel"
+                    type='radio'
+                    class='green'
+                    id='tlp-green-{{uniqueIdPrefix}}'
+                    name='tlpLevel'
                     onclick={{action (mut tlpInput) 1}}
-                    checked={{if (eq case.tlp 1) "true"}}
+                    checked={{if (eq case.tlp 1) 'true'}}
                   />
-                  <label for="tlp-green-{{uniqueIdPrefix}}">Green</label>
+                  <label for='tlp-green-{{uniqueIdPrefix}}'>Green</label>
 
                   <input
-                    type="radio"
-                    class="amber"
-                    id="tlp-amber-{{uniqueIdPrefix}}"
-                    name="tlpLevel"
+                    type='radio'
+                    class='amber'
+                    id='tlp-amber-{{uniqueIdPrefix}}'
+                    name='tlpLevel'
                     onclick={{action (mut tlpInput) 2}}
-                    checked={{if (eq case.tlp 2) "true"}}
+                    checked={{if (eq case.tlp 2) 'true'}}
                   />
-                  <label for="tlp-amber-{{uniqueIdPrefix}}">Amber</label>
+                  <label for='tlp-amber-{{uniqueIdPrefix}}'>Amber</label>
 
                   <input
-                    type="radio"
-                    class="red"
-                    id="tlp-red-{{uniqueIdPrefix}}"
-                    name="tlpLevel"
+                    type='radio'
+                    class='red'
+                    id='tlp-red-{{uniqueIdPrefix}}'
+                    name='tlpLevel'
                     onclick={{action (mut tlpInput) 3}}
-                    checked={{if (eq case.tlp 3) "true"}}
+                    checked={{if (eq case.tlp 3) 'true'}}
                   />
-                  <label for="tlp-red-{{uniqueIdPrefix}}">Red</label>
+                  <label for='tlp-red-{{uniqueIdPrefix}}'>Red</label>
                 </div>
               </tr>
 
               <tr>
                 <td><label>PAP: </label></td>
-                <div class="level-select">
+                <div class='level-select'>
                   <input
-                    type="radio"
-                    class="white"
-                    id="pap-white-{{uniqueIdPrefix}}"
-                    name="papLevel"
+                    type='radio'
+                    class='white'
+                    id='pap-white-{{uniqueIdPrefix}}'
+                    name='papLevel'
                     onclick={{action (mut papInput) 0}}
-                    checked={{if (eq case.pap 0) "true"}}
+                    checked={{if (eq case.pap 0) 'true'}}
                   />
-                  <label for="pap-white-{{uniqueIdPrefix}}">White</label>
+                  <label for='pap-white-{{uniqueIdPrefix}}'>White</label>
 
                   <input
-                    type="radio"
-                    class="green"
-                    id="pap-green-{{uniqueIdPrefix}}"
-                    name="papLevel"
+                    type='radio'
+                    class='green'
+                    id='pap-green-{{uniqueIdPrefix}}'
+                    name='papLevel'
                     onclick={{action (mut papInput) 1}}
-                    checked={{if (eq case.pap 1) "true"}}
+                    checked={{if (eq case.pap 1) 'true'}}
                   />
-                  <label for="pap-green-{{uniqueIdPrefix}}">Green</label>
+                  <label for='pap-green-{{uniqueIdPrefix}}'>Green</label>
 
                   <input
-                    type="radio"
-                    class="amber"
-                    id="pap-amber-{{uniqueIdPrefix}}"
-                    name="papLevel"
+                    type='radio'
+                    class='amber'
+                    id='pap-amber-{{uniqueIdPrefix}}'
+                    name='papLevel'
                     onclick={{action (mut papInput) 2}}
-                    checked={{if (eq case.pap 2) "true"}}
+                    checked={{if (eq case.pap 2) 'true'}}
                   />
-                  <label for="pap-amber-{{uniqueIdPrefix}}">Amber</label>
+                  <label for='pap-amber-{{uniqueIdPrefix}}'>Amber</label>
 
                   <input
-                    type="radio"
-                    class="red"
-                    id="pap-red-{{uniqueIdPrefix}}"
-                    name="papLevel"
+                    type='radio'
+                    class='red'
+                    id='pap-red-{{uniqueIdPrefix}}'
+                    name='papLevel'
                     onclick={{action (mut papInput) 3}}
-                    checked={{if (eq case.pap 3) "true"}}
+                    checked={{if (eq case.pap 3) 'true'}}
                   />
-                  <label for="pap-red-{{uniqueIdPrefix}}">Red</label>
+                  <label for='pap-red-{{uniqueIdPrefix}}'>Red</label>
                 </div>
               </tr>
             </table>
-
             <div>
               {{textarea
-                class="case-description"
-                onchange=(action (mut descriptionInput value="target.value"))
+                class='case-description'
+                onchange=(action (mut descriptionInput value='target.value'))
                 value=descriptionInput
-                cols="30"
-                rows="4"
-                placeholder="Case Description"
+                cols='30'
+                rows='4'
+                placeholder='Case Description'
               }}
             </div>
-            <div class="case-options">
-              <button class="case-modal-btn" type="button" {{action "closeModal" index "editModal"}}>
+            {{#if verificationError}}
+              <div class='verification-err-msg'>
+                {{verificationError}}
+              </div>
+            {{/if}}
+            <div class='case-options'>
+              <button class='case-modal-btn' type='button' {{action 'closeModal' index 'editModal'}}>
                 Cancel
               </button>
-              <button class="case-modal-btn" type="button" {{action "updateCase" case index "editModal"}}>
+              <button class='case-modal-btn' type='button' {{action 'updateCase' case index 'editModal'}}>
                 {{#if isRunning}}
-                  {{fa-icon "spinner-third" fixedWidth=true spin=true}}
+                  {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
                 {{/if}}
                 Submit
               </button>
@@ -435,167 +575,167 @@
         {{/if}}
 
         {{#if case.__observableModalOpen}}
-          <div class="modal case-modal">
-            <h1 class="p-title">
+          <div class='modal case-modal'>
+            <h1 class='p-title'>
               Adding an observable for case #{{case.number}}
             </h1>
 
             <table>
               <tr>
-                <td><label for="title">Type: </label></td>
+                <td><label for='title'>Type: </label></td>
                 <select
-                  class="modal-select"
-                  required="true"
-                  onclick={{action (mut observableTypeInput) value="target.value"}}
+                  class='modal-select'
+                  required='true'
+                  onclick={{action (mut observableTypeInput) value='target.value'}}
                 >
-                  <option value="none" selected disabled hidden>Select Type</option>
-                  <option value="hash">hash</option>
-                  <option value="ip">ip</option>
-                  <option value="domain">domain</option>
+                  <option value='none' selected disabled hidden>Select Type</option>
+                  <option value='hash'>hash</option>
+                  <option value='ip'>ip</option>
+                  <option value='domain'>domain</option>
                 </select>
               </tr>
               {{#if verificationError}}
-                <div class="verification-err-msg">
+                <div class='verification-err-msg'>
                   {{verificationError}}
                 </div>
               {{/if}}
               <tr>
-                <td> <label for="value">Value: </label></td>
+                <td> <label for='value'>Value: </label></td>
                 {{input
                   required=true
-                  class="observable-title"
-                  onclick=(action (mut observableDataInput value="target.value"))
+                  class='observable-title'
+                  onclick=(action (mut observableDataInput value='target.value'))
                   value=observableDataInput
-                  placeholder="Value"
+                  placeholder='Value'
                 }}
               </tr>
               {{#if verificationError}}
-                <div class="verification-err-msg">
+                <div class='verification-err-msg'>
                   {{verificationError}}
                 </div>
               {{/if}}
               <tr>
                 <td><label>TLP: </label></td>
-                <div class="level-select">
+                <div class='level-select'>
                   <input
-                    type="radio"
-                    class="white"
-                    id="white-{{uniqueIdPrefix}}"
-                    name="tlpLevel"
+                    type='radio'
+                    class='white'
+                    id='white-{{uniqueIdPrefix}}'
+                    name='tlpLevel'
                     onclick={{action (mut observableTlpInput) 0}}
                     checked
                   />
-                  <label for="white-{{uniqueIdPrefix}}">White</label>
+                  <label for='white-{{uniqueIdPrefix}}'>White</label>
 
                   <input
-                    type="radio"
-                    class="green"
-                    id="green-{{uniqueIdPrefix}}"
-                    name="tlpLevel"
+                    type='radio'
+                    class='green'
+                    id='green-{{uniqueIdPrefix}}'
+                    name='tlpLevel'
                     onclick={{action (mut observableTlpInput) 1}}
                   />
-                  <label for="green-{{uniqueIdPrefix}}">Green</label>
+                  <label for='green-{{uniqueIdPrefix}}'>Green</label>
                   <input
-                    type="radio"
-                    class="amber"
-                    id="amber-{{uniqueIdPrefix}}"
-                    name="tlpLevel"
+                    type='radio'
+                    class='amber'
+                    id='amber-{{uniqueIdPrefix}}'
+                    name='tlpLevel'
                     onclick={{action (mut observableTlpInput) 2}}
                   />
-                  <label for="amber-{{uniqueIdPrefix}}">Amber</label>
+                  <label for='amber-{{uniqueIdPrefix}}'>Amber</label>
 
                   <input
-                    type="radio"
-                    class="red"
-                    id="red-{{uniqueIdPrefix}}"
-                    name="tlpLevel"
+                    type='radio'
+                    class='red'
+                    id='red-{{uniqueIdPrefix}}'
+                    name='tlpLevel'
                     onclick={{action (mut observableTlpInput) 3}}
                   />
-                  <label for="red-{{uniqueIdPrefix}}">Red</label>
+                  <label for='red-{{uniqueIdPrefix}}'>Red</label>
                 </div>
               </tr>
 
               <tr>
                 <td><label>PAP: </label></td>
-                <div class="level-select">
+                <div class='level-select'>
                   <input
-                    type="radio"
-                    class="white"
-                    id="pap-white-{{uniqueIdPrefix}}"
-                    name="papLevel"
+                    type='radio'
+                    class='white'
+                    id='pap-white-{{uniqueIdPrefix}}'
+                    name='papLevel'
                     onclick={{action (mut observablePapInput) 0}}
                     checked
                   />
-                  <label for="pap-white-{{uniqueIdPrefix}}">White</label>
+                  <label for='pap-white-{{uniqueIdPrefix}}'>White</label>
 
                   <input
-                    type="radio"
-                    class="green"
-                    id="pap-green-{{uniqueIdPrefix}}"
-                    name="papLevel"
+                    type='radio'
+                    class='green'
+                    id='pap-green-{{uniqueIdPrefix}}'
+                    name='papLevel'
                     onclick={{action (mut observablePapInput) 1}}
                   />
-                  <label for="pap-green-{{uniqueIdPrefix}}">Green</label>
+                  <label for='pap-green-{{uniqueIdPrefix}}'>Green</label>
 
                   <input
-                    type="radio"
-                    class="amber"
-                    id="pap-amber-{{uniqueIdPrefix}}"
-                    name="papLevel"
+                    type='radio'
+                    class='amber'
+                    id='pap-amber-{{uniqueIdPrefix}}'
+                    name='papLevel'
                     onclick={{action (mut observablePapInput) 2}}
                   />
-                  <label for="pap-amber-{{uniqueIdPrefix}}">Amber</label>
+                  <label for='pap-amber-{{uniqueIdPrefix}}'>Amber</label>
 
                   <input
-                    type="radio"
-                    class="red"
-                    id="pap-red-{{uniqueIdPrefix}}"
-                    name="papLevel"
+                    type='radio'
+                    class='red'
+                    id='pap-red-{{uniqueIdPrefix}}'
+                    name='papLevel'
                     onclick={{action (mut observablePapInput) 3}}
                   />
-                  <label for="pap-red-{{uniqueIdPrefix}}">Red</label>
+                  <label for='pap-red-{{uniqueIdPrefix}}'>Red</label>
                 </div>
               </tr>
 
               <tr>
-                <td> <label for="ioc">is IOC: </label></td>
-                {{input type="checkbox" checked=isIocInput onchange=(action (mut isIocInput checked="target.value"))}}
+                <td> <label for='ioc'>is IOC: </label></td>
+                {{input type='checkbox' checked=isIocInput onchange=(action (mut isIocInput checked='target.value'))}}
               </tr>
               <tr>
-                <td> <label for="sighted">Sighted: </label></td>
+                <td> <label for='sighted'>Sighted: </label></td>
                 {{input
-                  type="checkbox"
+                  type='checkbox'
                   checked=sightedInput
-                  onchange=(action (mut sightedInput checked="target.value"))
+                  onchange=(action (mut sightedInput checked='target.value'))
                 }}
               </tr>
               <tr>
-                <td> <label for="tags">Tags: </label></td>
-                {{input onclick=(action (mut tagsInput value="target.value")) value=tagsInput placeholder="Tags"}}
-                <div class="mb-2 create-case-footnote">
-                  <span class="p-footnote">Add space separated strings.</span>
+                <td> <label for='tags'>Tags: </label></td>
+                {{input onclick=(action (mut tagsInput value='target.value')) value=tagsInput placeholder='Tags'}}
+                <div class='mb-2 create-case-footnote'>
+                  <span class='p-footnote'>Add space separated strings.</span>
                 </div>
               </tr>
             </table>
 
             <div>
               {{textarea
-                class="case-description"
-                onchange=(action (mut observableDescriptionInput value="target.value"))
+                class='case-description'
+                onchange=(action (mut observableDescriptionInput value='target.value'))
                 value=observableDescriptionInput
-                cols="30"
-                rows="4"
-                placeholder="Observable Description"
+                cols='30'
+                rows='4'
+                placeholder='Observable Description'
               }}
             </div>
 
-            <div class="case-options">
-              <button class="case-modal-btn" type="button" {{action "closeModal" index "observableModal"}}>
+            <div class='case-options'>
+              <button class='case-modal-btn' type='button' {{action 'closeModal' index 'observableModal'}}>
                 Cancel
               </button>
-              <button class="case-modal-btn" type="button" {{action "addObservable" case index "observableModal"}}>
+              <button class='case-modal-btn' type='button' {{action 'addObservable' case index 'observableModal'}}>
                 {{#if isRunning}}
-                  {{fa-icon "spinner-third" fixedWidth=true spin=true}}
+                  {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
                 {{/if}}
                 Add Observable
               </button>
@@ -604,22 +744,22 @@
         {{/if}}
 
         {{#if case.__closeCaseModalOpen}}
-          <div class="modal close-case-modal">
-            <div class="modal-text">
+          <div class='modal close-case-modal'>
+            <div class='modal-text'>
               <span>
                 Are you sure you want to close case
                 <strong>{{case.title}}</strong>
                 (#{{case.number}})?
               </span>
             </div>
-            <div class="modal-options">
+            <div class='modal-options'>
               <div>
-                <button {{action "closeModal" index "closeCaseModal"}} class="modal-btn">Cancel</button>
+                <button {{action 'closeModal' index 'closeCaseModal'}} class='modal-btn'>Cancel</button>
               </div>
               <div>
-                <button {{action "closeCase" case index}} class="modal-btn">
+                <button {{action 'closeCase' case index}} class='modal-btn'>
                   {{#if isRunning}}
-                    {{fa-icon "spinner-third" fixedWidth=true spin=true}}
+                    {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
                   {{/if}}
                   Confirm</button>
               </div>
@@ -629,123 +769,123 @@
 
         {{#if case.title}}
           <div>
-            <span class="p-key">Title: </span>
-            <span class="p-value">{{case.title}}</span>
+            <span class='p-key'>Title: </span>
+            <span class='p-value'>{{case.title}}</span>
           </div>
         {{/if}}
 
         {{#if case.severity}}
           {{#if (eq case.severity 1)}}
             <div>
-              <span class="p-key">Severity: </span>
-              <span class="p-value">WHITE</span>
+              <span class='p-key'>Severity: </span>
+              <span class='p-value'>WHITE</span>
             </div>
           {{/if}}
           {{#if (eq case.severity 2)}}
             <div>
-              <span class="p-key">Severity: </span>
-              <span class="p-value" style="color:green">GREEN</span>
+              <span class='p-key'>Severity: </span>
+              <span class='p-value' style='color:green'>GREEN</span>
             </div>
           {{/if}}
           {{#if (eq case.severity 3)}}
             <div>
-              <span class="p-key">Severity: </span>
-              <span class="p-value" style="color:orange">AMBER</span>
+              <span class='p-key'>Severity: </span>
+              <span class='p-value' style='color:orange'>AMBER</span>
             </div>
           {{/if}}
           {{#if (eq case.severity 4)}}
             <div>
-              <span class="p-key">Severity: </span>
-              <span class="p-value" style="color:red">RED</span>
+              <span class='p-key'>Severity: </span>
+              <span class='p-value' style='color:red'>RED</span>
             </div>
           {{/if}}
         {{/if}}
 
         {{#if (eq case.tlp 0)}}
           <div>
-            <span class="p-key">TLP: </span>
-            <span class="p-value">WHITE</span>
+            <span class='p-key'>TLP: </span>
+            <span class='p-value'>WHITE</span>
           </div>
         {{/if}}
         {{#if (eq case.tlp 1)}}
           <div>
-            <span class="p-key">TLP: </span>
-            <span class="p-value" style="color:green">GREEN</span>
+            <span class='p-key'>TLP: </span>
+            <span class='p-value' style='color:green'>GREEN</span>
           </div>
         {{/if}}
         {{#if (eq case.tlp 2)}}
           <div>
-            <span class="p-key">TLP: </span>
-            <span class="p-value" style="color:orange">AMBER</span>
+            <span class='p-key'>TLP: </span>
+            <span class='p-value' style='color:orange'>AMBER</span>
           </div>
         {{/if}}
         {{#if (eq case.tlp 3)}}
           <div>
-            <span class="p-key">TLP: </span>
-            <span class="p-value" style="color:red">RED</span>
+            <span class='p-key'>TLP: </span>
+            <span class='p-value' style='color:red'>RED</span>
           </div>
         {{/if}}
 
         {{#if (eq case.pap 0)}}
           <div>
-            <span class="p-key">PAP: </span>
-            <span class="p-value">WHITE</span>
+            <span class='p-key'>PAP: </span>
+            <span class='p-value'>WHITE</span>
           </div>
         {{/if}}
         {{#if (eq case.pap 1)}}
           <div>
-            <span class="p-key">PAP: </span>
-            <span class="p-value" style="color:green">GREEN</span>
+            <span class='p-key'>PAP: </span>
+            <span class='p-value' style='color:green'>GREEN</span>
           </div>
         {{/if}}
         {{#if (eq case.pap 2)}}
           <div>
-            <span class="p-key">PAP: </span>
-            <span class="p-value" style="color:orange">AMBER</span>
+            <span class='p-key'>PAP: </span>
+            <span class='p-value' style='color:orange'>AMBER</span>
           </div>
         {{/if}}
         {{#if (eq case.pap 3)}}
           <div>
-            <span class="p-key">PAP: </span>
-            <span class="p-value" style="color:red">RED</span>
+            <span class='p-key'>PAP: </span>
+            <span class='p-value' style='color:red'>RED</span>
           </div>
         {{/if}}
 
         {{#if case.tags}}
-          <span class="p-key">Tags: </span>
+          <span class='p-key'>Tags: </span>
           {{#each case.tags as |tag|}}
             <div>
-              <span class="tag">{{tag}}</span>
+              <span class='tag'>{{tag}}</span>
             </div>
           {{/each}}
         {{/if}}
         {{#if case.startDate}}
           <div>
-            <span class="p-key">Start Date: </span>
-            <span class="p-value">{{moment-format case.startDate timeZone=timezone}}</span>
+            <span class='p-key'>Start Date: </span>
+            <span class='p-value'>{{moment-format case.startDate timeZone=timezone}}</span>
           </div>
         {{/if}}
         {{#if case.status}}
           <div>
-            <span class="p-key">Status: </span>
-            <span class="p-value">{{case.status}}</span>
+            <span class='p-key'>Status: </span>
+            <span class='p-value'>{{case.status}}</span>
           </div>
         {{/if}}
         {{#if case.stage}}
           <div>
-            <span class="p-key">Stage: </span>
-            <span class="p-value">{{case.stage}}</span>
+            <span class='p-key'>Stage: </span>
+            <span class='p-value'>{{case.stage}}</span>
           </div>
         {{/if}}
 
-        <span class="p-key">Description:</span>
-        <div class="scrollable-block">
+        <span class='p-key'>Description:</span>
+        <div class='scrollable-block'>
           <table>
             <tbody>
               <tr>
-                <td class="pr-3">
+                <td class='pr-3'>
                   <div>
-                    <span class="p-value">{{case.description}}</span>
+                    <span class='p-value'>{{case.description}}</span>
                   </div>
                 </td>
               </tr>
@@ -754,111 +894,111 @@
         </div>
 
         {{#if (get caseObservables index)}}
-          <a href="#" class="expandable-title" {{on "click" (action "toggleExpandableObservables" index)}}>
-            <span class="text"><span class="desc">Observable(s)</span> {{UNIQUE_VALUE}}</span>
-            {{fa-icon "angle-up"}}
+          <a href='#' class='expandable-title' {{on 'click' (action 'toggleExpandableObservables' index)}}>
+            <span class='text'><span class='desc'>Observable(s)</span> {{UNIQUE_VALUE}}</span>
+            {{fa-icon 'angle-up'}}
           </a>
           {{#each case.caseObservables as |observable|}}
             {{#if observable._id}}
-              <h1 class="p-title">
-                {{fa-icon "eye" fixedWidth=true}}
+              <h1 class='p-title'>
+                {{fa-icon 'eye' fixedWidth=true}}
                 {{observable.data}}
               </h1>
               {{#if (eq observable.tlp 0)}}
                 <div>
-                  <span class="p-key">TLP: </span>
-                  <span class="p-value">WHITE</span>
+                  <span class='p-key'>TLP: </span>
+                  <span class='p-value'>WHITE</span>
                 </div>
               {{/if}}
               {{#if (eq observable.tlp 1)}}
                 <div>
-                  <span class="p-key">TLP: </span>
-                  <span class="p-value" style="color:green">GREEN</span>
+                  <span class='p-key'>TLP: </span>
+                  <span class='p-value' style='color:green'>GREEN</span>
                 </div>
               {{/if}}
               {{#if (eq observable.tlp 2)}}
                 <div>
-                  <span class="p-key">TLP: </span>
-                  <span class="p-value" style="color:orange">AMBER</span>
+                  <span class='p-key'>TLP: </span>
+                  <span class='p-value' style='color:orange'>AMBER</span>
                 </div>
               {{/if}}
               {{#if (eq observable.tlp 3)}}
                 <div>
-                  <span class="p-key">TLP: </span>
-                  <span class="p-value" style="color:red">RED</span>
+                  <span class='p-key'>TLP: </span>
+                  <span class='p-value' style='color:red'>RED</span>
                 </div>
               {{/if}}
               {{#if (eq observable.pap 0)}}
                 <div>
-                  <span class="p-key">PAP: </span>
-                  <span class="p-value">WHITE</span>
+                  <span class='p-key'>PAP: </span>
+                  <span class='p-value'>WHITE</span>
                 </div>
               {{/if}}
               {{#if (eq observable.pap 1)}}
                 <div>
-                  <span class="p-key">PAP: </span>
-                  <span class="p-value" style="color:green">GREEN</span>
+                  <span class='p-key'>PAP: </span>
+                  <span class='p-value' style='color:green'>GREEN</span>
                 </div>
               {{/if}}
               {{#if (eq observable.pap 2)}}
                 <div>
-                  <span class="p-key">PAP: </span>
-                  <span class="p-value" style="color:orange">AMBER</span>
+                  <span class='p-key'>PAP: </span>
+                  <span class='p-value' style='color:orange'>AMBER</span>
                 </div>
               {{/if}}
               {{#if (eq observable.pap 3)}}
                 <div>
-                  <span class="p-key">PAP: </span>
-                  <span class="p-value" style="color:red">RED</span>
+                  <span class='p-key'>PAP: </span>
+                  <span class='p-value' style='color:red'>RED</span>
                 </div>
               {{/if}}
               <div>
-                <span class="p-key">Case Created Date </span>
-                <span class="p-value">{{moment-time observable._createdAt}}</span>
+                <span class='p-key'>Case Created Date </span>
+                <span class='p-value'>{{moment-time observable._createdAt}}</span>
               </div>
               <div>
-                <span class="p-key">Case Start Date </span>
-                <span class="p-value">{{moment-time observable.startDate}}</span>
+                <span class='p-key'>Case Start Date </span>
+                <span class='p-value'>{{moment-time observable.startDate}}</span>
               </div>
 
               <div>
-                <span class="p-key">Observable Message: </span>
-                <span class="p-value">{{observable.message}}</span>
+                <span class='p-key'>Observable Message: </span>
+                <span class='p-value'>{{observable.message}}</span>
               </div>
               <div>
-                <span class="p-key">Observable Type: </span>
-                <span class="p-value">{{observable.dataType}}</span>
+                <span class='p-key'>Observable Type: </span>
+                <span class='p-value'>{{observable.dataType}}</span>
               </div>
               <div>
-                <span class="p-key">Created By: </span>
-                <span class="p-value">{{observable._createdBy}}</span>
+                <span class='p-key'>Created By: </span>
+                <span class='p-value'>{{observable._createdBy}}</span>
               </div>
               <div>
-                <span class="p-key">Is IOC? </span>
-                <span class="p-value">{{observable.ioc}}</span>
+                <span class='p-key'>Is IOC? </span>
+                <span class='p-value'>{{observable.ioc}}</span>
               </div>
               <div>
-                <span class="p-key">Observable Sighted? </span>
-                <span class="p-value">{{observable.sighted}}</span>
+                <span class='p-key'>Observable Sighted? </span>
+                <span class='p-value'>{{observable.sighted}}</span>
               </div>
 
               {{#if observable.tags}}
-                <div class="p-title">
-                  {{fa-icon "tag" fixedWidth=true}}
+                <div class='p-title'>
+                  {{fa-icon 'tag' fixedWidth=true}}
                   Tags
                 </div>
-                <div class="tags">
+                <div class='tags'>
                   {{#each observable.tags as |tag|}}
-                    <span class="pulse-tag">{{tag}}</span>
+                    <span class='pulse-tag'>{{tag}}</span>
                   {{/each}}
                 </div>
               {{/if}}
             {{/if}}
           {{/each}}
         {{else}}
-          <a href="#" class="expandable-title" {{on "click" (action "toggleExpandableObservables" index)}}>
-            <span class="text">Observable(s)</span>
-            {{fa-icon "angle-down"}}
+          <a href='#' class='expandable-title' {{on 'click' (action 'toggleExpandableObservables' index)}}>
+            <span class='text'>Observable(s)</span>
+            {{fa-icon 'angle-down'}}
           </a>
         {{/if}}
       </div>

@@ -154,10 +154,10 @@ const getObservablesForCase = async (currentCase, requestWithDefaults, options) 
       options
     );
     const observablesForCase = await requestWithDefaults(getObservableForCaseOptions);
+    const caseObservables = _.orderBy(observablesForCase.body, '_createdAt', 'desc');
+    const casesWithObservables = Object.assign({}, currentCase, { caseObservables });
 
-    currentCase.caseObservables = observablesForCase.body;
-
-    return currentCase;
+    return casesWithObservables;
   } catch (err) {
     Logger.error({ err });
     throw err;

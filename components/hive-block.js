@@ -20,7 +20,20 @@ polarity.export = PolarityComponent.extend({
   createCaseMessage: '',
   uniqueIdPrefix: '',
   verificationError: '',
+  newCaseCreated: false,
+  newCase: {},
   init () {
+    if (!this.get('block._state')) {
+      this.set('block._state', {});
+      this.set('block._state.newCaseCreated', false);
+    }
+
+    if (this.get('block._state.newCase')) {
+      const caseObj = this.get('block._state.newCase');
+      this.set('newCase', caseObj);
+      this.set('newCaseCreated', true);
+    }
+
     this.set('changeTab', this.get('details.length') ? 'cases' : 'create');
     let array = new Uint32Array(5);
     this.set('uniqueIdPrefix', window.crypto.getRandomValues(array).join(''));
@@ -40,6 +53,7 @@ polarity.export = PolarityComponent.extend({
       this.set('buttonDisabled', true);
     },
     closeModal: function (index, type) {
+      this.set('verificationError', '');
       this.toggleProperty('details.' + index + `.__${type}Open`);
       this.set('buttonDisabled', false);
     },
@@ -95,7 +109,12 @@ polarity.export = PolarityComponent.extend({
         action: 'createCase',
         data: { caseInputs }
       })
-        .then(() => {
+        .then((data) => {
+          const createdCase = data;
+          console.log(JSON.stringify(createdCase));
+          this.set('newCase', createdCase);
+          this.set('newCaseCreated', true);
+          this.set('block._state.newCase', createdCase);
           this.set('createCaseMessage', 'Case was created!');
         })
         .catch((err) => {
@@ -111,8 +130,8 @@ polarity.export = PolarityComponent.extend({
         });
     },
     updateCase: function (caseObj, index, type) {
+      if (!this.validCaseInputs()) return;
       this.set('isRunning', true);
-      this.get('block').notifyPropertyChange('data');
 
       const description = this.get('descriptionInput');
       const tlp = this.get('tlpInput');
@@ -193,7 +212,8 @@ polarity.export = PolarityComponent.extend({
         action: 'addObservable',
         data: { observableInputs }
       })
-        .then(() => {
+        .then((observable) => {
+          this.get(`details.${index}.caseObservables`).unshift(observable.body[0]);
           this.setMessages(
             index,
             'addObservable',
@@ -205,7 +225,7 @@ polarity.export = PolarityComponent.extend({
             err.meta.status === 207
               ? `${JSON.stringify(err.meta.description.failure[0].message)}`
               : `${JSON.stringify(err.meta.description.message)}`;
-              
+
           this.setErrorMessages(index, 'addObservable', errMessage);
         })
         .finally(() => {
