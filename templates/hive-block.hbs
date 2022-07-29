@@ -5,320 +5,185 @@
     </div>
   </div>
 {{else if details.allowCreateCase}}
-  {{#if (not newCaseCreated)}}
-    <div class='case-creation-form'>
-      <table class='case-inputs'>
-        {{#if createCaseMessage}}
-          <div class='alert alert-information mt-1'>
-            {{createCaseMessage}}
-          </div>
-        {{/if}}
+  <div class='case-creation-form'>
+    <table class='case-inputs'>
+      {{#if createCaseMessage}}
+        <div class='alert alert-information mt-1'>
+          {{createCaseMessage}}
+        </div>
+      {{/if}}
 
-        {{#if createCaseErrorMessage}}
-          <div class='alert alert-information mt-1'>
-            {{createCaseErrorMessage}}
-          </div>
-        {{/if}}
+      {{#if createCaseErrorMessage}}
+        <div class='alert alert-information mt-1'>
+          {{createCaseErrorMessage}}
+        </div>
+      {{/if}}
 
-        <tr>
-          <td> <label for='title'>Title: </label></td>
-          <div>{{input
-              class='case-title'
-              onclick=(action (mut titleInput value='target.value'))
-              value=titleInput
-              placeholder='Title'
-            }}</div>
-        </tr>
-        {{#if verificationError}}
-          <div class='verification-err-msg'>
-            {{verificationError}}
-          </div>
-        {{/if}}
-        <tr>
-          <td><label>Severity: </label></td>
-          <div class='level-select'>
-            <input
-              type='radio'
-              class='white'
-              id='severity-white-{{uniqueIdPrefix}}'
-              name='severityLevel'
-              onclick={{action (mut severityInput) 1}}
-            />
-            <label for='severity-white-{{uniqueIdPrefix}}'>White</label>
-            <input
-              type='radio'
-              class='green'
-              id='severity-green-{{uniqueIdPrefix}}'
-              name='severityLevel'
-              onclick={{action (mut severityInput) 2}}
-            />
-            <label for='severity-green-{{uniqueIdPrefix}}'>Green</label>
-            <input
-              type='radio'
-              class='amber'
-              id='severity-amber-{{uniqueIdPrefix}}'
-              name='severityLevel'
-              onclick={{action (mut severityInput) 3}}
-            />
-            <label for='severity-amber-{{uniqueIdPrefix}}'>Amber</label>
-            <input
-              type='radio'
-              class='red'
-              id='severity-red-{{uniqueIdPrefix}}'
-              name='severityLevel'
-              onclick={{action (mut severityInput) 4}}
-            />
-            <label for='severity-red-{{uniqueIdPrefix}}'>Red</label>
-          </div>
-        </tr>
-
-        <tr>
-          <td><label>TLP: </label></td>
-          <div class='level-select'>
-            <input
-              type='radio'
-              class='white'
-              id='tlp-white-{{uniqueIdPrefix}}'
-              name='tlpLevel'
-              onclick={{action (mut tlpInput) 0}}
-            />
-            <label for='tlp-white-{{uniqueIdPrefix}}'>White</label>
-            <input
-              type='radio'
-              class='green'
-              id='tlp-green-{{uniqueIdPrefix}}'
-              name='tlpLevel'
-              onclick={{action (mut tlpInput) 1}}
-            />
-            <label for='tlp-green-{{uniqueIdPrefix}}'>Green</label>
-            <input
-              type='radio'
-              class='amber'
-              id='tlp-amber-{{uniqueIdPrefix}}'
-              name='tlpLevel'
-              onclick={{action (mut tlpInput) 2}}
-            />
-            <label for='tlp-amber-{{uniqueIdPrefix}}'>Amber</label>
-            <input
-              type='radio'
-              class='red'
-              id='tlp-red-{{uniqueIdPrefix}}'
-              name='tlpLevel'
-              onclick={{action (mut tlpInput) 3}}
-            />
-            <label for='tlp-red-{{uniqueIdPrefix}}'>Red</label>
-          </div>
-        </tr>
-
-        <tr>
-          <td><label>PAP: </label></td>
-          <div class='level-select'>
-            <input
-              type='radio'
-              class='white'
-              id='pap-white-{{uniqueIdPrefix}}'
-              name='papLevel'
-              onclick={{action (mut papInput) 0}}
-              checked={{if (eq case.pap 0) 'true'}}
-            />
-            <label for='pap-white-{{uniqueIdPrefix}}'>White</label>
-            <input
-              type='radio'
-              class='green'
-              id='pap-green-{{uniqueIdPrefix}}'
-              name='papLevel'
-              onclick={{action (mut papInput) 1}}
-              checked={{if (eq case.pap 1) 'true'}}
-            />
-            <label for='pap-green-{{uniqueIdPrefix}}'>Green</label>
-            <input
-              type='radio'
-              class='amber'
-              id='pap-amber-{{uniqueIdPrefix}}'
-              name='papLevel'
-              onclick={{action (mut papInput) 2}}
-              checked={{if (eq case.pap 2) 'true'}}
-            />
-            <label for='pap-amber-{{uniqueIdPrefix}}'>Amber</label>
-            <input
-              type='radio'
-              class='red'
-              id='pap-red-{{uniqueIdPrefix}}'
-              name='papLevel'
-              onclick={{action (mut papInput) 3}}
-              checked={{if (eq case.pap 3) 'true'}}
-            />
-            <label for='pap-red-{{uniqueIdPrefix}}'>Red</label>
-          </div>
-        </tr>
-      </table>
-      <div>
-        {{textarea
-          class='case-description'
-          onchange=(action (mut descriptionInput value='target.value'))
-          value=descriptionInput
-          cols='30'
-          rows='4'
-          placeholder='Case Description'
-        }}
-      </div>
-      {{#if verificationError}}
+      <tr>
+        <td> <label for='title'>Title: </label></td>
+        <div>{{input
+            class='case-title'
+            onclick=(action (mut titleInput value='target.value'))
+            value=titleInput
+            placeholder='Title'
+          }}</div>
+      </tr>
+      {{#if titleVerificationError}}
         <div class='verification-err-msg'>
-          {{verificationError}}
+          {{titleVerificationError}}
         </div>
       {{/if}}
-      <button class='create-case-btn' type='button' {{action 'createCase'}}>
-        {{#if isRunning}}
-          {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
-        {{/if}}
-        New Case
-      </button>
+      <tr>
+        <td><label>Severity: </label></td>
+        <div class='level-select'>
+          <input
+            type='radio'
+            class='white'
+            id='severity-white-{{uniqueIdPrefix}}'
+            name='severityLevel'
+            onclick={{action (mut severityInput) 1}}
+          />
+          <label for='severity-white-{{uniqueIdPrefix}}'>White</label>
+          <input
+            type='radio'
+            class='green'
+            id='severity-green-{{uniqueIdPrefix}}'
+            name='severityLevel'
+            onclick={{action (mut severityInput) 2}}
+          />
+          <label for='severity-green-{{uniqueIdPrefix}}'>Green</label>
+          <input
+            type='radio'
+            class='amber'
+            id='severity-amber-{{uniqueIdPrefix}}'
+            name='severityLevel'
+            onclick={{action (mut severityInput) 3}}
+          />
+          <label for='severity-amber-{{uniqueIdPrefix}}'>Amber</label>
+          <input
+            type='radio'
+            class='red'
+            id='severity-red-{{uniqueIdPrefix}}'
+            name='severityLevel'
+            onclick={{action (mut severityInput) 4}}
+          />
+          <label for='severity-red-{{uniqueIdPrefix}}'>Red</label>
+        </div>
+      </tr>
+
+      <tr>
+        <td><label>TLP: </label></td>
+        <div class='level-select'>
+          <input
+            type='radio'
+            class='white'
+            id='tlp-white-{{uniqueIdPrefix}}'
+            name='tlpLevel'
+            onclick={{action (mut tlpInput) 0}}
+          />
+          <label for='tlp-white-{{uniqueIdPrefix}}'>White</label>
+          <input
+            type='radio'
+            class='green'
+            id='tlp-green-{{uniqueIdPrefix}}'
+            name='tlpLevel'
+            onclick={{action (mut tlpInput) 1}}
+          />
+          <label for='tlp-green-{{uniqueIdPrefix}}'>Green</label>
+          <input
+            type='radio'
+            class='amber'
+            id='tlp-amber-{{uniqueIdPrefix}}'
+            name='tlpLevel'
+            onclick={{action (mut tlpInput) 2}}
+          />
+          <label for='tlp-amber-{{uniqueIdPrefix}}'>Amber</label>
+          <input
+            type='radio'
+            class='red'
+            id='tlp-red-{{uniqueIdPrefix}}'
+            name='tlpLevel'
+            onclick={{action (mut tlpInput) 3}}
+          />
+          <label for='tlp-red-{{uniqueIdPrefix}}'>Red</label>
+        </div>
+      </tr>
+
+      <tr>
+        <td><label>PAP: </label></td>
+        <div class='level-select'>
+          <input
+            type='radio'
+            class='white'
+            id='pap-white-{{uniqueIdPrefix}}'
+            name='papLevel'
+            onclick={{action (mut papInput) 0}}
+            checked={{if (eq case.pap 0) 'true'}}
+          />
+          <label for='pap-white-{{uniqueIdPrefix}}'>White</label>
+          <input
+            type='radio'
+            class='green'
+            id='pap-green-{{uniqueIdPrefix}}'
+            name='papLevel'
+            onclick={{action (mut papInput) 1}}
+            checked={{if (eq case.pap 1) 'true'}}
+          />
+          <label for='pap-green-{{uniqueIdPrefix}}'>Green</label>
+          <input
+            type='radio'
+            class='amber'
+            id='pap-amber-{{uniqueIdPrefix}}'
+            name='papLevel'
+            onclick={{action (mut papInput) 2}}
+            checked={{if (eq case.pap 2) 'true'}}
+          />
+          <label for='pap-amber-{{uniqueIdPrefix}}'>Amber</label>
+          <input
+            type='radio'
+            class='red'
+            id='pap-red-{{uniqueIdPrefix}}'
+            name='papLevel'
+            onclick={{action (mut papInput) 3}}
+            checked={{if (eq case.pap 3) 'true'}}
+          />
+          <label for='pap-red-{{uniqueIdPrefix}}'>Red</label>
+        </div>
+      </tr>
+    </table>
+    <div>
+      {{textarea
+        class='case-description'
+        onchange=(action (mut descriptionInput value='target.value'))
+        value=descriptionInput
+        cols='30'
+        rows='4'
+        placeholder='Case Description'
+      }}
     </div>
-  {{/if}}
-
-  {{#if newCaseCreated}}
-    <h1 class='p-title'>
-      Case #{{newCase.number}}
-    </h1>
-    {{#if newCase.title}}
-      <div>
-        <span class='p-key'>Title: </span>
-        <span class='p-value'>{{newCase.title}}</span>
+    {{#if descriptionVerificationError}}
+      <div class='verification-err-msg'>
+        {{descriptionVerificationError}}
       </div>
     {{/if}}
-
-    {{#if newCase.severity}}
-      {{#if (eq newCase.severity 1)}}
-        <div>
-          <span class='p-key'>Severity: </span>
-          <span class='p-value'>WHITE</span>
-        </div>
+    <button class='create-case-btn' type='button' {{action 'createCase'}}>
+      {{#if isRunning}}
+        {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
       {{/if}}
-      {{#if (eq newCase.severity 2)}}
-        <div>
-          <span class='p-key'>Severity: </span>
-          <span class='p-value' style='color:green'>GREEN</span>
-        </div>
-      {{/if}}
-      {{#if (eq newCase.severity 3)}}
-        <div>
-          <span class='p-key'>Severity: </span>
-          <span class='p-value' style='color:orange'>AMBER</span>
-        </div>
-      {{/if}}
-      {{#if (eq newCase.severity 4)}}
-        <div>
-          <span class='p-key'>Severity: </span>
-          <span class='p-value' style='color:red'>RED</span>
-        </div>
-      {{/if}}
-    {{/if}}
-
-    {{#if (eq newCase.tlp 0)}}
-      <div>
-        <span class='p-key'>TLP: </span>
-        <span class='p-value'>WHITE</span>
-      </div>
-    {{/if}}
-    {{#if (eq newCase.tlp 1)}}
-      <div>
-        <span class='p-key'>TLP: </span>
-        <span class='p-value' style='color:green'>GREEN</span>
-      </div>
-    {{/if}}
-    {{#if (eq newCase.tlp 2)}}
-      <div>
-        <span class='p-key'>TLP: </span>
-        <span class='p-value' style='color:orange'>AMBER</span>
-      </div>
-    {{/if}}
-    {{#if (eq newCase.tlp 3)}}
-      <div>
-        <span class='p-key'>TLP: </span>
-        <span class='p-value' style='color:red'>RED</span>
-      </div>
-    {{/if}}
-
-    {{#if (eq newCase.pap 0)}}
-      <div>
-        <span class='p-key'>PAP: </span>
-        <span class='p-value'>WHITE</span>
-      </div>
-    {{/if}}
-    {{#if (eq newCase.pap 1)}}
-      <div>
-        <span class='p-key'>PAP: </span>
-        <span class='p-value' style='color:green'>GREEN</span>
-      </div>
-    {{/if}}
-    {{#if (eq newCase.pap 2)}}
-      <div>
-        <span class='p-key'>PAP: </span>
-        <span class='p-value' style='color:orange'>AMBER</span>
-      </div>
-    {{/if}}
-    {{#if (eq newCase.pap 3)}}
-      <div>
-        <span class='p-key'>PAP: </span>
-        <span class='p-value' style='color:red'>RED</span>
-      </div>
-    {{/if}}
-
-    {{#if newCase.tags}}
-      <span class='p-key'>Tags: </span>
-      {{#each newCase.tags as |tag|}}
-        <div>
-          <span class='tag'>{{tag}}</span>
-        </div>
-      {{/each}}
-    {{/if}}
-    {{#if newCase.startDate}}
-      <div>
-        <span class='p-key'>Start Date: </span>
-        <span class='p-value'>{{moment-format newCase.startDate timeZone=timezone}}</span>
-      </div>
-    {{/if}}
-    {{#if newCase.status}}
-      <div>
-        <span class='p-key'>Status: </span>
-        <span class='p-value'>{{newCase.status}}</span>
-      </div>
-    {{/if}}
-    {{#if newCase.stage}}
-      <div>
-        <span class='p-key'>Stage: </span>
-        <span class='p-value'>{{newCase.stage}}</span>
-      </div>
-    {{/if}}
-
-    <span class='p-key'>Description:</span>
-    <div class='scrollable-block'>
-      <table>
-        <tbody>
-          <tr>
-            <td class='pr-3'>
-              <div>
-                <span class='p-value'>{{newCase.description}}</span>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  {{/if}}
+      New Case
+    </button>
+  </div>
 {{else}}
   <ul class='nav nav-tabs'>
-    {{#if details}}
-      <li class='nav-item'>
-        <a
-          {{action 'changeTab' 'cases'}}
-          class='nav-link {{if (or (eq changeTab "cases") (not changeTab)) "active"}}'
-          href='#'
-        >
-          Cases
-        </a>
-      </li>
-    {{/if}}
+    <li class='nav-item'>
+      <a
+        {{action 'changeTab' 'cases'}}
+        class='nav-link {{if (or (eq changeTab "cases") (not changeTab)) "active"}}'
+        href='#'
+      >
+        Cases
+      </a>
+    </li>
   </ul>
   {{#if (eq changeTab 'cases')}}
     {{#each details as |case index|}}
@@ -405,9 +270,9 @@
                     }}</div>
                 {{/if}}
               </tr>
-              {{#if verificationError}}
+              {{#if titleVerificationError}}
                 <div class='verification-err-msg'>
-                  {{verificationError}}
+                  {{titleVerificationError}}
                 </div>
               {{/if}}
               <tr>
@@ -555,9 +420,9 @@
                 placeholder='Case Description'
               }}
             </div>
-            {{#if verificationError}}
+            {{#if descriptionVerificationError}}
               <div class='verification-err-msg'>
-                {{verificationError}}
+                {{descriptionVerificationError}}
               </div>
             {{/if}}
             <div class='case-options'>
@@ -594,9 +459,9 @@
                   <option value='domain'>domain</option>
                 </select>
               </tr>
-              {{#if verificationError}}
+              {{#if typeVerificationError}}
                 <div class='verification-err-msg'>
-                  {{verificationError}}
+                  {{typeVerificationError}}
                 </div>
               {{/if}}
               <tr>
@@ -609,9 +474,9 @@
                   placeholder='Value'
                 }}
               </tr>
-              {{#if verificationError}}
+              {{#if dataVerificationError}}
                 <div class='verification-err-msg'>
-                  {{verificationError}}
+                  {{dataVerificationError}}
                 </div>
               {{/if}}
               <tr>

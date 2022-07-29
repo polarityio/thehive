@@ -1,4 +1,4 @@
-'use strict'
-polarity.export = PolarityComponent.extend({
-  details: Ember.computed.alias('block.data.details')
-});
+// 'use strict'
+// polarity.export = PolarityComponent.extend({
+//   details: Ember.computed.alias('block.data.details')
+// });

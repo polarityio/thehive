@@ -133,7 +133,6 @@ const getCases = async (entity, requestWithDefaults, options) => {
       map(async (currentCase) => await getObservablesForCase(currentCase, requestWithDefaults, options), cases.body)
     );
 
-    Logger.trace({ cases: cases });
     return casesWithObservables;
   } catch (err) {
     Logger.error({ err });
@@ -235,16 +234,15 @@ const addObservable = async (observableInputs, requestWithDefaults, options) => 
 };
 
 const onMessage = async (payload, options, cb) => {
-  Logger.trace({ PAYLOAD: payload });
   switch (payload.action) {
     case 'createCase':
       try {
         const caseInputs = payload.data.caseInputs.inputs;
         const entity = payload.data.caseInputs.entity;
-        const createdCase = await createCase(caseInputs, entity, requestWithDefaults, options);
-        const response = _.get(createdCase, 'body', {});
-        Logger.trace({ RESPONSE_FROM_CREATE: response });
-        cb(null, response);
+        await createCase(caseInputs, entity, requestWithDefaults, options);
+        const caseObj = await getApiData(entity, requestWithDefaults, options);
+
+        cb(null, caseObj.data);
       } catch (err) {
         Logger.error({ err });
         cb(err, {});
@@ -294,8 +292,14 @@ const polarityError = (err) => ({
 
 const polarityResponse = (entity, options, cases) => {
   if (options.allowCreateCase && !cases.length)
-    return { entity, data: { summary: [], details: { allowCreateCase: true } } };
-  else return { entity, data: cases.length > 0 ? { summary: [], details: cases } : null };
+    return { entity, data: { summary: ['No Cases Found', 'Create Case'], details: { allowCreateCase: true } } };
+  else return { entity, data: cases.length > 0 ? { summary: getSummary(cases), details: cases } : null };
+};
+
+const getSummary = (cases) => {
+  const tags = [];
+  if (cases.length) tags.push(`Cases: ${cases.length}`);
+  return tags;
 };
 
 class RequestError extends Error {
@@ -361,6 +365,16 @@ function validateOptions (userOptions, cb) {
       message: 'You must provide a valid API key'
     });
   }
+  if (
+    typeof userOptions.url.value !== 'string' ||
+    (typeof userOptions.url.value === 'string' && userOptions.url.value.length === 0)
+  ) {
+    errors.push({
+      key: 'apiKey',
+      message: 'You must provide a URL'
+    });
+  }
+
   cb(null, errors);
 }
 

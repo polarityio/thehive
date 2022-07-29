@@ -49,14 +49,6 @@ module.exports = {
       file: './templates/hive-block.hbs'
     }
   },
-  summary: {
-    component: {
-      file: './components/hive-summary.js'
-    },
-    template: {
-      file: './templates/hive-summary.hbs'
-    }
-  },
   request: {
     // Provide the path to your certFile. Leave an empty string to ignore this option.
     // Relative paths are relative to the HIVE integration's root directory
@@ -77,7 +69,7 @@ module.exports = {
     rejectUnauthorized: true
   },
   logging: {
-    level: 'trace' //trace, debug, info, warn, error, fatal
+    level: 'info' //trace, debug, info, warn, error, fatal
   },
   /**
    * Options that are displayed to the user/admin in the Polarity integration user-interface.  Should be structured
