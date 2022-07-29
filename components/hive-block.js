@@ -122,7 +122,7 @@ polarity.export = PolarityComponent.extend({
       const description = this.get('descriptionInput');
       const title = this.get('titleInput');
 
-      // if (!this.validCaseInputs(description, title)) return;
+      if (!this.validCaseInputs(description, title)) return;
       this.set('isRunning', true);
 
       const tlp = this.get('tlpInput');
