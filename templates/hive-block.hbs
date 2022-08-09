@@ -270,25 +270,28 @@
             </h1>
             <table class='case-inputs'>
               <tr>
-                <td> <label for='title'>Title: </label></td>
-                {{#if case.title}}
-                  <div>{{input
-                      class='case-title'
-                      onclick=(action (mut titleInput value='target.value'))
-                      value=titleInput
-                      placeholder='Title'
-                      required='true'
-                    }}</div>
-                {{/if}}
+                <td class="align-top"><label for='title'>Title: </label></td>
+                <td>
+                  {{#if case.title}}
+                    {{input
+                        class='case-title'
+                        onclick=(action (mut titleInput value='target.value'))
+                        value=titleInput
+                        placeholder='Title'
+                        required='true'
+                      }}
+                  {{/if}}
+                  {{#if titleVerificationError}}
+                    <div class='verification-err-msg'>
+                      {{titleVerificationError}}
+                    </div>
+                  {{/if}}
+                </td>
               </tr>
-              {{#if titleVerificationError}}
-                <div class='verification-err-msg'>
-                  {{titleVerificationError}}
-                </div>
-              {{/if}}
+
               <tr>
-                <td><label>Severity: </label></td>
-                <div class='level-select'>
+                <td class="align-top"><label>Severity: </label></td>
+                <td class='level-select'>
                   <input
                     type='radio'
                     class='white'
@@ -328,12 +331,12 @@
                     checked={{if (eq case.severity 4) 'true'}}
                   />
                   <label for='severity-red-{{uniqueIdPrefix}}'>Red</label>
-                </div>
+                </td>
               </tr>
 
               <tr>
-                <td><label>TLP: </label></td>
-                <div class='level-select'>
+                <td class="align-top"><label>TLP: </label></td>
+                <td class='level-select'>
                   <input
                     type='radio'
                     class='white'
@@ -373,12 +376,12 @@
                     checked={{if (eq case.tlp 3) 'true'}}
                   />
                   <label for='tlp-red-{{uniqueIdPrefix}}'>Red</label>
-                </div>
+                </td>
               </tr>
 
               <tr>
-                <td><label>PAP: </label></td>
-                <div class='level-select'>
+                <td class="align-top"><label>PAP: </label></td>
+                <td class='level-select'>
                   <input
                     type='radio'
                     class='white'
@@ -418,10 +421,10 @@
                     checked={{if (eq case.pap 3) 'true'}}
                   />
                   <label for='pap-red-{{uniqueIdPrefix}}'>Red</label>
-                </div>
+                </td>
               </tr>
             </table>
-            <div>
+            <div class="mt-1">
               {{textarea
                 class='case-description'
                 onchange=(action (mut descriptionInput value='target.value'))
@@ -432,7 +435,7 @@
               }}
             </div>
             {{#if descriptionVerificationError}}
-              <div class='verification-err-msg'>
+              <div class='verification-err-msg text-left'>
                 {{descriptionVerificationError}}
               </div>
             {{/if}}
