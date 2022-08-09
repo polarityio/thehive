@@ -91,7 +91,6 @@ polarity.export = PolarityComponent.extend({
         inputs: {
           title,
           description,
-          title,
           severity,
           tlp,
           pap
@@ -136,8 +135,7 @@ polarity.export = PolarityComponent.extend({
           description,
           severity,
           tlp,
-          pap,
-          severity
+          pap
         }
       };
 
