@@ -21,6 +21,7 @@
       <tr>
         <td> <label for='title'>Title: </label></td>
         <td>{{input
+            disabled=buttonDisabled
             class='case-title'
             onclick=(action (mut titleInput value='target.value'))
             value=titleInput
@@ -39,6 +40,7 @@
           <input
             type='radio'
             class='white'
+            disabled={{buttonDisabled}}
             id='severity-white-{{uniqueIdPrefix}}'
             name='severityLevel'
             onclick={{action (mut severityInput) 1}}
@@ -47,6 +49,7 @@
           <input
             type='radio'
             class='green'
+            disabled={{buttonDisabled}}
             id='severity-green-{{uniqueIdPrefix}}'
             name='severityLevel'
             onclick={{action (mut severityInput) 2}}
@@ -55,6 +58,7 @@
           <input
             type='radio'
             class='amber'
+            disabled={{buttonDisabled}}
             id='severity-amber-{{uniqueIdPrefix}}'
             name='severityLevel'
             onclick={{action (mut severityInput) 3}}
@@ -63,6 +67,7 @@
           <input
             type='radio'
             class='red'
+            disabled={{buttonDisabled}}
             id='severity-red-{{uniqueIdPrefix}}'
             name='severityLevel'
             onclick={{action (mut severityInput) 4}}
@@ -77,6 +82,7 @@
           <input
             type='radio'
             class='white'
+            disabled={{buttonDisabled}}
             id='tlp-white-{{uniqueIdPrefix}}'
             name='tlpLevel'
             onclick={{action (mut tlpInput) 0}}
@@ -85,6 +91,7 @@
           <input
             type='radio'
             class='green'
+            disabled={{buttonDisabled}}
             id='tlp-green-{{uniqueIdPrefix}}'
             name='tlpLevel'
             onclick={{action (mut tlpInput) 1}}
@@ -93,6 +100,7 @@
           <input
             type='radio'
             class='amber'
+            disabled={{buttonDisabled}}
             id='tlp-amber-{{uniqueIdPrefix}}'
             name='tlpLevel'
             onclick={{action (mut tlpInput) 2}}
@@ -101,6 +109,7 @@
           <input
             type='radio'
             class='red'
+            disabled={{buttonDisabled}}
             id='tlp-red-{{uniqueIdPrefix}}'
             name='tlpLevel'
             onclick={{action (mut tlpInput) 3}}
@@ -115,6 +124,7 @@
           <input
             type='radio'
             class='white'
+            disabled={{buttonDisabled}}
             id='pap-white-{{uniqueIdPrefix}}'
             name='papLevel'
             onclick={{action (mut papInput) 0}}
@@ -124,6 +134,7 @@
           <input
             type='radio'
             class='green'
+            disabled={{buttonDisabled}}
             id='pap-green-{{uniqueIdPrefix}}'
             name='papLevel'
             onclick={{action (mut papInput) 1}}
@@ -133,6 +144,7 @@
           <input
             type='radio'
             class='amber'
+            disabled={{buttonDisabled}}
             id='pap-amber-{{uniqueIdPrefix}}'
             name='papLevel'
             onclick={{action (mut papInput) 2}}
@@ -142,6 +154,7 @@
           <input
             type='radio'
             class='red'
+            disabled={{buttonDisabled}}
             id='pap-red-{{uniqueIdPrefix}}'
             name='papLevel'
             onclick={{action (mut papInput) 3}}
@@ -156,6 +169,7 @@
         class='case-description'
         onchange=(action (mut descriptionInput value='target.value'))
         value=descriptionInput
+        disabled=buttonDisabled
         cols='30'
         rows='4'
         placeholder='Case Description'
@@ -166,7 +180,7 @@
         {{descriptionVerificationError}}
       </div>
     {{/if}}
-    <button class='create-case-btn' type='button' {{action 'createCase'}}>
+    <button class='create-case-btn' type='button' {{action 'createCase'}} disabled={{buttonDisabled}}>
       {{#if isRunning}}
         {{fa-icon icon='spinner-third' fixedWidth=true spin=true}}
       {{/if}}

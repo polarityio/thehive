@@ -91,6 +91,7 @@ polarity.export = PolarityComponent.extend({
           pap
         }
       };
+      this.set('buttonDisabled', true);
 
       this.sendIntegrationMessage({
         action: 'createCase',
@@ -107,6 +108,7 @@ polarity.export = PolarityComponent.extend({
           setTimeout(() => {
             this.set('createCaseMessage', '');
             this.set('createCaseErrorMessage', '');
+            this.set('buttonDisabled', false);
           }, 5000);
         });
     },
