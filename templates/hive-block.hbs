@@ -6,36 +6,36 @@
   </div>
 {{else if details.allowCreateCase}}
   <div class='case-creation-form'>
+    {{#if createCaseMessage}}
+      <div class='alert alert-information mt-1'>
+        {{createCaseMessage}}
+      </div>
+    {{/if}}
+
+    {{#if createCaseErrorMessage}}
+      <div class='alert alert-information mt-1'>
+        {{createCaseErrorMessage}}
+      </div>
+    {{/if}}
     <table class='case-inputs'>
-      {{#if createCaseMessage}}
-        <div class='alert alert-information mt-1'>
-          {{createCaseMessage}}
-        </div>
-      {{/if}}
-
-      {{#if createCaseErrorMessage}}
-        <div class='alert alert-information mt-1'>
-          {{createCaseErrorMessage}}
-        </div>
-      {{/if}}
-
       <tr>
         <td> <label for='title'>Title: </label></td>
-        <div>{{input
+        <td>{{input
             class='case-title'
             onclick=(action (mut titleInput value='target.value'))
             value=titleInput
             placeholder='Title'
-          }}</div>
+          }}
+          {{#if titleVerificationError}}
+            <div class='verification-err-msg'>
+              {{titleVerificationError}}
+            </div>
+          {{/if}}
+        </td>
       </tr>
-      {{#if titleVerificationError}}
-        <div class='verification-err-msg'>
-          {{titleVerificationError}}
-        </div>
-      {{/if}}
       <tr>
         <td><label>Severity: </label></td>
-        <div class='level-select'>
+        <td class='level-select'>
           <input
             type='radio'
             class='white'
@@ -68,12 +68,12 @@
             onclick={{action (mut severityInput) 4}}
           />
           <label for='severity-red-{{uniqueIdPrefix}}'>Red</label>
-        </div>
+        </td>
       </tr>
 
       <tr>
         <td><label>TLP: </label></td>
-        <div class='level-select'>
+        <td class='level-select'>
           <input
             type='radio'
             class='white'
@@ -106,12 +106,12 @@
             onclick={{action (mut tlpInput) 3}}
           />
           <label for='tlp-red-{{uniqueIdPrefix}}'>Red</label>
-        </div>
+        </td>
       </tr>
 
       <tr>
         <td><label>PAP: </label></td>
-        <div class='level-select'>
+        <td class='level-select'>
           <input
             type='radio'
             class='white'
@@ -148,10 +148,10 @@
             checked={{if (eq case.pap 3) 'true'}}
           />
           <label for='pap-red-{{uniqueIdPrefix}}'>Red</label>
-        </div>
+        </td>
       </tr>
     </table>
-    <div>
+    <div class="mt-1">
       {{textarea
         class='case-description'
         onchange=(action (mut descriptionInput value='target.value'))
@@ -168,31 +168,26 @@
     {{/if}}
     <button class='create-case-btn' type='button' {{action 'createCase'}}>
       {{#if isRunning}}
-        {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
+        {{fa-icon icon='spinner-third' fixedWidth=true spin=true}}
       {{/if}}
       New Case
     </button>
   </div>
 {{else}}
-  <ul class='nav nav-tabs'>
+  <ul class='nav nav-tabs mb-2'>
     <li class='nav-item'>
       <a
-        {{action 'changeTab' 'cases'}}
-        class='nav-link {{if (or (eq changeTab "cases") (not changeTab)) "active"}}'
+        class='nav-link active'
         href='#'
       >
         Cases
       </a>
     </li>
   </ul>
-  {{#if (eq changeTab 'cases')}}
-    {{#each details as |case index|}}
+  {{#each details as |case index|}}
       {{#if (not-eq index 0)}}
         <hr />
       {{/if}}
-      <div class='pivot-link'>
-        <a href='{{block.userOptions.url}}/cases/{{case._id}}/details' class='p-link'>(Pivot To Case Details)</a>
-      </div>
       {{#if (get addObservableErrorMessage index)}}
         <div class='alert alert-danger mt-1'>
           {{get addObservableErrorMessage index}}
@@ -217,44 +212,46 @@
         </div>
       {{/if}}
 
-      <div class='case-options'>
-        <h1 class='p-title'>
+      <div class='case-options mb-1'>
+        <h1 class='p-title m-0'>
+          {{fa-icon icon="suitcase" fixedWidth=true}}
           Case #{{case.number}}
           {{if (get closedCase case._id) '(CASE HAS BEEN CLOSED)'}}
         </h1>
 
         {{#unless (get closedCase case._id)}}
-          <button
-            disabled={{buttonDisabled}}
-            class='case-btn'
-            title='Add an observable to this case'
-            type='button'
-            {{action 'openModal' case index 'observableModal'}}
-          >{{fa-icon 'plus' fixedWidth=true}}</button>
-          <button
-            id='hey-btn'
-            disabled={{buttonDisabled}}
-            class='case-btn'
-            title='Edit this case'
-            type='button'
-            {{action 'openModal' case index 'editModal'}}
-          >
-            {{fa-icon 'pen'}}</button>
-          <button
-            style='background-color: red'
-            disabled={{buttonDisabled}}
-            title='Close this case'
-            class='case-btn'
-            type='button'
-            {{action 'openModal' case index 'closeCaseModal'}}
-          >X</button>
+          <div class="d-flex">
+            <button
+              disabled={{buttonDisabled}}
+              class='case-btn'
+              title='Add an observable to this case'
+              type='button'
+              {{action 'openModal' case index 'observableModal'}}
+            >{{fa-icon icon='plus' fixedWidth=true}}</button>
+            <button
+              id='hey-btn'
+              disabled={{buttonDisabled}}
+              class='case-btn'
+              title='Edit this case'
+              type='button'
+              {{action 'openModal' case index 'editModal'}}
+            >
+              {{fa-icon icon='pen' fixedWidth=true}}</button>
+            <button
+              disabled={{buttonDisabled}}
+              title='Close this case'
+              class='case-btn close-btn'
+              type='button'
+              {{action 'openModal' case index 'closeCaseModal'}}
+            >{{fa-icon icon="times" fixedWidth=true}}</button>
+          </div>
         {{/unless}}
       </div>
 
       <div class='case-container'>
         {{#if case.__editModalOpen}}
           <div class='modal case-modal'>
-            <h1 class='p-title'>
+            <h1 class='modal-title'>
               Editing Case #{{case.number}}
             </h1>
             <table class='case-inputs'>
@@ -431,7 +428,7 @@
               </button>
               <button class='case-modal-btn' type='button' {{action 'updateCase' case index 'editModal'}}>
                 {{#if isRunning}}
-                  {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
+                  {{fa-icon icon='spinner-third' fixedWidth=true spin=true}}
                 {{/if}}
                 Submit
               </button>
@@ -441,7 +438,7 @@
 
         {{#if case.__observableModalOpen}}
           <div class='modal case-modal'>
-            <h1 class='p-title'>
+            <h1 class="modal-title">
               Adding an observable for case #{{case.number}}
             </h1>
 
@@ -600,7 +597,7 @@
               </button>
               <button class='case-modal-btn' type='button' {{action 'addObservable' case index 'observableModal'}}>
                 {{#if isRunning}}
-                  {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
+                  {{fa-icon icon='spinner-third' fixedWidth=true spin=true}}
                 {{/if}}
                 Add Observable
               </button>
@@ -624,13 +621,17 @@
               <div>
                 <button {{action 'closeCase' case index}} class='modal-btn'>
                   {{#if isRunning}}
-                    {{fa-icon 'spinner-third' fixedWidth=true spin=true}}
+                    {{fa-icon icon='spinner-third' fixedWidth=true spin=true}}
                   {{/if}}
                   Confirm</button>
               </div>
             </div>
           </div>
         {{/if}}
+
+        <div class='pivot-link my-1'>
+          <a href='{{block.userOptions.url}}/cases/{{case._id}}/details' class='p-link'>Pivot To Case Details {{fa-icon icon="external-link-square" fiexedWidth=true class="external-link"}}</a>
+        </div>
 
         {{#if case.title}}
           <div>
@@ -743,30 +744,23 @@
           </div>
         {{/if}}
 
-        <span class='p-key'>Description:</span>
-        <div class='scrollable-block'>
-          <table>
-            <tbody>
-              <tr>
-                <td class='pr-3'>
-                  <div>
-                    <span class='p-value'>{{case.description}}</span>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        {{#if case.description}}
+          <div>
+            <div class='p-key'>Description:</div>
+            <div class='p-description'>{{case.description}}</div>
+          </div>
+        {{/if}}
+
 
         {{#if (get caseObservables index)}}
           <a href='#' class='expandable-title' {{on 'click' (action 'toggleExpandableObservables' index)}}>
             <span class='text'><span class='desc'>Observable(s)</span> {{UNIQUE_VALUE}}</span>
-            {{fa-icon 'angle-up'}}
+            {{fa-icon icon='angle-up' fixedWidth=true}}
           </a>
           {{#each case.caseObservables as |observable|}}
             {{#if observable._id}}
               <h1 class='p-title'>
-                {{fa-icon 'eye' fixedWidth=true}}
+                {{fa-icon icon='eye' fixedWidth=true}}
                 {{observable.data}}
               </h1>
               {{#if (eq observable.tlp 0)}}
@@ -848,11 +842,10 @@
               </div>
 
               {{#if observable.tags}}
-                <div class='p-title'>
-                  {{fa-icon 'tag' fixedWidth=true}}
-                  Tags
-                </div>
-                <div class='tags'>
+                <div class="mt-1">
+                  <span class='p-key'>
+                    Tags:
+                  </span>
                   {{#each observable.tags as |tag|}}
                     <span class='pulse-tag'>{{tag}}</span>
                   {{/each}}
@@ -863,10 +856,9 @@
         {{else}}
           <a href='#' class='expandable-title' {{on 'click' (action 'toggleExpandableObservables' index)}}>
             <span class='text'>Observable(s)</span>
-            {{fa-icon 'angle-down'}}
+            {{fa-icon icon='angle-down' fixedWidth=true}}
           </a>
         {{/if}}
       </div>
     {{/each}}
-  {{/if}}
 {{/if}}
