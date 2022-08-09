@@ -458,41 +458,45 @@
 
             <table>
               <tr>
-                <td><label for='title'>Type: </label></td>
-                <select
-                  class='modal-select'
-                  required='true'
-                  onclick={{action (mut observableTypeInput) value='target.value'}}
-                >
-                  <option value='none' selected disabled hidden>Select Type</option>
-                  <option value='hash'>hash</option>
-                  <option value='ip'>ip</option>
-                  <option value='domain'>domain</option>
-                </select>
+                <td class="align-top"><label for='title'>Type: </label></td>
+                <td>
+                  <select
+                    class='modal-select'
+                    required='true'
+                    onclick={{action (mut observableTypeInput) value='target.value'}}
+                  >
+                    <option value='none' selected disabled hidden>Select Type</option>
+                    <option value='hash'>hash</option>
+                    <option value='ip'>ip</option>
+                    <option value='domain'>domain</option>
+                  </select>
+                  {{#if typeVerificationError}}
+                    <div class='verification-err-msg'>
+                      {{typeVerificationError}}
+                    </div>
+                  {{/if}}
+                </td>
               </tr>
-              {{#if typeVerificationError}}
-                <div class='verification-err-msg'>
-                  {{typeVerificationError}}
-                </div>
-              {{/if}}
               <tr>
-                <td> <label for='value'>Value: </label></td>
-                {{input
-                  required=true
-                  class='observable-title'
-                  onclick=(action (mut observableDataInput value='target.value'))
-                  value=observableDataInput
-                  placeholder='Value'
-                }}
+                <td class="align-top"><label for='value'>Value: </label></td>
+                <td>
+                  {{input
+                    required=true
+                    class='observable-title'
+                    onclick=(action (mut observableDataInput value='target.value'))
+                    value=observableDataInput
+                    placeholder='Value'
+                  }}
+                  {{#if dataVerificationError}}
+                    <div class='verification-err-msg'>
+                      {{dataVerificationError}}
+                    </div>
+                  {{/if}}
+                </td>
               </tr>
-              {{#if dataVerificationError}}
-                <div class='verification-err-msg'>
-                  {{dataVerificationError}}
-                </div>
-              {{/if}}
               <tr>
-                <td><label>TLP: </label></td>
-                <div class='level-select'>
+                <td class="align-top"><label>TLP: </label></td>
+                <td class='level-select'>
                   <input
                     type='radio'
                     class='white'
@@ -528,12 +532,12 @@
                     onclick={{action (mut observableTlpInput) 3}}
                   />
                   <label for='red-{{uniqueIdPrefix}}'>Red</label>
-                </div>
+                </td>
               </tr>
 
               <tr>
-                <td><label>PAP: </label></td>
-                <div class='level-select'>
+                <td class="align-top"><label>PAP: </label></td>
+                <td class='level-select'>
                   <input
                     type='radio'
                     class='white'
@@ -570,27 +574,33 @@
                     onclick={{action (mut observablePapInput) 3}}
                   />
                   <label for='pap-red-{{uniqueIdPrefix}}'>Red</label>
-                </div>
+                </td>
               </tr>
 
               <tr>
-                <td> <label for='ioc'>is IOC: </label></td>
-                {{input type='checkbox' checked=isIocInput onchange=(action (mut isIocInput checked='target.value'))}}
+                <td class="align-top"> <label for='ioc'>is IOC: </label></td>
+                <td>
+                  {{input type='checkbox' checked=isIocInput onchange=(action (mut isIocInput checked='target.value'))}}
+                </td>
               </tr>
               <tr>
-                <td> <label for='sighted'>Sighted: </label></td>
-                {{input
-                  type='checkbox'
-                  checked=sightedInput
-                  onchange=(action (mut sightedInput checked='target.value'))
-                }}
+                <td class="align-top"><label for='sighted'>Sighted: </label></td>
+                <td>
+                  {{input
+                    type='checkbox'
+                    checked=sightedInput
+                    onchange=(action (mut sightedInput checked='target.value'))
+                  }}
+                </td>
               </tr>
               <tr>
-                <td> <label for='tags'>Tags: </label></td>
-                {{input onclick=(action (mut tagsInput value='target.value')) value=tagsInput placeholder='Tags'}}
-                <div class='mb-2 create-case-footnote'>
-                  <span class='p-footnote'>Add space separated strings.</span>
-                </div>
+                <td class="align-top"> <label for='tags'>Tags: </label></td>
+                <td>
+                  {{input onclick=(action (mut tagsInput value='target.value')) value=tagsInput placeholder='Tags'}}
+                  <div class='mb-2 create-case-footnote'>
+                    <span class='p-footnote'>Add space separated strings.</span>
+                  </div>
+                </td>
               </tr>
             </table>
 
