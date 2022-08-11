@@ -8,10 +8,9 @@ For more information on TheHive, please visit [official website](http://docs.the
 
 Check out the integration in action:
 
-![thehive](https://user-images.githubusercontent.com/22529325/56053166-5c93ba00-5d21-11e9-96a6-ea2b02ace95a.gif)
+<img width="350" alt="Integration Example" src="./assets/thehive.png">
 
 ## TheHive Integration Options
-
 ### TheHive Host
 
 The host of your TheHive instance
