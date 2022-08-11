@@ -789,99 +789,93 @@
               class='p-link'
             >{{observable.data}}{{fa-icon 'external-link-square' fixedWidth=true class='external-link'}}</a>
           </div>
-          {{#if observable._id}}
-            <h1 class='p-title'>
-              {{fa-icon icon='eye' fixedWidth=true}}
-              {{observable.data}}
-            </h1>
-            {{#if (eq observable.tlp 0)}}
-              <div>
-                <span class='p-key'>TLP: </span>
-                <span class='p-value'>WHITE</span>
-              </div>
-            {{/if}}
-            {{#if (eq observable.tlp 1)}}
-              <div>
-                <span class='p-key'>TLP: </span>
-                <span class='p-value' style='color:green'>GREEN</span>
-              </div>
-            {{/if}}
-            {{#if (eq observable.tlp 2)}}
-              <div>
-                <span class='p-key'>TLP: </span>
-                <span class='p-value' style='color:orange'>AMBER</span>
-              </div>
-            {{/if}}
-            {{#if (eq observable.tlp 3)}}
-              <div>
-                <span class='p-key'>TLP: </span>
-                <span class='p-value' style='color:red'>RED</span>
-              </div>
-            {{/if}}
-            {{#if (eq observable.pap 0)}}
-              <div>
-                <span class='p-key'>PAP: </span>
-                <span class='p-value'>WHITE</span>
-              </div>
-            {{/if}}
-            {{#if (eq observable.pap 1)}}
-              <div>
-                <span class='p-key'>PAP: </span>
-                <span class='p-value' style='color:green'>GREEN</span>
-              </div>
-            {{/if}}
-            {{#if (eq observable.pap 2)}}
-              <div>
-                <span class='p-key'>PAP: </span>
-                <span class='p-value' style='color:orange'>AMBER</span>
-              </div>
-            {{/if}}
-            {{#if (eq observable.pap 3)}}
-              <div>
-                <span class='p-key'>PAP: </span>
-                <span class='p-value' style='color:red'>RED</span>
-              </div>
-            {{/if}}
+          {{#if (eq observable.tlp 0)}}
             <div>
-              <span class='p-key'>Case Created Date </span>
-              <span class='p-value'>{{moment-time observable._createdAt}}</span>
+              <span class='p-key'>TLP: </span>
+              <span class='p-value'>WHITE</span>
             </div>
+          {{/if}}
+          {{#if (eq observable.tlp 1)}}
             <div>
-              <span class='p-key'>Case Start Date </span>
-              <span class='p-value'>{{moment-time observable.startDate}}</span>
+              <span class='p-key'>TLP: </span>
+              <span class='p-value' style='color:green'>GREEN</span>
             </div>
+          {{/if}}
+          {{#if (eq observable.tlp 2)}}
+            <div>
+              <span class='p-key'>TLP: </span>
+              <span class='p-value' style='color:orange'>AMBER</span>
+            </div>
+          {{/if}}
+          {{#if (eq observable.tlp 3)}}
+            <div>
+              <span class='p-key'>TLP: </span>
+              <span class='p-value' style='color:red'>RED</span>
+            </div>
+          {{/if}}
+          {{#if (eq observable.pap 0)}}
+            <div>
+              <span class='p-key'>PAP: </span>
+              <span class='p-value'>WHITE</span>
+            </div>
+          {{/if}}
+          {{#if (eq observable.pap 1)}}
+            <div>
+              <span class='p-key'>PAP: </span>
+              <span class='p-value' style='color:green'>GREEN</span>
+            </div>
+          {{/if}}
+          {{#if (eq observable.pap 2)}}
+            <div>
+              <span class='p-key'>PAP: </span>
+              <span class='p-value' style='color:orange'>AMBER</span>
+            </div>
+          {{/if}}
+          {{#if (eq observable.pap 3)}}
+            <div>
+              <span class='p-key'>PAP: </span>
+              <span class='p-value' style='color:red'>RED</span>
+            </div>
+          {{/if}}
+          <div>
+            <span class='p-key'>Case Created Date </span>
+            <span class='p-value'>{{moment-time observable._createdAt}}</span>
+          </div>
+          <div>
+            <span class='p-key'>Case Start Date </span>
+            <span class='p-value'>{{moment-time observable.startDate}}</span>
+          </div>
 
-            <div>
-              <span class='p-key'>Observable Message: </span>
-              <span class='p-value'>{{observable.message}}</span>
-            </div>
-            <div>
-              <span class='p-key'>Observable Type: </span>
-              <span class='p-value'>{{observable.dataType}}</span>
-            </div>
-            <div>
-              <span class='p-key'>Created By: </span>
-              <span class='p-value'>{{observable._createdBy}}</span>
-            </div>
-            <div>
-              <span class='p-key'>Is IOC? </span>
-              <span class='p-value'>{{observable.ioc}}</span>
-            </div>
-            <div>
-              <span class='p-key'>Observable Sighted? </span>
-              <span class='p-value'>{{observable.sighted}}</span>
-            </div>
+          <div>
+            <span class='p-key'>Observable Message: </span>
+            <span class='p-value'>{{observable.message}}</span>
+          </div>
+          <div>
+            <span class='p-key'>Observable Type: </span>
+            <span class='p-value'>{{observable.dataType}}</span>
+          </div>
+          <div>
+            <span class='p-key'>Created By: </span>
+            <span class='p-value'>{{observable._createdBy}}</span>
+          </div>
+          <div>
+            <span class='p-key'>Is IOC? </span>
+            <span class='p-value'>{{observable.ioc}}</span>
+          </div>
+          <div>
+            <span class='p-key'>Observable Sighted? </span>
+            <span class='p-value'>{{observable.sighted}}</span>
+          </div>
 
-            {{#if observable.tags}}
-              <div class='mt-1'>
-                <span class='p-key'>
-                  Tags:
-                </span>
-                {{#each observable.tags as |tag|}}
-                  <span class='pulse-tag'>{{tag}}</span>
-                {{/each}}
-              </div>
-            {{/if}}
+          {{#if observable.tags}}
+            <div class='mt-1'>
+              <span class='p-key'>
+                Tags:
+              </span>
+              {{#each observable.tags as |tag|}}
+                <span class='pulse-tag'>{{tag}}</span>
+              {{/each}}
+            </div>
           {{/if}}
         {{/each}}
       {{else}}
