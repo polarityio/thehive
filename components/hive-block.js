@@ -3,7 +3,6 @@
 polarity.export = PolarityComponent.extend({
   details: Ember.computed.alias('block.data.details'),
   allowCreateCase: false,
-  changeTab: 'cases',
   observableTypes: ['ip', 'hash', 'domain'],
   caseObservables: {},
   observableModal: false,
@@ -21,16 +20,12 @@ polarity.export = PolarityComponent.extend({
   uniqueIdPrefix: '',
   newCase: {},
   init () {
-    this.set('changeTab', this.get('details.length') ? 'cases' : 'create');
     let array = new Uint32Array(5);
     this.set('uniqueIdPrefix', window.crypto.getRandomValues(array).join(''));
 
     this._super(...arguments);
   },
   actions: {
-    changeTab: function (tabName) {
-      this.set('changeTab', tabName);
-    },
     openModal: function (caseObj, index, type) {
       this.set('titleInput', caseObj.title);
       this.set('descriptionInput', caseObj.description);
@@ -91,19 +86,18 @@ polarity.export = PolarityComponent.extend({
         inputs: {
           title,
           description,
-          title,
           severity,
           tlp,
           pap
         }
       };
+      this.set('buttonDisabled', true);
 
       this.sendIntegrationMessage({
         action: 'createCase',
         data: { caseInputs }
       })
         .then((caseObj) => {
-          this.set('activeTab', 'cases');
           this.set('block.data', caseObj);
         })
         .catch((err) => {
@@ -114,7 +108,7 @@ polarity.export = PolarityComponent.extend({
           setTimeout(() => {
             this.set('createCaseMessage', '');
             this.set('createCaseErrorMessage', '');
-            this.get('block').notifyPropertyChange('data');
+            this.set('buttonDisabled', false);
           }, 5000);
         });
     },
@@ -136,8 +130,7 @@ polarity.export = PolarityComponent.extend({
           description,
           severity,
           tlp,
-          pap,
-          severity
+          pap
         }
       };
 

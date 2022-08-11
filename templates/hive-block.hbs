@@ -5,6 +5,7 @@
     </div>
   </div>
 {{else if details.allowCreateCase}}
+<<<<<<< HEAD
   <div class="case-creation-form">
     <table class="case-inputs">
       {{#if createCaseMessage}}
@@ -18,8 +19,23 @@
           {{createCaseErrorMessage}}
         </div>
       {{/if}}
+=======
+  <div class='case-creation-form'>
+    {{#if createCaseMessage}}
+      <div class='alert alert-information mt-1'>
+        {{createCaseMessage}}
+      </div>
+    {{/if}}
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
 
+    {{#if createCaseErrorMessage}}
+      <div class='alert alert-information mt-1'>
+        {{createCaseErrorMessage}}
+      </div>
+    {{/if}}
+    <table class='case-inputs'>
       <tr>
+<<<<<<< HEAD
         <td> <label for="title">Title: </label></td>
         <div>{{input
             class="case-title"
@@ -41,26 +57,69 @@
             class="white"
             id="severity-white-{{uniqueIdPrefix}}"
             name="severityLevel"
+=======
+        <td> <label for='title'>Title: </label></td>
+        <td>{{input
+            disabled=buttonDisabled
+            class='case-title'
+            onclick=(action (mut titleInput value='target.value'))
+            value=titleInput
+            placeholder='Title'
+          }}
+          {{#if titleVerificationError}}
+            <div class='verification-err-msg'>
+              {{titleVerificationError}}
+            </div>
+          {{/if}}
+        </td>
+      </tr>
+      <tr>
+        <td><label>Severity: </label></td>
+        <td class='level-select'>
+          <input
+            type='radio'
+            class='white'
+            disabled={{buttonDisabled}}
+            id='severity-white-{{uniqueIdPrefix}}'
+            name='severityLevel'
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
             onclick={{action (mut severityInput) 1}}
           />
           <label for="severity-white-{{uniqueIdPrefix}}">White</label>
           <input
+<<<<<<< HEAD
             type="radio"
             class="green"
             id="severity-green-{{uniqueIdPrefix}}"
             name="severityLevel"
+=======
+            type='radio'
+            class='green'
+            disabled={{buttonDisabled}}
+            id='severity-green-{{uniqueIdPrefix}}'
+            name='severityLevel'
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
             onclick={{action (mut severityInput) 2}}
           />
           <label for="severity-green-{{uniqueIdPrefix}}">Green</label>
           <input
+<<<<<<< HEAD
             type="radio"
             class="amber"
             id="severity-amber-{{uniqueIdPrefix}}"
             name="severityLevel"
+=======
+            type='radio'
+            class='amber'
+            disabled={{buttonDisabled}}
+            id='severity-amber-{{uniqueIdPrefix}}'
+            name='severityLevel'
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
             onclick={{action (mut severityInput) 3}}
           />
           <label for="severity-amber-{{uniqueIdPrefix}}">Amber</label>
           <input
+<<<<<<< HEAD
             type="radio"
             class="red"
             id="severity-red-{{uniqueIdPrefix}}"
@@ -69,36 +128,74 @@
           />
           <label for="severity-red-{{uniqueIdPrefix}}">Red</label>
         </div>
+=======
+            type='radio'
+            class='red'
+            disabled={{buttonDisabled}}
+            id='severity-red-{{uniqueIdPrefix}}'
+            name='severityLevel'
+            onclick={{action (mut severityInput) 4}}
+          />
+          <label for='severity-red-{{uniqueIdPrefix}}'>Red</label>
+        </td>
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
       </tr>
 
       <tr>
         <td><label>TLP: </label></td>
+<<<<<<< HEAD
         <div class="level-select">
           <input
             type="radio"
             class="white"
             id="tlp-white-{{uniqueIdPrefix}}"
             name="tlpLevel"
+=======
+        <td class='level-select'>
+          <input
+            type='radio'
+            class='white'
+            disabled={{buttonDisabled}}
+            id='tlp-white-{{uniqueIdPrefix}}'
+            name='tlpLevel'
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
             onclick={{action (mut tlpInput) 0}}
           />
           <label for="tlp-white-{{uniqueIdPrefix}}">White</label>
           <input
+<<<<<<< HEAD
             type="radio"
             class="green"
             id="tlp-green-{{uniqueIdPrefix}}"
             name="tlpLevel"
+=======
+            type='radio'
+            class='green'
+            disabled={{buttonDisabled}}
+            id='tlp-green-{{uniqueIdPrefix}}'
+            name='tlpLevel'
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
             onclick={{action (mut tlpInput) 1}}
           />
           <label for="tlp-green-{{uniqueIdPrefix}}">Green</label>
           <input
+<<<<<<< HEAD
             type="radio"
             class="amber"
             id="tlp-amber-{{uniqueIdPrefix}}"
             name="tlpLevel"
+=======
+            type='radio'
+            class='amber'
+            disabled={{buttonDisabled}}
+            id='tlp-amber-{{uniqueIdPrefix}}'
+            name='tlpLevel'
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
             onclick={{action (mut tlpInput) 2}}
           />
           <label for="tlp-amber-{{uniqueIdPrefix}}">Amber</label>
           <input
+<<<<<<< HEAD
             type="radio"
             class="red"
             id="tlp-red-{{uniqueIdPrefix}}"
@@ -107,58 +204,115 @@
           />
           <label for="tlp-red-{{uniqueIdPrefix}}">Red</label>
         </div>
+=======
+            type='radio'
+            class='red'
+            disabled={{buttonDisabled}}
+            id='tlp-red-{{uniqueIdPrefix}}'
+            name='tlpLevel'
+            onclick={{action (mut tlpInput) 3}}
+          />
+          <label for='tlp-red-{{uniqueIdPrefix}}'>Red</label>
+        </td>
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
       </tr>
 
       <tr>
         <td><label>PAP: </label></td>
+<<<<<<< HEAD
         <div class="level-select">
           <input
             type="radio"
             class="white"
             id="pap-white-{{uniqueIdPrefix}}"
             name="papLevel"
+=======
+        <td class='level-select'>
+          <input
+            type='radio'
+            class='white'
+            disabled={{buttonDisabled}}
+            id='pap-white-{{uniqueIdPrefix}}'
+            name='papLevel'
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
             onclick={{action (mut papInput) 0}}
             checked={{if (eq case.pap 0) "true"}}
           />
           <label for="pap-white-{{uniqueIdPrefix}}">White</label>
           <input
+<<<<<<< HEAD
             type="radio"
             class="green"
             id="pap-green-{{uniqueIdPrefix}}"
             name="papLevel"
+=======
+            type='radio'
+            class='green'
+            disabled={{buttonDisabled}}
+            id='pap-green-{{uniqueIdPrefix}}'
+            name='papLevel'
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
             onclick={{action (mut papInput) 1}}
             checked={{if (eq case.pap 1) "true"}}
           />
           <label for="pap-green-{{uniqueIdPrefix}}">Green</label>
           <input
+<<<<<<< HEAD
             type="radio"
             class="amber"
             id="pap-amber-{{uniqueIdPrefix}}"
             name="papLevel"
+=======
+            type='radio'
+            class='amber'
+            disabled={{buttonDisabled}}
+            id='pap-amber-{{uniqueIdPrefix}}'
+            name='papLevel'
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
             onclick={{action (mut papInput) 2}}
             checked={{if (eq case.pap 2) "true"}}
           />
           <label for="pap-amber-{{uniqueIdPrefix}}">Amber</label>
           <input
+<<<<<<< HEAD
             type="radio"
             class="red"
             id="pap-red-{{uniqueIdPrefix}}"
             name="papLevel"
+=======
+            type='radio'
+            class='red'
+            disabled={{buttonDisabled}}
+            id='pap-red-{{uniqueIdPrefix}}'
+            name='papLevel'
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
             onclick={{action (mut papInput) 3}}
             checked={{if (eq case.pap 3) "true"}}
           />
+<<<<<<< HEAD
           <label for="pap-red-{{uniqueIdPrefix}}">Red</label>
         </div>
+=======
+          <label for='pap-red-{{uniqueIdPrefix}}'>Red</label>
+        </td>
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
       </tr>
     </table>
-    <div>
+    <div class="mt-1">
       {{textarea
         class="case-description"
         onchange=(action (mut descriptionInput value="target.value"))
         value=descriptionInput
+<<<<<<< HEAD
         cols="30"
         rows="4"
         placeholder="Case Description"
+=======
+        disabled=buttonDisabled
+        cols='30'
+        rows='4'
+        placeholder='Case Description'
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
       }}
     </div>
     {{#if descriptionVerificationError}}
@@ -166,14 +320,21 @@
         {{descriptionVerificationError}}
       </div>
     {{/if}}
+<<<<<<< HEAD
     <button class="create-case-btn" type="button" {{action "createCase"}}>
       {{#if isRunning}}
         {{fa-icon "spinner-third" fixedWidth=true spin=true}}
+=======
+    <button class='create-case-btn' type='button' {{action 'createCase'}} disabled={{buttonDisabled}}>
+      {{#if isRunning}}
+        {{fa-icon icon='spinner-third' fixedWidth=true spin=true}}
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
       {{/if}}
       New Case
     </button>
   </div>
 {{else}}
+<<<<<<< HEAD
   {{#if (eq changeTab "cases")}}
     {{#each details as |case index|}}
       {{#if (not-eq index 0)}}
@@ -182,6 +343,22 @@
       <div class="pivot-link">
         <a href="{{block.userOptions.url}}/cases/{{case._id}}/details" class="p-link">(Pivot To Case Details)</a>
       </div>
+=======
+  <ul class='nav nav-tabs mb-2'>
+    <li class='nav-item'>
+      <a
+        class='nav-link active'
+        href='#'
+      >
+        Cases
+      </a>
+    </li>
+  </ul>
+  {{#each details as |case index|}}
+      {{#if (not-eq index 0)}}
+        <hr />
+      {{/if}}
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
       {{#if (get addObservableErrorMessage index)}}
         <div class="alert alert-danger mt-1">
           {{get addObservableErrorMessage index}}
@@ -206,13 +383,20 @@
         </div>
       {{/if}}
 
+<<<<<<< HEAD
       <div class="case-options">
         <h1 class="p-title">
+=======
+      <div class='case-options mb-1'>
+        <h1 class='p-title m-0'>
+          {{fa-icon icon="suitcase" fixedWidth=true}}
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
           Case #{{case.number}}
           {{if (get closedCase case._id) "(CASE HAS BEEN CLOSED)"}}
         </h1>
 
         {{#unless (get closedCase case._id)}}
+<<<<<<< HEAD
           <button
             disabled={{buttonDisabled}}
             class="case-btn"
@@ -237,17 +421,50 @@
             type="button"
             {{action "openModal" case index "closeCaseModal"}}
           >X</button>
+=======
+          <div class="d-flex">
+            <button
+              disabled={{buttonDisabled}}
+              class='case-btn'
+              title='Add an observable to this case'
+              type='button'
+              {{action 'openModal' case index 'observableModal'}}
+            >{{fa-icon icon='plus' fixedWidth=true}}</button>
+            <button
+              id='hey-btn'
+              disabled={{buttonDisabled}}
+              class='case-btn'
+              title='Edit this case'
+              type='button'
+              {{action 'openModal' case index 'editModal'}}
+            >
+              {{fa-icon icon='pen' fixedWidth=true}}</button>
+            <button
+              disabled={{buttonDisabled}}
+              title='Close this case'
+              class='case-btn close-btn'
+              type='button'
+              {{action 'openModal' case index 'closeCaseModal'}}
+            >{{fa-icon icon="times" fixedWidth=true}}</button>
+          </div>
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
         {{/unless}}
       </div>
 
       <div class="case-container">
         {{#if case.__editModalOpen}}
+<<<<<<< HEAD
           <div class="modal case-modal">
             <h1 class="p-title">
+=======
+          <div class='modal case-modal'>
+            <h1 class='modal-title'>
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
               Editing Case #{{case.number}}
             </h1>
             <table class="case-inputs">
               <tr>
+<<<<<<< HEAD
                 <td> <label for="title">Title: </label></td>
                 {{#if case.title}}
                   <div>{{input
@@ -267,6 +484,30 @@
               <tr>
                 <td><label>Severity: </label></td>
                 <div class="level-select">
+=======
+                <td class="align-top"><label for='title'>Title: </label></td>
+                <td>
+                  {{#if case.title}}
+                    {{input
+                        class='case-title'
+                        onclick=(action (mut titleInput value='target.value'))
+                        value=titleInput
+                        placeholder='Title'
+                        required='true'
+                      }}
+                  {{/if}}
+                  {{#if titleVerificationError}}
+                    <div class='verification-err-msg'>
+                      {{titleVerificationError}}
+                    </div>
+                  {{/if}}
+                </td>
+              </tr>
+
+              <tr>
+                <td class="align-top"><label>Severity: </label></td>
+                <td class='level-select'>
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
                   <input
                     type="radio"
                     class="white"
@@ -305,6 +546,7 @@
                     onclick={{action (mut severityInput) 4}}
                     checked={{if (eq case.severity 4) "true"}}
                   />
+<<<<<<< HEAD
                   <label for="severity-red-{{uniqueIdPrefix}}">Red</label>
                 </div>
               </tr>
@@ -312,6 +554,15 @@
               <tr>
                 <td><label>TLP: </label></td>
                 <div class="level-select">
+=======
+                  <label for='severity-red-{{uniqueIdPrefix}}'>Red</label>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="align-top"><label>TLP: </label></td>
+                <td class='level-select'>
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
                   <input
                     type="radio"
                     class="white"
@@ -350,6 +601,7 @@
                     onclick={{action (mut tlpInput) 3}}
                     checked={{if (eq case.tlp 3) "true"}}
                   />
+<<<<<<< HEAD
                   <label for="tlp-red-{{uniqueIdPrefix}}">Red</label>
                 </div>
               </tr>
@@ -357,6 +609,15 @@
               <tr>
                 <td><label>PAP: </label></td>
                 <div class="level-select">
+=======
+                  <label for='tlp-red-{{uniqueIdPrefix}}'>Red</label>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="align-top"><label>PAP: </label></td>
+                <td class='level-select'>
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
                   <input
                     type="radio"
                     class="white"
@@ -395,11 +656,16 @@
                     onclick={{action (mut papInput) 3}}
                     checked={{if (eq case.pap 3) "true"}}
                   />
+<<<<<<< HEAD
                   <label for="pap-red-{{uniqueIdPrefix}}">Red</label>
                 </div>
+=======
+                  <label for='pap-red-{{uniqueIdPrefix}}'>Red</label>
+                </td>
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
               </tr>
             </table>
-            <div>
+            <div class="mt-1">
               {{textarea
                 class="case-description"
                 onchange=(action (mut descriptionInput value="target.value"))
@@ -410,7 +676,11 @@
               }}
             </div>
             {{#if descriptionVerificationError}}
+<<<<<<< HEAD
               <div class="verification-err-msg">
+=======
+              <div class='verification-err-msg text-left'>
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
                 {{descriptionVerificationError}}
               </div>
             {{/if}}
@@ -420,7 +690,11 @@
               </button>
               <button class="case-modal-btn" type="button" {{action "updateCase" case index "editModal"}}>
                 {{#if isRunning}}
+<<<<<<< HEAD
                   {{fa-icon "spinner-third" fixedWidth=true spin=true}}
+=======
+                  {{fa-icon icon='spinner-third' fixedWidth=true spin=true}}
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
                 {{/if}}
                 Submit
               </button>
@@ -429,13 +703,19 @@
         {{/if}}
 
         {{#if case.__observableModalOpen}}
+<<<<<<< HEAD
           <div class="modal case-modal">
             <h1 class="p-title">
+=======
+          <div class='modal case-modal'>
+            <h1 class="modal-title">
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
               Adding an observable for case #{{case.number}}
             </h1>
 
             <table>
               <tr>
+<<<<<<< HEAD
                 <td><label for="title">Type: </label></td>
                 <select
                   class="modal-select"
@@ -471,6 +751,47 @@
               <tr>
                 <td><label>TLP: </label></td>
                 <div class="level-select">
+=======
+                <td class="align-top"><label for='title'>Type: </label></td>
+                <td>
+                  <select
+                    class='modal-select'
+                    required='true'
+                    onclick={{action (mut observableTypeInput) value='target.value'}}
+                  >
+                    <option value='none' selected disabled hidden>Select Type</option>
+                    <option value='hash'>hash</option>
+                    <option value='ip'>ip</option>
+                    <option value='domain'>domain</option>
+                  </select>
+                  {{#if typeVerificationError}}
+                    <div class='verification-err-msg'>
+                      {{typeVerificationError}}
+                    </div>
+                  {{/if}}
+                </td>
+              </tr>
+              <tr>
+                <td class="align-top"><label for='value'>Value: </label></td>
+                <td>
+                  {{input
+                    required=true
+                    class='observable-title'
+                    onclick=(action (mut observableDataInput value='target.value'))
+                    value=observableDataInput
+                    placeholder='Value'
+                  }}
+                  {{#if dataVerificationError}}
+                    <div class='verification-err-msg'>
+                      {{dataVerificationError}}
+                    </div>
+                  {{/if}}
+                </td>
+              </tr>
+              <tr>
+                <td class="align-top"><label>TLP: </label></td>
+                <td class='level-select'>
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
                   <input
                     type="radio"
                     class="white"
@@ -505,6 +826,7 @@
                     name="tlpLevel"
                     onclick={{action (mut observableTlpInput) 3}}
                   />
+<<<<<<< HEAD
                   <label for="red-{{uniqueIdPrefix}}">Red</label>
                 </div>
               </tr>
@@ -512,6 +834,15 @@
               <tr>
                 <td><label>PAP: </label></td>
                 <div class="level-select">
+=======
+                  <label for='red-{{uniqueIdPrefix}}'>Red</label>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="align-top"><label>PAP: </label></td>
+                <td class='level-select'>
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
                   <input
                     type="radio"
                     class="white"
@@ -547,6 +878,7 @@
                     name="papLevel"
                     onclick={{action (mut observablePapInput) 3}}
                   />
+<<<<<<< HEAD
                   <label for="pap-red-{{uniqueIdPrefix}}">Red</label>
                 </div>
               </tr>
@@ -569,6 +901,36 @@
                 <div class="mb-2 create-case-footnote">
                   <span class="p-footnote">Add space separated strings.</span>
                 </div>
+=======
+                  <label for='pap-red-{{uniqueIdPrefix}}'>Red</label>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="align-top"> <label for='ioc'>is IOC: </label></td>
+                <td>
+                  {{input type='checkbox' checked=isIocInput onchange=(action (mut isIocInput checked='target.value'))}}
+                </td>
+              </tr>
+              <tr>
+                <td class="align-top"><label for='sighted'>Sighted: </label></td>
+                <td>
+                  {{input
+                    type='checkbox'
+                    checked=sightedInput
+                    onchange=(action (mut sightedInput checked='target.value'))
+                  }}
+                </td>
+              </tr>
+              <tr>
+                <td class="align-top"> <label for='tags'>Tags: </label></td>
+                <td>
+                  {{input onclick=(action (mut tagsInput value='target.value')) value=tagsInput placeholder='Tags'}}
+                  <div class='mb-2 create-case-footnote'>
+                    <span class='p-footnote'>Add space separated strings.</span>
+                  </div>
+                </td>
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
               </tr>
             </table>
 
@@ -589,7 +951,11 @@
               </button>
               <button class="case-modal-btn" type="button" {{action "addObservable" case index "observableModal"}}>
                 {{#if isRunning}}
+<<<<<<< HEAD
                   {{fa-icon "spinner-third" fixedWidth=true spin=true}}
+=======
+                  {{fa-icon icon='spinner-third' fixedWidth=true spin=true}}
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
                 {{/if}}
                 Add Observable
               </button>
@@ -613,13 +979,21 @@
               <div>
                 <button {{action "closeCase" case index}} class="modal-btn">
                   {{#if isRunning}}
+<<<<<<< HEAD
                     {{fa-icon "spinner-third" fixedWidth=true spin=true}}
+=======
+                    {{fa-icon icon='spinner-third' fixedWidth=true spin=true}}
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
                   {{/if}}
                   Confirm</button>
               </div>
             </div>
           </div>
         {{/if}}
+
+        <div class='pivot-link my-1'>
+          <a href='{{block.userOptions.url}}/cases/{{case._id}}/details' class='p-link'>Pivot To Case Details {{fa-icon icon="external-link-square" fiexedWidth=true class="external-link"}}</a>
+        </div>
 
         {{#if case.title}}
           <div>
@@ -732,6 +1106,7 @@
           </div>
         {{/if}}
 
+<<<<<<< HEAD
         <span class="p-key">Description:</span>
         <div class="scrollable-block">
           <table>
@@ -751,16 +1126,37 @@
           <a href="#" class="expandable-title" {{on "click" (action "toggleExpandableObservables" index)}}>
             <span class="text"><span class="desc">Observable(s)</span> {{UNIQUE_VALUE}}</span>
             {{fa-icon "angle-up"}}
+=======
+        {{#if case.description}}
+          <div>
+            <div class='p-key'>Description:</div>
+            <div class='p-description'>{{case.description}}</div>
+          </div>
+        {{/if}}
+
+
+        {{#if (get caseObservables index)}}
+          <a href='#' class='expandable-title' {{on 'click' (action 'toggleExpandableObservables' index)}}>
+            <span class='text'><span class='desc'>Observable(s)</span> {{UNIQUE_VALUE}}</span>
+            {{fa-icon icon='angle-up' fixedWidth=true}}
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
           </a>
           {{#each case.caseObservables as |observable|}}
             <hr />
             {{#if observable._id}}
+<<<<<<< HEAD
               <div class="pivot-link">
                 <a
                   href="{{block.userOptions.url}}/cases/{{case._id}}/observables/{{observable._id}}"
                   class="p-link"
                 >{{observable.data}}{{fa-icon "external-link-square" fixedWidth=true class="external-link"}}</a>
               </div>
+=======
+              <h1 class='p-title'>
+                {{fa-icon icon='eye' fixedWidth=true}}
+                {{observable.data}}
+              </h1>
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
               {{#if (eq observable.tlp 0)}}
                 <div>
                   <span class="p-key">TLP: </span>
@@ -840,11 +1236,18 @@
               </div>
 
               {{#if observable.tags}}
+<<<<<<< HEAD
                 <div class="p-title">
                   {{fa-icon "tag" fixedWidth=true}}
                   Tags
                 </div>
                 <div class="tags">
+=======
+                <div class="mt-1">
+                  <span class='p-key'>
+                    Tags:
+                  </span>
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
                   {{#each observable.tags as |tag|}}
                     <span class="pulse-tag">{{tag}}</span>
                   {{/each}}
@@ -853,12 +1256,17 @@
             {{/if}}
           {{/each}}
         {{else}}
+<<<<<<< HEAD
           <a href="#" class="expandable-title" {{on "click" (action "toggleExpandableObservables" index)}}>
             <span class="text">Observable(s)</span>
             {{fa-icon "angle-down"}}
+=======
+          <a href='#' class='expandable-title' {{on 'click' (action 'toggleExpandableObservables' index)}}>
+            <span class='text'>Observable(s)</span>
+            {{fa-icon icon='angle-down' fixedWidth=true}}
+>>>>>>> 9a36ae9ac9fcc9beb219021131c238262b22b648
           </a>
         {{/if}}
       </div>
     {{/each}}
-  {{/if}}
 {{/if}}
