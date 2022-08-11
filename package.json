@@ -2,6 +2,7 @@
   "name": "thehive",
   "version": "3.0.1-beta",
   "description": "",
+  "private": true,
   "main": "integration.js",
   "directories": {
     "test": "test"
