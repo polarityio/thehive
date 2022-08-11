@@ -1,20 +1,18 @@
 'use strict';
 
-let request = require('request');
-let _ = require('lodash');
-let util = require('util');
-let net = require('net');
-let config = require('./config/config');
-let async = require('async');
-let fs = require('fs');
+const config = require('./config/config');
+const { map } = require('lodash/fp');
+const fs = require('fs');
+const request = require('postman-request');
+const _ = require('lodash');
+const _configFieldIsValid = (field) => typeof field === 'string' && field.length > 0;
 let Logger;
 
-let requestWithDefaults;
 let previousDomainRegexAsString = '';
 let previousIpRegexAsString = '';
 let domainBlocklistRegex = null;
 let ipBlocklistRegex = null;
-const MAX_PARALLEL_LOOKUPS = 10;
+let requestWithDefaults;
 
 /**
  *
@@ -23,157 +21,310 @@ const MAX_PARALLEL_LOOKUPS = 10;
  * @param cb
  */
 
-function startup(logger) {
+function startup (logger) {
   Logger = logger;
-  let defaults = {};
 
-  if (typeof config.request.cert === 'string' && config.request.cert.length > 0) {
-    defaults.cert = fs.readFileSync(config.request.cert);
-  }
+  const {
+    request: { ca, cert, key, passphrase, rejectUnauthorized, proxy }
+  } = config;
 
-  if (typeof config.request.key === 'string' && config.request.key.length > 0) {
-    defaults.key = fs.readFileSync(config.request.key);
-  }
+  const defaults = {
+    ...(_configFieldIsValid(ca) && { ca: fs.readFileSync(ca) }),
+    ...(_configFieldIsValid(cert) && { cert: fs.readFileSync(cert) }),
+    ...(_configFieldIsValid(key) && { key: fs.readFileSync(key) }),
+    ...(_configFieldIsValid(passphrase) && { passphrase }),
+    ...(_configFieldIsValid(proxy) && { proxy }),
+    ...(typeof rejectUnauthorized === 'boolean' && { rejectUnauthorized })
+  };
 
-  if (typeof config.request.passphrase === 'string' && config.request.passphrase.length > 0) {
-    defaults.passphrase = config.request.passphrase;
-  }
+  let _requestWithDefaults = request.defaults(defaults);
 
-  if (typeof config.request.ca === 'string' && config.request.ca.length > 0) {
-    defaults.ca = fs.readFileSync(config.request.ca);
-  }
+  requestWithDefaults = (requestOptions) =>
+    new Promise((resolve, reject) => {
+      _requestWithDefaults(requestOptions, (err, res, body) => {
+        if (err) return reject(err);
+        let response = { ...res, body };
 
-  if (typeof config.request.proxy === 'string' && config.request.proxy.length > 0) {
-    defaults.proxy = config.request.proxy;
-  }
-  requestWithDefaults = request.defaults(defaults);
-}
+        Logger.trace({ response }, 'Response in requestWithDefaults');
 
-function _setupRegexBlocklists(options) {
-  if (options.domainBlocklistRegex !== previousDomainRegexAsString && options.domainBlocklistRegex.length === 0) {
-    Logger.debug('Removing Domain Blocklist Regex Filtering');
-    previousDomainRegexAsString = '';
-    domainBlocklistRegex = null;
-  } else {
-    if (options.domainBlocklistRegex !== previousDomainRegexAsString) {
-      previousDomainRegexAsString = options.domainBlocklistRegex;
-      Logger.debug({ domainBlocklistRegex: previousDomainRegexAsString }, 'Modifying Domain Blocklist Regex');
-      domainBlocklistRegex = new RegExp(options.domainBlocklistRegex, 'i');
-    }
-  }
+        try {
+          Logger.trace({ requestOptions });
+          checkForStatusError(response, requestOptions);
+        } catch (err) {
+          Logger.trace({ err }, 'Error in _requestWithDefaults');
+          reject(err);
+        }
 
-  if (options.ipBlocklistRegex !== previousIpRegexAsString && options.ipBlocklistRegex.length === 0) {
-    Logger.debug('Removing IP Blocklist Regex Filtering');
-    previousIpRegexAsString = '';
-    ipBlocklistRegex = null;
-  } else {
-    if (options.ipBlocklistRegex !== previousIpRegexAsString) {
-      previousIpRegexAsString = options.ipBlocklistRegex;
-      Logger.debug({ ipBlocklistRegex: previousIpRegexAsString }, 'Modifying IP Blocklist Regex');
-      ipBlocklistRegex = new RegExp(options.ipBlocklistRegex, 'i');
-    }
-  }
-}
-
-function doLookup(entities, options, cb) {
-  let lookupResults = [];
-  let tasks = [];
-
-  _setupRegexBlocklists(options);
-
-  Logger.trace({ entities: entities }, 'Loging the entity coming through');
-
-  entities.forEach((entity) => {
-    if (_isEntityBlocklisted(entity, options)) {
-      next(null);
-    } else if (entity.value) {
-      //do the lookup
-      let postData = { query: { _string: entity.value } };
-      let requestOptions = {
-        method: 'POST',
-        uri: options.url + '/api/case/artifact/_search?range=all&sort=-createdAt',
-        body: postData,
-        headers: {
-          Authorization: 'Bearer ' + options.apiKey,
-          'Content-Type': 'application/json'
-        },
-        json: true
-      };
-
-      Logger.trace({ uri: options }, 'Request URI');
-
-      tasks.push(function (done) {
-        requestWithDefaults(requestOptions, function (err, res, body) {
-          if (err) {
-            Logger.error({ err: err }, 'Error Executing Request');
-            done(err);
-            return;
-          }
-
-          Logger.trace({ body: body, statusCode: res.statusCode }, 'Result of Lookup');
-
-          let result = {};
-
-          if (res.statusCode === 200) {
-            // we got data!
-            result = {
-              entity: entity,
-              body: body
-            };
-          } else if (res.statusCode === 404) {
-            // no result found
-            result = {
-              entity: entity,
-              body: null
-            };
-          } else if (res.statusCode === 202) {
-            // no result found
-            result = {
-              entity: entity,
-              body: null
-            };
-          }
-          if (body.error) {
-            // entity not found
-            result = {
-              entity: entity,
-              body: null
-            };
-          }
-          done(null, result);
-        });
+        resolve(response);
       });
-    }
-  });
-
-  async.parallelLimit(tasks, MAX_PARALLEL_LOOKUPS, (err, results) => {
-    if (err) {
-      cb(err);
-      return;
-    }
-
-    results.forEach((result) => {
-      if (result.body === null || (Array.isArray(result.body) && result.body.length === 0)) {
-        lookupResults.push({
-          entity: result.entity,
-          data: null
-        });
-      } else {
-        lookupResults.push({
-          entity: result.entity,
-          data: {
-            summary: [],
-            details: result.body
-          }
-        });
-      }
     });
-
-    cb(null, lookupResults);
-  });
 }
 
-function _isEntityBlocklisted(entity, options) {
+const checkForStatusError = (response, requestOptions) => {
+  let statusCode = response.statusCode;
+
+  if (![200, 201, 204, 429, 500, 502, 504].includes(statusCode)) {
+    const errorMessage = _.get(response, 'body.err', 'Request Error');
+    const requestError = new RequestError(errorMessage, statusCode, response.body, {
+      ...requestOptions,
+      headers: '********'
+    });
+    throw requestError;
+  }
+};
+
+const doLookup = async (entities, options, cb) => {
+  _setupRegexBlocklists(options);
+  try {
+    const lookupResults = await Promise.all(
+      map(async (entity) => await getApiData(entity, requestWithDefaults, options), entities)
+    );
+
+    Logger.trace({ lookupResults }, 'lookup results');
+    return cb(null, lookupResults);
+  } catch (error) {
+    const err = parseErrorToReadableJSON(error);
+    Logger.error({ err });
+    return cb(polarityError(err));
+  }
+};
+
+const buildRequestOptions = async (query, restVerb, path, options) => {
+  const requestOptions = {
+    method: restVerb,
+    uri: options.url + `${path}`,
+    body: query,
+    headers: {
+      Authorization: 'Bearer ' + options.apiKey,
+      'Content-Type': 'application/json'
+    },
+    json: true
+  };
+  return requestOptions;
+};
+
+const getApiData = async (entity, requestWithDefaults, options) => {
+  try {
+    if (_isEntityBlocklisted(entity, options)) return;
+    const cases = await getCases(entity, requestWithDefaults, options);
+    Logger.trace({ cases }, 'cases');
+    return polarityResponse(entity, options, cases);
+  } catch (err) {
+    Logger.trace({ err });
+    throw err;
+  }
+};
+
+const getCases = async (entity, requestWithDefaults, options) => {
+  try {
+    if (entity.isHash) entity.value.toLowerCase();
+
+    const getCasesQuery = {
+      query: [
+        { _name: 'listObservable' },
+        { _name: 'filter', _eq: { _field: 'data', _value: entity.value } },
+        { _name: 'case' }
+      ]
+    };
+    const getCasesOptions = await buildRequestOptions(getCasesQuery, 'POST', '/api/v1/query', options);
+    const cases = await requestWithDefaults(getCasesOptions);
+
+    const casesWithObservables = await Promise.all(
+      map(async (currentCase) => await getObservablesForCase(currentCase, requestWithDefaults, options), cases.body)
+    );
+
+    return casesWithObservables;
+  } catch (err) {
+    Logger.error({ err });
+    throw err;
+  }
+};
+
+const getObservablesForCase = async (currentCase, requestWithDefaults, options) => {
+  try {
+    const getObservablesForCaseQuery = {
+      query: [{ _name: 'getCase', idOrName: currentCase._id }, { _name: 'observables' }]
+    };
+
+    const getObservableForCaseOptions = await buildRequestOptions(
+      getObservablesForCaseQuery,
+      'POST',
+      '/api/v1/query',
+      options
+    );
+    const observablesForCase = await requestWithDefaults(getObservableForCaseOptions);
+    const caseObservables = _.orderBy(observablesForCase.body, '_createdAt', 'desc');
+    const casesWithObservables = Object.assign({}, currentCase, { caseObservables });
+
+    return casesWithObservables;
+  } catch (err) {
+    Logger.error({ err });
+    throw err;
+  }
+};
+
+const updateCase = async (updatedInputs, requestWithDefaults, options) => {
+  try {
+    const query = updatedInputs.inputs;
+    const caseId = updatedInputs.caseId;
+
+    const requestOptions = await buildRequestOptions(query, 'PATCH', `/api/v1/case/${caseId}`, options);
+    const updatedCase = await requestWithDefaults(requestOptions);
+
+    return updatedCase;
+  } catch (err) {
+    Logger.error({ err });
+    throw err;
+  }
+};
+
+const closeCase = async (caseToClose, requestWithDefaults, options) => {
+  try {
+    const requestOptions = await buildRequestOptions({}, 'DELETE', `/api/v1/case/${caseToClose}`, options);
+    const closedCase = await requestWithDefaults(requestOptions);
+
+    return closedCase;
+  } catch (err) {
+    Logger.error({ err });
+    throw err;
+  }
+};
+
+const createCase = async (caseInputs, entity, requestWithDefaults, options) => {
+  try {
+    const query = caseInputs;
+    const requestOptions = await buildRequestOptions(query, 'POST', '/api/v1/case', options);
+    const createdCase = await requestWithDefaults(requestOptions);
+
+    const defaultObservableInputs = {
+      caseId: createdCase.body._id,
+      inputs: { data: entity.value, dataType: getDataType(entity) }
+    };
+
+    if (createdCase.statusCode === 201) {
+      await addObservable(defaultObservableInputs, requestWithDefaults, options);
+    }
+
+    return createdCase;
+  } catch (err) {
+    Logger.error({ ERR: err });
+    throw err;
+  }
+};
+
+const getDataType = (entity) => {
+  if (entity.isDomain) return 'domain';
+  if (entity.isHash) return 'hash';
+  if (entity.isIP) return 'ip';
+};
+
+const addObservable = async (observableInputs, requestWithDefaults, options) => {
+  const query = observableInputs.inputs;
+  const caseId = observableInputs.caseId;
+
+  try {
+    const requestOptions = await buildRequestOptions(query, 'POST', `/api/v1/case/${caseId}/observable`, options);
+    const addedObservable = await requestWithDefaults(requestOptions);
+
+    return addedObservable;
+  } catch (err) {
+    Logger.error({ err });
+    throw err;
+  }
+};
+
+const onMessage = async (payload, options, cb) => {
+  switch (payload.action) {
+    case 'createCase':
+      try {
+        const caseInputs = payload.data.caseInputs.inputs;
+        const entity = payload.data.caseInputs.entity;
+        await createCase(caseInputs, entity, requestWithDefaults, options);
+        const caseObj = await getApiData(entity, requestWithDefaults, options);
+
+        cb(null, caseObj.data);
+      } catch (err) {
+        Logger.error({ err });
+        cb(err, {});
+      }
+      break;
+    case 'addObservable':
+      try {
+        const observableInputs = payload.data.observableInputs;
+        const addedObservable = await addObservable(observableInputs, requestWithDefaults, options);
+        cb(null, addedObservable);
+      } catch (err) {
+        Logger.error({ err });
+        cb(err, {});
+      }
+      break;
+    case 'updateCase':
+      try {
+        const updatedInputs = payload.data.updatedInputs;
+        const updatedCase = await updateCase(updatedInputs, requestWithDefaults, options);
+        cb(null, updatedCase);
+      } catch (err) {
+        Logger.error({ err });
+        cb(err, {});
+      }
+      break;
+    case 'closeCase':
+      try {
+        const caseToClose = payload.data._id;
+        const closedCase = await closeCase(caseToClose, requestWithDefaults, options);
+        cb(null, closedCase);
+      } catch (err) {
+        Logger.error({ err });
+        cb(err, {});
+      }
+      break;
+    default:
+      return;
+  }
+};
+/**
+ * These functions return potential response objects the integration can return to the client
+ */
+const polarityError = (err) => ({
+  detail: err.message || 'Unknown Error',
+  error: err
+});
+
+const polarityResponse = (entity, options, cases) => {
+  if (options.allowCreateCase && !cases.length)
+    return { entity, data: { summary: ['No Cases Found', 'Create Case'], details: { allowCreateCase: true } } };
+  else return { entity, data: cases.length > 0 ? { summary: getSummary(cases), details: cases } : null };
+};
+
+const getSummary = (cases) => {
+  const tags = [];
+  if (cases.length) tags.push(`Cases: ${cases.length}`);
+  return tags;
+};
+
+class RequestError extends Error {
+  constructor (message, status, description, requestOptions) {
+    super(message);
+    this.name = 'requestError';
+    this.status = status;
+    this.description = description;
+    this.requestOptions = requestOptions;
+  }
+}
+
+const parseErrorToReadableJSON = (err) => {
+  return err instanceof Error
+    ? {
+        ...err,
+        name: err.name,
+        message: err.message,
+        stack: err.stack,
+        detail: err.message ? err.message : 'Unexpected error encountered'
+      }
+    : err;
+};
+
+function _isEntityBlocklisted (entity, options) {
   const blocklist = options.blocklist;
 
   Logger.trace({ blocklist: blocklist }, 'checking to see what blocklist looks like');
@@ -203,7 +354,7 @@ function _isEntityBlocklisted(entity, options) {
   return false;
 }
 
-function validateOptions(userOptions, cb) {
+function validateOptions (userOptions, cb) {
   let errors = [];
   if (
     typeof userOptions.apiKey.value !== 'string' ||
@@ -214,11 +365,48 @@ function validateOptions(userOptions, cb) {
       message: 'You must provide a valid API key'
     });
   }
+  if (
+    typeof userOptions.url.value !== 'string' ||
+    (typeof userOptions.url.value === 'string' && userOptions.url.value.length === 0)
+  ) {
+    errors.push({
+      key: 'apiKey',
+      message: 'You must provide a URL'
+    });
+  }
+
   cb(null, errors);
+}
+
+function _setupRegexBlocklists (options) {
+  if (options.domainBlocklistRegex !== previousDomainRegexAsString && options.domainBlocklistRegex.length === 0) {
+    Logger.debug('Removing Domain Blocklist Regex Filtering');
+    previousDomainRegexAsString = '';
+    domainBlocklistRegex = null;
+  } else {
+    if (options.domainBlocklistRegex !== previousDomainRegexAsString) {
+      previousDomainRegexAsString = options.domainBlocklistRegex;
+      Logger.debug({ domainBlocklistRegex: previousDomainRegexAsString }, 'Modifying Domain Blocklist Regex');
+      domainBlocklistRegex = new RegExp(options.domainBlocklistRegex, 'i');
+    }
+  }
+
+  if (options.ipBlocklistRegex !== previousIpRegexAsString && options.ipBlocklistRegex.length === 0) {
+    Logger.debug('Removing IP Blocklist Regex Filtering');
+    previousIpRegexAsString = '';
+    ipBlocklistRegex = null;
+  } else {
+    if (options.ipBlocklistRegex !== previousIpRegexAsString) {
+      previousIpRegexAsString = options.ipBlocklistRegex;
+      Logger.debug({ ipBlocklistRegex: previousIpRegexAsString }, 'Modifying IP Blocklist Regex');
+      ipBlocklistRegex = new RegExp(options.ipBlocklistRegex, 'i');
+    }
+  }
 }
 
 module.exports = {
   doLookup: doLookup,
+  onMessage: onMessage,
   startup: startup,
   validateOptions: validateOptions
 };
