@@ -1,17 +1,8 @@
 {
   "name": "thehive",
-  "version": "3.0.4-beta",
-  "description": "",
+  "version": "3.1.0-beta",
   "private": true,
   "main": "integration.js",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "test": "npm run jest"
-  },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "bottleneck": "^2.19.5",
     "lodash": "^4.17.21",
