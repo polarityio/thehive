@@ -3,15 +3,9 @@
   "name": "TheHive",
   "acronym": "HIVE",
   "description": "TheHive is a scalable, open source and free Security Incident Response Platform",
-  "entityTypes": [
-    "IPv4",
-    "hash",
-    "domain"
-  ],
+  "entityTypes": ["IPv4", "MD5", "SHA1", "SHA256", "domain"],
   "defaultColor": "light-blue",
-  "styles": [
-    "./styles/hive.less"
-  ],
+  "styles": ["./styles/hive.less"],
   "block": {
     "component": {
       "file": "./components/hive-block.js"
@@ -19,13 +13,6 @@
     "template": {
       "file": "./templates/hive-block.hbs"
     }
-  },
-  "request": {
-    "cert": "",
-    "key": "",
-    "passphrase": "",
-    "ca": "",
-    "proxy": ""
   },
   "logging": {
     "level": "info"
