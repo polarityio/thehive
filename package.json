@@ -1,11 +1,11 @@
 {
   "name": "thehive",
-  "version": "3.1.4",
+  "version": "3.1.5",
   "private": true,
   "main": "integration.js",
   "dependencies": {
     "bottleneck": "^2.19.5",
     "lodash": "^4.17.21",
-    "postman-request": "^2.88.1-postman.31"
+    "postman-request": "^2.88.1-postman.40"
   }
 }

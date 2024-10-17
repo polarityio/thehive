@@ -63,7 +63,7 @@ function startup (logger) {
 const checkForStatusError = (response, requestOptions) => {
   let statusCode = response.statusCode;
 
-  if (![200, 201, 204, 429, 500, 502, 504].includes(statusCode)) {
+  if (![200, 201, 204, 400, 429, 500, 502, 504].includes(statusCode)) {
     const errorMessage = _.get(response, 'body.err', 'Request Error');
     const requestError = new RequestError(errorMessage, statusCode, response.body, {
       ...requestOptions,
